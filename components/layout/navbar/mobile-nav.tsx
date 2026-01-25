@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { LanguageOption } from "./navbar-config";
+import { LoginButton } from "@/components/auth";
 
 function MobileLanguageSwitch({
   languages,
@@ -67,7 +68,7 @@ function MobileLanguageSwitch({
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
-  const { logo, actions, topBar } = navbarConfig;
+  const { logo, topBar } = navbarConfig;
   const { currentLanguage, setLanguage, languages } = useLanguage();
 
   return (
@@ -114,27 +115,12 @@ export function MobileNav() {
           </div>
         </div>
 
-        {/* Action Buttons */}
-        {actions.length > 0 && (
-          <div className="p-4 border-t flex-shrink-0 space-y-2">
-            {actions.map((action) => {
-              const Icon = action.icon;
-              return (
-                <Button
-                  key={action.id}
-                  variant={action.variant}
-                  className="w-full justify-center"
-                  size="sm"
-                  asChild
-                >
-                  <Link href={action.href} onClick={() => setOpen(false)}>
-                    {action.label}
-                  </Link>
-                </Button>
-              );
-            })}
+        {/* Login Button */}
+        <div className="p-4 border-t flex-shrink-0">
+          <div className="w-full">
+            <LoginButton variant="default" />
           </div>
-        )}
+        </div>
       </SheetContent>
     </Sheet>
   );

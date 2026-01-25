@@ -8,6 +8,7 @@ import { menuData, MenuItem } from "./menu-data";
 import { cn } from "@/lib/utils";
 import { useNavbar } from "./navbar-context";
 import { Button } from "@/components/ui/button";
+import { Container } from "@/components/layout/container";
 
 const leftItems = menuData.filter((item) => item.position === "left");
 const rightItems = menuData.filter((item) => item.position === "right");
@@ -100,7 +101,7 @@ export function DesktopNav() {
             ease: [0.4, 0, 0.2, 1],
             height: { duration: 0.25 },
           }}
-          className="fixed mt-2  left-0 right-0 top-[104px] z-50 bg-background border-b border-border shadow-xl overflow-hidden"
+          className="absolute left-0 right-0 top-full z-50 bg-background border-b border-border shadow-xl overflow-hidden"
           onMouseEnter={handleContentMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
@@ -116,13 +117,14 @@ export function DesktopNav() {
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: 10 }}
                         transition={{ duration: 0.15, ease: "easeOut" }}
-                        className="container max-w-7xl mx-auto px-4 md:px-8 py-8"
                       >
-                        {item.type === "mega" ? (
-                          <MegaMenuContent item={item} closeMenu={closeMenu} />
-                        ) : (
-                          <DropdownContent items={item.children} closeMenu={closeMenu} />
-                        )}
+                        <Container className="py-8">
+                          {item.type === "mega" ? (
+                            <MegaMenuContent item={item} closeMenu={closeMenu} />
+                          ) : (
+                            <DropdownContent items={item.children} closeMenu={closeMenu} />
+                          )}
+                        </Container>
                       </motion.div>
                     );
                   }

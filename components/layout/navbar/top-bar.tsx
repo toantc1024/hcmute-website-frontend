@@ -11,6 +11,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Container } from "@/components/layout/container";
 
 export function TopBar() {
   const { topBar, logo } = navbarConfig;
@@ -19,7 +20,7 @@ export function TopBar() {
 
   return (
     <div className="hidden lg:block bg-primary py-2 text-primary-foreground">
-      <div className="container flex h-10 items-center justify-between px-4 md:px-8 max-w-7xl mx-auto text-sm">
+      <Container className="flex h-10 items-center justify-between text-sm">
         {/* Left - Links */}
         <div className="flex items-center gap-1">
           {/* Desktop: Show top bar links */}
@@ -69,7 +70,7 @@ export function TopBar() {
 
         {/* Right - Language Selector */}
         <LanguageSelector variant="topbar" />
-      </div>
+      </Container>
     </div>
   );
 }
