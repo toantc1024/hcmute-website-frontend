@@ -117,14 +117,14 @@ export function UserSidebar() {
                 <div className="flex aspect-square size-8 items-center justify-center">
                   <Image
                     src="/logo/square-logo.png"
-                    alt="HCMUTE"
+                    alt="HCM-UTE"
                     width={32}
                     height={32}
                     className="rounded"
                   />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">HCMUTE</span>
+                  <span className="truncate font-semibold">HCM-UTE</span>
                   <span className="truncate text-xs text-muted-foreground">
                     {getNestedTranslation(
                       t as unknown as Record<string, unknown>,

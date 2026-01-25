@@ -25,7 +25,7 @@ interface NewsItem {
 const newsItems: NewsItem[] = [
   {
     id: 101,
-    title: "HCMUTE ký kết hợp tác với Đại học Tokyo - Nhật Bản",
+    title: "HCM-UTE ký kết hợp tác với Đại học Tokyo - Nhật Bản",
     excerpt:
       "Chương trình hợp tác tạo cơ hội trao đổi sinh viên, giảng viên và phát triển các dự án nghiên cứu chung trong lĩnh vực kỹ thuật và công nghệ.",
     date: "2024-01-15",
@@ -37,7 +37,7 @@ const newsItems: NewsItem[] = [
   },
   {
     id: 102,
-    title: "Sinh viên HCMUTE đạt giải Nhất cuộc thi Robotics Việt Nam 2024",
+    title: "Sinh viên HCM-UTE đạt giải Nhất cuộc thi Robotics Việt Nam 2024",
     excerpt:
       "Đội thi của Khoa Cơ khí xuất sắc giành giải Nhất với dự án robot tự động phân loại rác thải thông minh.",
     date: "2024-01-12",
@@ -85,7 +85,7 @@ export default function NewsSection() {
             >
               <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 sm:px-4 py-2 text-xs sm:text-sm text-blue-700 w-fit">
                 <span className="inline-flex size-2 rounded-full bg-blue-600" />
-                Tin tức nổi bật của HCMUTE
+                Tin tức nổi bật của HCM-UTE
               </div>
 
               <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold leading-tight text-gray-900">
@@ -270,7 +270,7 @@ export default function NewsSection() {
         >
           <div>
             <h3 className="text-sm sm:text-base lg:text-lg font-semibold text-gray-900">
-              Khám phá toàn bộ tin tức, sự kiện và thông báo từ HCMUTE.
+              Khám phá toàn bộ tin tức, sự kiện và thông báo từ HCM-UTE.
             </h3>
             <p className="text-xs sm:text-sm text-gray-500 mt-1">
               Cập nhật những hoạt động mới nhất của trường

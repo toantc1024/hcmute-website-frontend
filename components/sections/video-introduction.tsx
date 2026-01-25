@@ -160,7 +160,7 @@ export default function VideoIntroduction() {
               className="px-2"
               colors={["#0c4ebfff", "#1760dfff", "#ae0303ff"]}
             >
-              HCMUTE
+              HCM-UTE
             </AuroraText>
           </h2>
           <p className="text-base lg:text-lg text-gray-600 mx-auto">
@@ -233,7 +233,7 @@ export default function VideoIntroduction() {
                     width="100%"
                     height="100%"
                     src={activeEvent.videoUrl}
-                    title={`HCMUTE ${activeEvent.yearRange} - ${activeEvent.title}`}
+                    title={`HCM-UTE ${activeEvent.yearRange} - ${activeEvent.title}`}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowFullScreen
                     className="rounded-2xl"
@@ -241,7 +241,7 @@ export default function VideoIntroduction() {
                 ) : activeEvent.imageUrl ? (
                   <img
                     src={activeEvent.imageUrl}
-                    alt={`HCMUTE ${activeEvent.yearRange} - ${activeEvent.title}`}
+                    alt={`HCM-UTE ${activeEvent.yearRange} - ${activeEvent.title}`}
                     className="w-full h-full object-cover rounded-2xl"
                   />
                 ) : (

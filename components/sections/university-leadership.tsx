@@ -21,7 +21,7 @@ const leadershipData = [
     position: "Phó Bí thư Đảng uỷ, Hiệu trưởng Nhà trường",
     image: "/PGS_TS_LGH.png",
     description:
-      "Bằng tinh thần trách nhiệm xã hội cao nhất, Nhà trường cam kết mang đến cho người học và xã hội những giá trị khoa học và nhân bản xứng tầm để HCMUTE luôn là sự lựa chọn của những sinh viên tài năng, có khát vọng học hỏi vươn lên, kiên trì với mục tiêu và hoài bão của mình để làm giàu cho bản thân, gia đình và xã hội.",
+      "Bằng tinh thần trách nhiệm xã hội cao nhất, Nhà trường cam kết mang đến cho người học và xã hội những giá trị khoa học và nhân bản xứng tầm để HCM-UTE luôn là sự lựa chọn của những sinh viên tài năng, có khát vọng học hỏi vươn lên, kiên trì với mục tiêu và hoài bão của mình để làm giàu cho bản thân, gia đình và xã hội.",
   },
 ];
 
@@ -53,7 +53,7 @@ export default function UniversityLeadership() {
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
             LÃNH ĐẠO CỦA
             <AuroraText className="px-2" colors={["#002e7dff", "#ae0303ff"]}>
-              HCMUTE
+              HCM-UTE
             </AuroraText>
           </h2>
           <p className="text-base lg:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">

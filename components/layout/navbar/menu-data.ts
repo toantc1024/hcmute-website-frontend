@@ -123,7 +123,7 @@ export const menuData: MenuItem[] = [
           },
           {
             id: "hcmute-360",
-            label: "HCMUTE 360 Virtual Tour",
+            label: "HCM-UTE 360 Virtual Tour",
             href: "https://360.hcmute.edu.vn/",
             icon: Globe,
             isExternal: true,

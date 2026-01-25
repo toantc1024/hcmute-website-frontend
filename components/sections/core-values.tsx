@@ -16,7 +16,7 @@ const coreValuesData = [
     title: "#421–430",
     subtitle: "QS Asia 2025 Rankings",
     description:
-      "Đứng trong TOP 430 trường đại học tốt nhất châu Á theo bảng xếp hạng QS Asia 2025, khẳng định vị thế và chất lượng giáo dục của HCMUTE trên bản đồ giáo dục khu vực.",
+      "Đứng trong TOP 430 trường đại học tốt nhất châu Á theo bảng xếp hạng QS Asia 2025, khẳng định vị thế và chất lượng giáo dục của HCM-UTE trên bản đồ giáo dục khu vực.",
     icon: Globe,
     color: "text-gray-400",
   },

@@ -365,7 +365,7 @@ export default function NewsPage() {
                             ) : (
                               <div className="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
                                 <span className="text-white/50 text-4xl font-bold">
-                                  HCMUTE
+                                  HCM-UTE
                                 </span>
                               </div>
                             )}

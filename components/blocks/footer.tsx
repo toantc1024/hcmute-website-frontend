@@ -83,7 +83,7 @@ export default function Footer() {
               <div className="flex items-center gap-3 mb-6">
                 <Image
                   src="/logo/banner.png"
-                  alt="HCMUTE Logo"
+                  alt="HCM-UTE Logo"
                   width={180}
                   height={50}
                   className="h-12 w-auto"

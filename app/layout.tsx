@@ -4,8 +4,8 @@ import { AuthProvider } from "@/components/layout/auth";
 import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
-  title: "HCMUTE - Trường Đại học Sư phạm Kỹ thuật TP.HCM",
-  description: "Website chính thức của Trường Đại học Sư phạm Kỹ thuật TP.HCM",
+  title: "HCM-UTE - Trường Đại học Công nghệ Kỹ thuật TP. HCM",
+  description: "Website chính thức của Trường Đại học Công nghệ Kỹ thuật TP. HCM",
 };
 
 export default function RootLayout({

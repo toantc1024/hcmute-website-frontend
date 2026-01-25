@@ -58,7 +58,7 @@ export const navbarConfig: NavbarConfig = {
     href: "/",
     image: "/logo/rectangle-logo.png",
     mobileImage: "/logo/rectangle-logo.png",
-    alt: "HCMUTE Logo",
+    alt: "HCM-UTE Logo",
     width: 180,
     height: 48,
     mobileWidth: 140,

@@ -243,7 +243,7 @@ export default function UnitsSection() {
                 className="px-2"
                 colors={["#0c4ebfff", "#1760dfff", "#ae0303ff"]}
               >
-                ĐƠN VỊ HCMUTE
+                ĐƠN VỊ HCM-UTE
               </AuroraText>
             </h2>
 

@@ -10,7 +10,7 @@ export default function Logo({ className }: LogoProps) {
   return (
     <Image
       src={BANNER_LOGO}
-      alt="HCMUTE Logo"
+      alt="HCM-UTE Logo"
       width={200}
       height={56}
       className={className}
