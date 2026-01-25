@@ -3,6 +3,7 @@ export { DesktopNav, DesktopNavLeft, DesktopNavRight } from "./desktop-nav";
 export { MobileNav } from "./mobile-nav";
 export { TopBar } from "./top-bar";
 export { LanguageSelector } from "./language-selector";
+export { LanguageProvider, useLanguage } from "./language-context";
 export { NavbarProvider, useNavbar } from "./navbar-context";
 export { NavbarOverlay } from "./navbar-overlay";
 export { navbarConfig } from "./navbar-config";

@@ -7,6 +7,7 @@ import { MobileNav } from "./mobile-nav";
 import { NavbarProvider } from "./navbar-context";
 import { NavbarOverlay } from "./navbar-overlay";
 import { TopBar } from "./top-bar";
+import { LanguageProvider } from "./language-context";
 import { navbarConfig } from "./navbar-config";
 import { Button } from "@/components/ui/button";
 
@@ -15,6 +16,7 @@ export function Navbar() {
   const SearchIcon = search.icon;
 
   return (
+    <LanguageProvider>
     <NavbarProvider>
       {/* Top Bar - Primary Color */}
       <TopBar />
@@ -72,7 +74,7 @@ export function Navbar() {
                   <Button
                     key={action.id}
                     variant={action.variant}
-                    size="sm"
+                    size="default"
                     icon={Icon as React.ElementType}
                     iconPlacement="right"
                     effect="expandIcon" 
@@ -95,5 +97,6 @@ export function Navbar() {
       {/* Overlay rendered via portal to document.body */}
       <NavbarOverlay />
     </NavbarProvider>
+    </LanguageProvider>
   );
 }

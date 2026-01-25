@@ -1,15 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
-import { navbarConfig } from "./navbar-config";
+import React from "react";
+import { motion } from "framer-motion";
+import { useLanguage } from "./language-context";
 import { cn } from "@/lib/utils";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 interface LanguageSelectorProps {
   variant?: "topbar" | "default";
@@ -17,61 +11,85 @@ interface LanguageSelectorProps {
 }
 
 export function LanguageSelector({ variant = "default", className }: LanguageSelectorProps) {
-  const { topBar } = navbarConfig;
-  const [currentLang, setCurrentLang] = useState(topBar.defaultLanguage);
+  const { currentLanguage, setLanguage, languages } = useLanguage();
 
-  const selectedLang = topBar.languages.find((l) => l.id === currentLang);
+  const activeIndex = languages.findIndex((lang) => lang.id === currentLanguage);
 
   if (variant === "topbar") {
     return (
-      <Select value={currentLang} onValueChange={setCurrentLang}>
-        <SelectTrigger 
-          className={cn(
-            "w-auto gap-2 border-0 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 focus:ring-0 focus:ring-offset-0 h-8 px-2",
-            className
-          )}
-        >
-          <SelectValue>
-            <span className="flex items-center gap-2">
-              <span className={cn("fi", `fi-${selectedLang?.flagCode}`)} />
-              <span className="hidden sm:inline">{selectedLang?.shortLabel}</span>
-            </span>
-          </SelectValue>
-        </SelectTrigger>
-        <SelectContent>
-          {topBar.languages.map((lang) => (
-            <SelectItem key={lang.id} value={lang.id}>
-              <span className="flex items-center gap-2">
-                <span className={cn("fi ", `fi-${lang.flagCode}`)} />
-                <span>{lang.label}</span>
-              </span>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <div className={cn("relative flex items-center rounded-full bg-primary-foreground/10 p-1", className)}>
+        {/* Moving indicator */}
+        <motion.div
+          className="absolute h-[calc(100%-8px)] rounded-full bg-primary-foreground shadow-sm"
+          initial={false}
+          animate={{
+            x: `calc(${activeIndex * 100}% + ${activeIndex * 4}px)`,
+            width: `calc(${100 / languages.length}% - 4px)`,
+          }}
+          transition={{
+            type: "spring",
+            stiffness: 500,
+            damping: 30,
+          }}
+          style={{
+            left: 4,
+          }}
+        />
+        
+        {languages.map((lang) => (
+          <button
+            key={lang.id}
+            onClick={() => setLanguage(lang.id)}
+            className={cn(
+              "relative z-10 flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium transition-colors duration-200",
+              currentLanguage === lang.id
+                ? "text-primary"
+                : "text-primary-foreground/80 hover:text-primary-foreground"
+            )}
+          >
+            <span className={cn("fi w-4 h-3", `fi-${lang.flagCode}`)} />
+            <span>{lang.shortLabel}</span>
+          </button>
+        ))}
+      </div>
     );
   }
 
   return (
-    <Select value={currentLang} onValueChange={setCurrentLang}>
-      <SelectTrigger className={cn("w-[140px]", className)}>
-        <SelectValue>
-          <span className="flex items-center gap-2">
-            <span className={cn("fi rounded-sm", `fi-${selectedLang?.flagCode}`)} />
-            <span>{selectedLang?.label}</span>
-          </span>
-        </SelectValue>
-      </SelectTrigger>
-      <SelectContent>
-        {topBar.languages.map((lang) => (
-          <SelectItem key={lang.id} value={lang.id}>
-            <span className="flex items-center gap-2">
-              <span className={cn("fi rounded-sm", `fi-${lang.flagCode}`)} />
-              <span>{lang.label}</span>
-            </span>
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <div className={cn("relative flex items-center rounded-full bg-muted p-1", className)}>
+      {/* Moving indicator */}
+      <motion.div
+        className="absolute h-[calc(100%-8px)] rounded-full bg-background shadow-sm"
+        initial={false}
+        animate={{
+          x: `calc(${activeIndex * 100}% + ${activeIndex * 4}px)`,
+          width: `calc(${100 / languages.length}% - 4px)`,
+        }}
+        transition={{
+          type: "spring",
+          stiffness: 500,
+          damping: 30,
+        }}
+        style={{
+          left: 4,
+        }}
+      />
+      
+      {languages.map((lang) => (
+        <button
+          key={lang.id}
+          onClick={() => setLanguage(lang.id)}
+          className={cn(
+            "relative z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors duration-200",
+            currentLanguage === lang.id
+              ? "text-foreground"
+              : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <span className={cn("fi w-4 h-3", `fi-${lang.flagCode}`)} />
+          <span>{lang.label}</span>
+        </button>
+      ))}
+    </div>
   );
 }

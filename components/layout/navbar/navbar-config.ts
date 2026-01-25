@@ -107,7 +107,7 @@ export const navbarConfig: NavbarConfig = {
       id: "login",
       label: "Đăng nhập",
       href: "/login",
-      variant: "ghost",
+      variant: "default",
       icon: ArrowRight,
       showOnMobile: true,
     },

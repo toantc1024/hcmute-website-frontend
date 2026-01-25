@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, ChevronRight, ExternalLink } from "lucide-react";
 import { menuData, MenuItem } from "./menu-data";
 import { navbarConfig } from "./navbar-config";
+import { useLanguage } from "./language-context";
 import { cn } from "@/lib/utils";
 import {
   Sheet,
@@ -15,20 +16,59 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { LanguageOption } from "./navbar-config";
+
+function MobileLanguageSwitch({
+  languages,
+  currentLanguage,
+  setLanguage,
+}: {
+  languages: LanguageOption[];
+  currentLanguage: string;
+  setLanguage: (lang: string) => void;
+}) {
+  const activeIndex = languages.findIndex((lang) => lang.id === currentLanguage);
+
+  return (
+    <div className="relative flex items-center rounded-full bg-muted p-1">
+      {/* Moving indicator */}
+      <motion.div
+        className="absolute h-[calc(100%-8px)] rounded-full bg-background shadow-sm"
+        initial={false}
+        animate={{
+          left: `calc(${(activeIndex / languages.length) * 100}% + 4px)`,
+          width: `calc(${100 / languages.length}% - 8px)`,
+        }}
+        transition={{
+          type: "spring",
+          stiffness: 500,
+          damping: 30,
+        }}
+      />
+
+      {languages.map((lang) => (
+        <button
+          key={lang.id}
+          onClick={() => setLanguage(lang.id)}
+          className={cn(
+            "relative z-10 flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors duration-200",
+            currentLanguage === lang.id
+              ? "text-foreground"
+              : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <span className={cn("fi w-4 h-3", `fi-${lang.flagCode}`)} />
+          <span>{lang.shortLabel}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
   const { logo, actions, topBar } = navbarConfig;
-  const [currentLang, setCurrentLang] = useState(topBar.defaultLanguage);
-
-  const selectedLang = topBar.languages.find((l) => l.id === currentLang);
+  const { currentLanguage, setLanguage, languages } = useLanguage();
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -55,29 +95,14 @@ export function MobileNav() {
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto">
-          {/* Language Selector */}
-          {topBar.enabled && topBar.languages.length > 0 && (
+          {/* Language Selector - Animated Switch Style */}
+          {topBar.enabled && languages.length > 0 && (
             <div className="px-4 py-3 border-b border-border/50">
-              <Select value={currentLang} onValueChange={setCurrentLang}>
-                <SelectTrigger className="w-full">
-                  <SelectValue>
-                    <span className="flex items-center gap-2">
-                      <span className={cn("fi rounded-sm", `fi-${selectedLang?.flagCode}`)} />
-                      <span>{selectedLang?.label}</span>
-                    </span>
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {topBar.languages.map((lang) => (
-                    <SelectItem key={lang.id} value={lang.id}>
-                      <span className="flex items-center gap-2">
-                        <span className={cn("fi rounded-sm", `fi-${lang.flagCode}`)} />
-                        <span>{lang.label}</span>
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <MobileLanguageSwitch
+                languages={languages}
+                currentLanguage={currentLanguage}
+                setLanguage={setLanguage}
+              />
             </div>
           )}
 
