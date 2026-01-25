@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -116,7 +117,6 @@
 }
 
 @layer base {
-
   html {
     line-height: 1.6;
   }
@@ -169,46 +169,31 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-
-  * {
-    @apply border-border outline-ring/50;
-  }
-
-  body {
-    @apply bg-background text-foreground;
-  }
 }
 
 @layer utilities {
-  .nav-dropdown-enter {
-    animation: nav-dropdown-enter 0.25s ease-out forwards;
+  .container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--container-padding);
+    padding-right: var(--container-padding);
   }
 
-  .nav-dropdown-exit {
-    animation: nav-dropdown-exit 0.2s ease-in forwards;
+  @media (min-width: 1400px) {
+    .container {
+      max-width: var(--container-max-width);
+    }
   }
 }
 
-@keyframes nav-dropdown-enter {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* All scrollbars hidden (Chrome, Safari, Opera) */
+*::-webkit-scrollbar {
+  display: none;
 }
 
-@keyframes nav-dropdown-exit {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  to {
-    opacity: 0;
-    transform: translateY(8px);
-  }
+/* All scrollbars hidden (Firefox) */
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
