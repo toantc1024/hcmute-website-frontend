@@ -10,7 +10,7 @@ import { TopBar } from "./top-bar";
 import { LanguageProvider } from "./language-context";
 import { navbarConfig } from "./navbar-config";
 import { Button } from "@/components/ui/button";
-import { LoginButton } from "@/components/auth";
+import { LoginButton } from "@/components/layout/auth";
 import { Container } from "@/components/layout/container";
 
 export function Navbar() {

@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { LanguageOption } from "./navbar-config";
-import { LoginButton } from "@/components/auth";
+import { LoginButton } from "@/components/layout/auth";
 
 function MobileLanguageSwitch({
   languages,

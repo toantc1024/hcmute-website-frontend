@@ -211,8 +211,6 @@
     min-height: 0.2rem !important;
   }
 
-
-
   * {
     @apply border-border outline-ring/50;
     -webkit-font-smoothing: antialiased;

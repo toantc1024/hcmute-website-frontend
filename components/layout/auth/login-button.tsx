@@ -10,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useRouter } from "next/navigation";
 
 interface LoginButtonProps {
   variant?: "default" | "ghost" | "outline" | "secondary" | "destructive" | "link";
@@ -17,15 +18,13 @@ interface LoginButtonProps {
 
 export function LoginButton({ variant = "default" }: LoginButtonProps) {
   const { user, isLoading, initiateLogin, logout, isInitialized } = useAuth();
-
+  const router = useRouter();
   const handleLogin = async () => {
     await initiateLogin();
   };
 
   const handleShowProfile = () => {
-    if (user) {
-      alert(`Current User Profile:\n\n${JSON.stringify(user, null, 2)}`);
-    }
+    router.push("/manage");
   };
 
   if (!isInitialized) {
@@ -55,7 +54,7 @@ export function LoginButton({ variant = "default" }: LoginButtonProps) {
           </div>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleShowProfile}>
-            View Profile (JSON)
+        Bảng điều khiển
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={logout} className="text-destructive">

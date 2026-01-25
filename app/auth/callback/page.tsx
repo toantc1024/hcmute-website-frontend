@@ -27,7 +27,7 @@ function AuthCallbackContent() {
     
     handleCallback(code).then((user) => {
       if (user) {
-        router.replace("/protected");
+        router.replace("/manage");
       } else {
         clearError();
         router.replace("/");

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { AuthProvider } from "@/components/auth";
+import { AuthProvider } from "@/components/layout/auth";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "HCMUTE - Trường Đại học Sư phạm Kỹ thuật TP.HCM",
@@ -24,6 +25,7 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <AuthProvider>{children}</AuthProvider>
+        <Toaster position="bottom-right" richColors closeButton />
       </body>
     </html>
   );

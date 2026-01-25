@@ -5,8 +5,12 @@ export interface JwtUserProfile {
   preferred_username?: string;
   given_name?: string;
   family_name?: string;
+  picture?: string;
   exp?: number;
   iat?: number;
+  realm_access?: {
+    roles?: string[];
+  };
   [key: string]: unknown;
 }
 
