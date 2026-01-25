@@ -1,5 +1,6 @@
 import React from "react";
 import { Navbar } from "@/components/layout/navbar/navbar";
+import { Footer } from "@/components/blocks";
 
 const Layout = ({
   children,
@@ -10,6 +11,7 @@ const Layout = ({
     <div className="min-h-screen flex flex-col relative">
       <Navbar />
       <main className="flex-1 relative z-0">{children}</main>
+      <Footer />
     </div>
   );
 };

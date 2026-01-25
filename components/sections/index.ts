@@ -1,0 +1,8 @@
+export { default as HeroCarousel } from "./hero-carousel";
+export { default as UniversityStats } from "./university-stats";
+export { default as NewsSection } from "./news-section";
+export { default as PartnerLogos } from "./partner-logos";
+export { default as CoreValues } from "./core-values";
+export { default as VideoIntroduction } from "./video-introduction";
+export { default as UniversityLeadership } from "./university-leadership";
+export { default as UnitsSection } from "./units-section";

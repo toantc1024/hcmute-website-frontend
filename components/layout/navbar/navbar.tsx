@@ -25,7 +25,7 @@ export function Navbar() {
 
         {/* Main Navigation Bar - Sticky container includes menu content */}
         <div className="sticky top-0 z-50 w-full">
-          <header className="w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <header className="w-full border-b bg-background/95 bg-white backdrop-blur supports-[backdrop-filter]:bg-background/90">
             <Container className="h-16 relative">
               {/* Mobile: Logo left, Menu right */}
               <div className="flex lg:hidden items-center justify-between w-full h-full">
