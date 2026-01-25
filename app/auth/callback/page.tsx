@@ -19,7 +19,7 @@ function AuthCallbackContent() {
     if (errorParam || !code) {
       hasProcessed.current = true;
       clearError();
-      router.replace("/");
+      // router.replace("/");
       return;
     }
     
@@ -29,8 +29,8 @@ function AuthCallbackContent() {
       if (user) {
         router.replace("/manage");
       } else {
-        clearError();
-        router.replace("/");
+        // clearError();
+        // router.replace("/");
       }
     });
   }, [searchParams, handleCallback, router, clearError]);
