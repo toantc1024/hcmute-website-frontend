@@ -213,7 +213,7 @@ function ReviewSessionDetailsPanel({
                 {comment.selectedText && (
                   <div className="mb-2 p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded text-sm">
                     <span className="text-muted-foreground">Văn bản được chọn: </span>
-                    <span className="font-medium">"{comment.selectedText}"</span>
+                    <span className="font-medium">&quot;{comment.selectedText}&quot;</span>
                   </div>
                 )}
                 <p className="text-sm">{comment.content}</p>

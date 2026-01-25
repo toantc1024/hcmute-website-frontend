@@ -484,7 +484,7 @@ export function CategoryManagementModal({
           <AlertDialogHeader>
             <AlertDialogTitle>Xóa danh mục?</AlertDialogTitle>
             <AlertDialogDescription>
-              Bạn có chắc chắn muốn xóa danh mục "{deleteCategory?.name}"? 
+              Bạn có chắc chắn muốn xóa danh mục &quot;{deleteCategory?.name}&quot;? 
               Hành động này không thể hoàn tác.
             </AlertDialogDescription>
           </AlertDialogHeader>

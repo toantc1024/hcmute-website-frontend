@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
+import React, { createContext, useContext, useState, useCallback, useSyncExternalStore } from "react";
 import { i18nConfig } from "./config";
 import { getTranslations, type TranslationKeys } from "./locales";
 import type { Locale } from "./types";
@@ -17,17 +17,37 @@ const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
 const LOCALE_STORAGE_KEY = "hcmute-locale";
 
-export function I18nProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(i18nConfig.defaultLocale);
-  const [isHydrated, setIsHydrated] = useState(false);
+function subscribeToNothing() {
+  return () => {};
+}
 
-  useEffect(() => {
-    const stored = localStorage.getItem(LOCALE_STORAGE_KEY) as Locale | null;
-    if (stored && i18nConfig.locales.includes(stored)) {
-      setLocaleState(stored);
+function getHydratedSnapshot() {
+  return true;
+}
+
+function getServerSnapshot() {
+  return false;
+}
+
+function getStoredLocale(): Locale {
+  if (typeof window === "undefined") {
+    return i18nConfig.defaultLocale;
+  }
+  const stored = localStorage.getItem(LOCALE_STORAGE_KEY) as Locale | null;
+  if (stored && i18nConfig.locales.includes(stored)) {
+    return stored;
+  }
+  return i18nConfig.defaultLocale;
+}
+
+export function I18nProvider({ children }: { children: React.ReactNode }) {
+  const isHydrated = useSyncExternalStore(subscribeToNothing, getHydratedSnapshot, getServerSnapshot);
+  const [locale, setLocaleState] = useState<Locale>(() => {
+    if (typeof window === "undefined") {
+      return i18nConfig.defaultLocale;
     }
-    setIsHydrated(true);
-  }, []);
+    return getStoredLocale();
+  });
 
   const setLocale = useCallback((newLocale: Locale) => {
     if (i18nConfig.locales.includes(newLocale)) {

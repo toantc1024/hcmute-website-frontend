@@ -1,13 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion } from "motion/react";
 import {
   Search,
   Filter,
   X,
   ChevronRight,
-  Clock,
   Eye,
   Calendar,
   Tag,
@@ -42,7 +41,7 @@ export default function NewsPage() {
   const [tags, setTags] = useState<TagView[]>([]);
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
-  const [cursor, setCursor] = useState<string | undefined>(undefined);
+  const cursorRef = useRef<string | undefined>(undefined);
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -55,7 +54,7 @@ export default function NewsPage() {
       try {
         setLoading(true);
         const response = await postsApi.getPublishedPosts({
-          cursor: reset ? undefined : cursor,
+          cursor: reset ? undefined : cursorRef.current,
           limit: 12,
           categoryId: selectedCategory || undefined,
           tagId: selectedTags.length > 0 ? selectedTags[0] : undefined,
@@ -69,14 +68,14 @@ export default function NewsPage() {
         }
 
         setHasMore(response.hasNext);
-        setCursor(response.cursor);
+        cursorRef.current = response.cursor;
       } catch (error) {
         console.error("Failed to fetch posts:", error);
       } finally {
         setLoading(false);
       }
     },
-    [cursor, selectedCategory, selectedTags, searchQuery]
+    [selectedCategory, selectedTags, searchQuery]
   );
 
   const fetchFilters = useCallback(async () => {
@@ -97,9 +96,9 @@ export default function NewsPage() {
   }, [fetchFilters]);
 
   useEffect(() => {
-    setCursor(undefined);
+    cursorRef.current = undefined;
     fetchPosts(true);
-  }, [selectedCategory, selectedTags, searchQuery]);
+  }, [fetchPosts]);
 
   useEffect(() => {
     const handleScroll = () => {

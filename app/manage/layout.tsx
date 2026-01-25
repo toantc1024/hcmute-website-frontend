@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 
 import { useAuth } from "@/features/auth";
@@ -18,20 +18,18 @@ export default function UserLayout({
 }) {
   const router = useRouter();
   const { user, accessToken, isInitialized } = useAuth();
-  const [isChecking, setIsChecking] = useState(true);
+
+  const isAuthenticated = useMemo(() => {
+    return isInitialized && accessToken && user;
+  }, [isInitialized, accessToken, user]);
 
   useEffect(() => {
-    if (!isInitialized) return;
-
-    if (!accessToken || !user) {
+    if (isInitialized && (!accessToken || !user)) {
       router.push("/");
-      return;
     }
-
-    setIsChecking(false);
   }, [accessToken, user, isInitialized, router]);
 
-  if (!isInitialized || isChecking) {
+  if (!isInitialized) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader size="lg" text="Đang kiểm tra xác thực..." />
@@ -39,7 +37,7 @@ export default function UserLayout({
     );
   }
 
-  if (!accessToken || !user) {
+  if (!isAuthenticated) {
     return null;
   }
 

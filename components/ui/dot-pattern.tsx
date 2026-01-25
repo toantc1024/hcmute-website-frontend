@@ -1,9 +1,14 @@
 "use client";
 
-import React, { useEffect, useId, useRef, useState } from "react";
+import React, { useEffect, useId, useRef, useState, useMemo } from "react";
 import { motion } from "motion/react";
 
 import { cn } from "@/lib/utils";
+
+function seededRandom(seed: number) {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+}
 
 interface DotPatternProps extends React.SVGProps<SVGSVGElement> {
   width?: number;
@@ -47,23 +52,25 @@ export function DotPattern({
     return () => window.removeEventListener("resize", updateDimensions);
   }, []);
 
-  const dots = Array.from(
-    {
-      length:
-        Math.ceil(dimensions.width / width) *
-        Math.ceil(dimensions.height / height),
-    },
-    (_, i) => {
-      const col = i % Math.ceil(dimensions.width / width);
-      const row = Math.floor(i / Math.ceil(dimensions.width / width));
-      return {
-        x: col * width + cx,
-        y: row * height + cy,
-        delay: Math.random() * 5,
-        duration: Math.random() * 3 + 2,
-      };
-    }
-  );
+  const dots = useMemo(() => {
+    return Array.from(
+      {
+        length:
+          Math.ceil(dimensions.width / width) *
+          Math.ceil(dimensions.height / height),
+      },
+      (_, i) => {
+        const col = i % Math.ceil(dimensions.width / width);
+        const row = Math.floor(i / Math.ceil(dimensions.width / width));
+        return {
+          x: col * width + cx,
+          y: row * height + cy,
+          delay: seededRandom(i * 13) * 5,
+          duration: seededRandom(i * 17) * 3 + 2,
+        };
+      }
+    );
+  }, [dimensions.width, dimensions.height, width, height, cx, cy]);
 
   return (
     <svg
@@ -81,7 +88,7 @@ export function DotPattern({
           <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
         </radialGradient>
       </defs>
-      {dots.map((dot, index) => (
+      {dots.map((dot) => (
         <motion.circle
           key={`${dot.x}-${dot.y}`}
           cx={dot.x}

@@ -10,7 +10,6 @@ import {
   Tag,
   Share2,
   Clock,
-  ChevronRight,
   Facebook,
   Twitter,
   Link as LinkIcon,

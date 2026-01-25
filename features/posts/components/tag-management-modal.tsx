@@ -412,7 +412,7 @@ export function TagManagementModal({
           <AlertDialogHeader>
             <AlertDialogTitle>Xóa thẻ?</AlertDialogTitle>
             <AlertDialogDescription>
-              Bạn có chắc chắn muốn xóa thẻ "{deleteTag?.name}"? Hành động này không thể hoàn tác.
+              Bạn có chắc chắn muốn xóa thẻ &quot;{deleteTag?.name}&quot;? Hành động này không thể hoàn tác.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

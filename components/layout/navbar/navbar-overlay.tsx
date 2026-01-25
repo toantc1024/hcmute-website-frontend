@@ -1,17 +1,25 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavbar } from "./navbar-context";
 
+function subscribe() {
+  return () => {};
+}
+
+function getSnapshot() {
+  return true;
+}
+
+function getServerSnapshot() {
+  return false;
+}
+
 export function NavbarOverlay() {
   const { isOpen, closeMenu } = useNavbar();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   if (!mounted) return null;
 
