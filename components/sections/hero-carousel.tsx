@@ -106,7 +106,7 @@ export default function HeroCarousel() {
           <div className="absolute inset-0 bg-black/40" />
 
           <div className="relative z-10 h-full flex items-center">
-            <div className="w-full px-4 sm:px-8 lg:px-16 xl:px-24">
+            <div className="w-full px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40">
               <div className="max-w-3xl">
                 <motion.div
                   initial={{ opacity: 0 }}
@@ -159,14 +159,14 @@ export default function HeroCarousel() {
 
       <ArrowButton
         direction="left"
-        className="absolute left-4 lg:left-8 top-1/2 -translate-y-1/2 z-20"
+        className="absolute left-6 lg:left-12 xl:left-16 top-1/2 -translate-y-1/2 z-20"
         onClick={prevSlide}
         onMouseEnter={() => setIsAutoPlay(false)}
         onMouseLeave={() => setIsAutoPlay(true)}
       />
 
       <ArrowButton
-        className="absolute right-4 lg:right-8 top-1/2 -translate-y-1/2 z-20"
+        className="absolute right-6 lg:right-12 xl:right-16 top-1/2 -translate-y-1/2 z-20"
         direction="right"
         onClick={nextSlide}
         onMouseEnter={() => setIsAutoPlay(false)}

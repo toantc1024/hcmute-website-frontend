@@ -42,9 +42,9 @@ export default function UniversityLeadership() {
 
   return (
     <section id="leadership" className="py-12 lg:py-20 relative overflow-hidden">
-      <div className="w-full px-4 sm:px-8 lg:px-16 xl:px-24 relative">
+      <div className="w-full px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40 relative">
         <motion.div
-          className="text-center mb-12"
+          className="text-center  mb-12"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -64,7 +64,7 @@ export default function UniversityLeadership() {
       </div>
 
       <div className="relative pt-8 lg:pt-16">
-        <div className="absolute top-0 left-4 sm:left-8 lg:left-16 xl:left-24 z-30 flex space-x-2">
+        <div className="absolute top-0 left-6 sm:left-12 lg:left-24 xl:left-32 2xl:left-40 z-30 flex space-x-2">
           <button
             onClick={prevSlide}
             className="bg-white hover:bg-gray-100 rounded-full p-2 sm:p-3 border border-gray-200 shadow-md transition-all duration-200 flex items-center justify-center"
@@ -96,7 +96,7 @@ export default function UniversityLeadership() {
           </motion.div>
 
           <div className="relative z-10 h-full min-h-[280px] md:min-h-[360px] flex items-center">
-            <div className="px-4 sm:px-8 lg:px-16 xl:px-24 w-full">
+            <div className="px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40 w-full">
               <div className="flex items-center justify-center lg:justify-start">
                 <motion.div
                   key={currentSlide}
@@ -112,7 +112,7 @@ export default function UniversityLeadership() {
                     {currentLeader.position}
                   </p>
 
-                  <p className="text-blue-100 leading-relaxed text-xs sm:text-sm lg:text-base">
+                  <p className="text-blue-100 font-bold leading-relaxed text-xs sm:text-sm lg:text-base">
                     <Quote className="inline w-4 h-4 sm:w-5 sm:h-5 mr-2 mb-1 text-blue-200" />
                     {currentLeader.description}
                   </p>
@@ -123,7 +123,7 @@ export default function UniversityLeadership() {
 
           <motion.div
             key={`image-${currentSlide}`}
-            className="hidden lg:block absolute right-16 xl:right-24 bottom-0"
+            className="hidden lg:block absolute right-24 xl:right-32 2xl:right-40 bottom-0"
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}

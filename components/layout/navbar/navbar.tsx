@@ -35,36 +35,37 @@ export function Navbar() {
                     alt={logo.alt}
                     width={logo.mobileWidth}
                     height={logo.mobileHeight}
-                    className="h-10 w-auto"
+                    className="h-10 w-10 object-contain"
                   />
                 </Link>
                 <MobileNav />
               </div>
 
-              {/* Desktop: Logo (left) | Nav (center) | Actions (right) */}
+              {/* Desktop: Nav Left | Logo (center) | Nav Right + Actions */}
               <div className="hidden lg:flex items-center w-full h-full">
-                {/* Left - Logo */}
-                <Link href={logo.href} className="flex items-center shrink-0">
+                {/* Left - Navigation */}
+                <div className="flex-1 flex items-center justify-start gap-1">
+                  <DesktopNavLeft />
+                </div>
+
+                {/* Center - Logo */}
+                <Link href={logo.href} className="flex items-center shrink-0 mx-4">
                   <img
                     src={logo.image}
                     alt={logo.alt}
                     width={logo.width}
                     height={logo.height}
-                    className="h-10 w-auto"
+                    className="h-12 w-12 object-contain"
                   />
                 </Link>
 
-                {/* Center - Navigation (flex-1 to take remaining space, justify-center) */}
-                <div className="flex-1 flex items-center justify-center gap-1">
-                  <DesktopNavLeft />
+                {/* Right - Navigation + Actions (aligned with topbar) */}
+                <div className="flex-1 flex items-center justify-end gap-1">
                   <DesktopNavRight />
-                </div>
-
-                {/* Right - Actions */}
-                <div className="flex items-center gap-2 shrink-0">
+                  
                   {/* Search Button */}
                   {search.enabled && (
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon" className="ml-2">
                       <SearchIcon className="w-5 h-5" />
                       <span className="sr-only">{search.placeholder}</span>
                     </Button>

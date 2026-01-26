@@ -58,7 +58,7 @@ const mockBanners: BannerSlide[] = [
   {
     id: "1",
     title: "Chào mừng đến với HCMUTE",
-    subtitle: "Trường Đại học Sư phạm Kỹ thuật TP. Hồ Chí Minh",
+    subtitle: "Trường Đại học Công nghệ Kỹ Thuật TP. Hồ Chí Minh",
     image: "/images/banner-1.jpg",
     link: "/gioi-thieu",
     active: true,

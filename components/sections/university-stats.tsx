@@ -13,7 +13,7 @@ interface StatItem {
 
 const stats: StatItem[] = [
   {
-    suffix: "TOP 9",
+    suffix: "TOP 3",
     description: "Trường Đại học kỹ thuật hàng đầu Việt Nam",
     color: "text-blue-900",
   },
@@ -61,7 +61,7 @@ const itemVariants = {
 
 export default function UniversityStats() {
   return (
-    <section id="stats" className="py-12 px-4 sm:px-8 lg:px-16 xl:px-24 bg-gradient-to-br from-gray-50 to-blue-50 overflow-hidden">
+    <section id="stats" className="py-12 px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40 bg-gradient-to-br from-gray-50 to-blue-50 overflow-hidden">
       <div className="w-full">
         <motion.div
           className="text-center mb-12"
@@ -95,7 +95,7 @@ export default function UniversityStats() {
             <motion.div
               key={index}
               variants={itemVariants}
-              className="rounded-xl p-6 transition-shadow duration-300 border border-gray-100 bg-white/50"
+              className="rounded-xl p-6 transition-shadow duration-300 border border-gray-100"
             >
               <div className="flex flex-col items-center text-center">
                 <div

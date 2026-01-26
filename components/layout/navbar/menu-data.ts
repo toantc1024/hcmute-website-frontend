@@ -71,12 +71,6 @@ export const menuData: MenuItem[] = [
             href: "/gioi-thieu/tam-nhin-su-mang",
             icon: Award,
           },
-          {
-            id: "thanh-tich",
-            label: "Thành tích của Nhà trường",
-            href: "/gioi-thieu/thanh-tich",
-            icon: Award,
-          },
         ],
       },
       {
@@ -356,7 +350,7 @@ export const menuData: MenuItem[] = [
     label: "Đào tạo",
     type: "mega",
     layout: "group",
-    position: "right",
+    position: "left",
     children: [
       {
         id: "he-dao-tao",

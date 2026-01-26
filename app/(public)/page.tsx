@@ -13,6 +13,7 @@ import {
   VideoIntroduction,
   UniversityLeadership,
   UnitsSection,
+  FeatureShowcase,
 } from "@/components/sections";
 
 const sectionNavItems = [
@@ -109,6 +110,7 @@ export default function HomePage() {
         <HeroCarousel />
         <UniversityStats />
         <NewsSection />
+        <FeatureShowcase />
         <CoreValues />
         <VideoIntroduction />
         <UnitsSection />

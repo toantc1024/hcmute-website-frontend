@@ -6,3 +6,4 @@ export { default as CoreValues } from "./core-values";
 export { default as VideoIntroduction } from "./video-introduction";
 export { default as UniversityLeadership } from "./university-leadership";
 export { default as UnitsSection } from "./units-section";
+export { default as FeatureShowcase } from "./feature-showcase";

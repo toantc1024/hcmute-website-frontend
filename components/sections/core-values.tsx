@@ -75,8 +75,8 @@ export default function CoreValues() {
 
   return (
     <section id="values" className="py-12 lg:py-20 relative bg-white overflow-hidden">
-      <div className="px-4 sm:px-8 lg:px-16 xl:px-24 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+      <div className="px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-0 items-start">
           <motion.div
             className="space-y-4 lg:space-y-6"
             initial={{ opacity: 0, x: -50 }}
@@ -122,7 +122,7 @@ export default function CoreValues() {
                   align: "start",
                   loop: true,
                 }}
-                className="w-full max-w-2xl"
+                className="w-full max-w-8xl"
               >
                 <CarouselContent className="-ml-4">
                   {coreValuesData.map((value, index) => {

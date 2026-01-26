@@ -26,7 +26,7 @@ const TIMELINE_EVENTS: TimelineEvent[] = [
     yearRange: "1974 - 1984",
     title: "Định Hình",
     description:
-      "Chính thức mang tên Trường Đại học Sư phạm Kỹ thuật Thủ Đức, khẳng định vị thế giáo dục kỹ thuật quốc gia.",
+      "Chính thức mang tên Trường Đại học Công nghệ Kỹ Thuật Thủ Đức, khẳng định vị thế giáo dục kỹ thuật quốc gia.",
     imageUrl: "/assets/1974.png",
   },
   {
@@ -146,7 +146,7 @@ export default function VideoIntroduction() {
         />
       </div>
 
-      <div className="w-full text-center px-4 sm:px-8 lg:px-16 xl:px-24 relative">
+      <div className="w-full text-center px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40 relative">
         <motion.div
           className="text-center mb-8"
           initial={{ opacity: 0, y: 20 }}

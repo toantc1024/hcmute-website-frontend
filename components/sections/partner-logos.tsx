@@ -33,7 +33,7 @@ export default function PartnerLogos() {
       <div className="hidden lg:block max-w-xl size-full opacity-[.4] absolute top-0 left-0 -translate-x-1/2">
         <Globe className="right-0" />
       </div>
-      <div className="px-4 sm:px-8 lg:px-16 xl:px-24 w-full relative z-10">
+      <div className="px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40 w-full relative z-10">
         <motion.div
           className="text-center mb-8 lg:mb-16"
           initial={{ opacity: 0, y: 20 }}

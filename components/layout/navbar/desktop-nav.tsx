@@ -9,6 +9,8 @@ import { cn } from "@/lib/utils";
 import { useNavbar } from "./navbar-context";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/container";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 
 const leftItems = menuData.filter((item) => item.position === "left");
 const rightItems = menuData.filter((item) => item.position === "right");
@@ -42,12 +44,16 @@ function NavItems({ items }: { items: MenuItem[] }) {
               onClick={() => handleClick(item.id)}
              
                 className={
-                  activeMenu === item.id ? " !bg-primary !text-primary-foreground" : "bg-transparent"
+                  cn(
+                    "uppercase tracking-wider",
+                    activeMenu === item.id ? " !bg-primary !text-primary-foreground" : "bg-transparent"
+                  )
                 }
                 variant="ghost"
             >
               {item.label}
               <motion.div
+              
                 animate={{ rotate: activeMenu === item.id ? 180 : 0 }}
                 transition={{ duration: 0.2, ease: "easeInOut" }}
               >
@@ -101,7 +107,7 @@ export function DesktopNav() {
             ease: [0.4, 0, 0.2, 1],
             height: { duration: 0.25 },
           }}
-          className="absolute left-0 right-0 top-full z-50 bg-background border-b border-border shadow-xl overflow-hidden"
+          className="absolute left-0 right-0 top-full z-50 bg-background border-b border-border shadow-xl"
           onMouseEnter={handleContentMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
@@ -118,7 +124,7 @@ export function DesktopNav() {
                         exit={{ opacity: 0, x: 10 }}
                         transition={{ duration: 0.15, ease: "easeOut" }}
                       >
-                        <Container className="py-8">
+                        <Container className="py-6 max-h-[calc(100vh-200px)] overflow-y-auto">
                           {item.type === "mega" ? (
                             <MegaMenuContent item={item} closeMenu={closeMenu} />
                           ) : (
@@ -141,32 +147,32 @@ export function DesktopNav() {
 
 function MegaMenuContent({ item, closeMenu }: { item: MenuItem; closeMenu: () => void }) {
   const isGroupLayout = item.layout === "group";
-  const columns = item.columns || (isGroupLayout ? item.children?.length : 3);
+  const columns = item.columns || 3;
 
   if (isGroupLayout) {
     return (
-      <div className="space-y-6 ">
+      <div className="flex flex-col">
         {item.children?.map((group, groupIndex) => (
           <motion.div
             key={group.id}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: groupIndex * 0.05, duration: 0.2 }}
           >
-            {groupIndex > 0 && <div className="border-t border-border my-4" />}
-            <div className="mb-3">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            {groupIndex > 0 && <Separator className="my-5" />}
+            <div className="flex items-center gap-2 mb-4">
+              <h2 className="text-lg font-semibold text-primary  uppercase">
                 {group.label}
-              </h3>
+              </h2>
             </div>
-            <div className="grid  grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-1">
+            <div className="flex flex-wrap gap-1.5">
               {group.children?.map((child, childIndex) => (
                 <motion.div
                   key={child.id}
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
                   transition={{
-                    delay: groupIndex * 0.05 + childIndex * 0.02,
+                    delay: groupIndex * 0.03 + childIndex * 0.015,
                     duration: 0.15,
                   }}
                 >
@@ -182,28 +188,30 @@ function MegaMenuContent({ item, closeMenu }: { item: MenuItem; closeMenu: () =>
 
   return (
     <div
-      className="grid gap-8 "
+      className="grid gap-8"
       style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
     >
       {item.children?.map((column, columnIndex) => (
         <motion.div
           key={column.id}
-          className="space-y-3"
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: columnIndex * 0.05, duration: 0.2 }}
+          className="space-y-3"
         >
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground border-b border-border pb-2">
-            {column.label}
-          </h3>
-          <div className="space-y-0.5">
+          <div className="flex items-center gap-2 pb-2 border-b border-border">
+            <h3 className="text-lg font-semibold text-primary  uppercase">
+              {column.label}
+            </h3>
+          </div>
+          <div className="flex flex-col gap-0.5">
             {column.children?.map((child, childIndex) => (
               <motion.div
                 key={child.id}
-                initial={{ opacity: 0, x: -5 }}
+                initial={{ opacity: 0, x: -4 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{
-                  delay: columnIndex * 0.05 + childIndex * 0.02,
+                  delay: columnIndex * 0.03 + childIndex * 0.02,
                   duration: 0.15,
                 }}
               >
@@ -219,13 +227,13 @@ function MegaMenuContent({ item, closeMenu }: { item: MenuItem; closeMenu: () =>
 
 function DropdownContent({ items, closeMenu }: { items: MenuItem[]; closeMenu: () => void }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+    <div className="flex flex-wrap gap-1.5">
       {items.map((item, index) => (
         <motion.div
           key={item.id}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.03, duration: 0.15 }}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: index * 0.02, duration: 0.15 }}
         >
           <MenuLink item={item} closeMenu={closeMenu} showDescription />
         </motion.div>
@@ -248,47 +256,51 @@ function MenuLink({
   const Icon = item.icon;
   const isExternal = item.isExternal;
 
-  const linkContent = (
+  const defaultContent = (
     <span
       className={cn(
-        "group flex items-start gap-3 p-3 rounded-lg transition-all duration-150",
-        "hover:bg-accent hover:shadow-sm",
-        variant === "compact" && "p-2 gap-2"
+        "group inline-flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200",
+        ""
       )}
     >
       {Icon && (
-        <span
-          className={cn(
-            "flex-shrink-0 p-1.5 rounded-md bg-muted/50 text-muted-foreground",
-            "group-hover:bg-primary/10 group-hover:text-primary transition-colors duration-150",
-            variant === "compact" && "p-1"
-          )}
-        >
-          <Icon className={cn("w-4 h-4", variant === "compact" && "w-3.5 h-3.5")} />
+        <span className="flex-shrink-0 text-muted-foreground group-hover:text-primary transition-colors duration-200">
+          <Icon className="w-4 h-4" />
         </span>
       )}
-      <span className="flex-1 min-w-0">
-        <span className="flex items-center gap-1.5">
-          <span
-            className={cn(
-              "text-sm font-medium text-foreground group-hover:text-primary transition-colors duration-150",
-              variant === "compact" && "text-[13px]"
-            )}
-          >
-            {item.label}
-          </span>
-          {isExternal && (
-            <ExternalLink className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
-          )}
+      <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors duration-200 whitespace-nowrap">
+        {item.label}
+      </span>
+      {isExternal && (
+        <ExternalLink className="w-3 h-3 flex-shrink-0 text-muted-foreground group-hover:text-primary opacity-60 transition-all duration-200" />
+      )}
+    </span>
+  );
+
+  const compactContent = (
+    <span
+      className={cn(
+        "group flex items-center gap-2.5 px-2 py-1.5 rounded-md transition-all duration-200",
+        "hover:bg-accent"
+      )}
+    >
+      {Icon && (
+        <span className="flex-shrink-0 p-1 rounded bg-muted/60 text-muted-foreground group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-200">
+          <Icon className="w-3.5 h-3.5" />
         </span>
-        {showDescription && item.description && (
-          <span className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
-            {item.description}
-          </span>
+      )}
+      <span className="flex items-center gap-1.5 min-w-0">
+        <span className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors duration-200">
+          {item.label}
+        </span>
+        {isExternal && (
+          <ExternalLink className="w-3 h-3 flex-shrink-0 text-muted-foreground group-hover:text-primary opacity-50 transition-all duration-200" />
         )}
       </span>
     </span>
   );
+
+  const linkContent = variant === "compact" ? compactContent : defaultContent;
 
   if (isExternal) {
     return (
@@ -297,6 +309,7 @@ function MenuLink({
         target="_blank"
         rel="noopener noreferrer"
         onClick={closeMenu}
+        className="inline-block"
       >
         {linkContent}
       </a>
@@ -304,7 +317,7 @@ function MenuLink({
   }
 
   return (
-    <Link href={item.href || "#"} onClick={closeMenu}>
+    <Link href={item.href || "#"} onClick={closeMenu} className="inline-block">
       {linkContent}
     </Link>
   );

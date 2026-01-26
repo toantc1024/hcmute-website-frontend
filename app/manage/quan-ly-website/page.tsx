@@ -133,7 +133,7 @@ export default function WebsiteManagementPage() {
                     <Label htmlFor="siteName">{t.websiteManagement.siteName}</Label>
                     <Input
                       id="siteName"
-                      defaultValue="Trường Đại học Sư phạm Kỹ thuật TP.HCM"
+                      defaultValue="Trường Đại học Công nghệ Kỹ Thuật TP.HCM"
                     />
                   </div>
                   <div className="space-y-2">
@@ -148,7 +148,7 @@ export default function WebsiteManagementPage() {
                   <Label htmlFor="siteDescription">{t.websiteManagement.siteDescription}</Label>
                   <Textarea
                     id="siteDescription"
-                    defaultValue="Trường Đại học Sư phạm Kỹ thuật TP. Hồ Chí Minh (HCMUTE) - Đào tạo nguồn nhân lực chất lượng cao trong lĩnh vực kỹ thuật và công nghệ."
+                    defaultValue="Trường Đại học Công nghệ Kỹ Thuật TP. Hồ Chí Minh (HCMUTE) - Đào tạo nguồn nhân lực chất lượng cao trong lĩnh vực kỹ thuật và công nghệ."
                     rows={3}
                   />
                 </div>
@@ -284,7 +284,7 @@ export default function WebsiteManagementPage() {
                   <Label htmlFor="metaTitle">Meta Title</Label>
                   <Input
                     id="metaTitle"
-                    defaultValue="HCMUTE - Trường Đại học Sư phạm Kỹ thuật TP.HCM"
+                    defaultValue="HCMUTE - Trường Đại học Công nghệ Kỹ Thuật TP.HCM"
                   />
                   <p className="text-xs text-muted-foreground">Khuyến nghị: 50-60 ký tự</p>
                 </div>
@@ -292,7 +292,7 @@ export default function WebsiteManagementPage() {
                   <Label htmlFor="metaDescription">Meta Description</Label>
                   <Textarea
                     id="metaDescription"
-                    defaultValue="Trường Đại học Sư phạm Kỹ thuật TP. Hồ Chí Minh - Đào tạo kỹ sư, cử nhân chất lượng cao trong các lĩnh vực kỹ thuật, công nghệ và sư phạm."
+                    defaultValue="Trường Đại học Công nghệ Kỹ Thuật TP. Hồ Chí Minh - Đào tạo kỹ sư, cử nhân chất lượng cao trong các lĩnh vực kỹ thuật, công nghệ và sư phạm."
                     rows={3}
                   />
                   <p className="text-xs text-muted-foreground">Khuyến nghị: 150-160 ký tự</p>
@@ -373,7 +373,7 @@ export default function WebsiteManagementPage() {
                   <Label htmlFor="footerAbout">Giới thiệu ngắn</Label>
                   <Textarea
                     id="footerAbout"
-                    defaultValue="Trường Đại học Sư phạm Kỹ thuật TP. Hồ Chí Minh được thành lập năm 1962, là một trong những trường đại học hàng đầu về đào tạo kỹ thuật và công nghệ tại Việt Nam."
+                    defaultValue="Trường Đại học Công nghệ Kỹ Thuật TP. Hồ Chí Minh được thành lập năm 1962, là một trong những trường đại học hàng đầu về đào tạo kỹ thuật và công nghệ tại Việt Nam."
                     rows={3}
                   />
                 </div>
@@ -413,7 +413,7 @@ export default function WebsiteManagementPage() {
                   <Label htmlFor="copyright">Bản quyền</Label>
                   <Input
                     id="copyright"
-                    defaultValue="© 2026 Trường Đại học Sư phạm Kỹ thuật TP.HCM. All rights reserved."
+                    defaultValue="© 2026 Trường Đại học Công nghệ Kỹ Thuật TP.HCM. All rights reserved."
                   />
                 </div>
               </CardContent>

@@ -230,7 +230,7 @@ export default function UnitsSection() {
   return (
     <>
       <section id="units" className="py-12 lg:py-16 bg-white overflow-hidden">
-        <div className="w-full px-4 sm:px-8 lg:px-16 xl:px-24">
+        <div className="w-full px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40">
           <motion.div
             className="text-center mb-8 lg:mb-12"
             initial={{ opacity: 0, y: 20 }}

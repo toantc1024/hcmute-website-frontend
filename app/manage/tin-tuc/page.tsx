@@ -71,7 +71,7 @@ const mockNews: NewsItem[] = [
   {
     id: "1",
     title: "Thông báo tuyển sinh đại học chính quy năm 2026",
-    excerpt: "Trường Đại học Sư phạm Kỹ thuật TP.HCM thông báo tuyển sinh đại học chính quy năm 2026 với nhiều ngành học mới...",
+    excerpt: "Trường Đại học Công nghệ Kỹ Thuật TP.HCM thông báo tuyển sinh đại học chính quy năm 2026 với nhiều ngành học mới...",
     category: "Tuyển sinh",
     author: "Admin",
     status: "published",

@@ -56,13 +56,13 @@ export type NavbarConfig = {
 export const navbarConfig: NavbarConfig = {
   logo: {
     href: "/",
-    image: "/logo/rectangle-logo.png",
-    mobileImage: "/logo/rectangle-logo.png",
+    image: "/logo/square-logo.png",
+    mobileImage: "/logo/square-logo.png",
     alt: "HCM-UTE Logo",
-    width: 180,
+    width: 48,
     height: 48,
-    mobileWidth: 140,
-    mobileHeight: 36,
+    mobileWidth: 40,
+    mobileHeight: 40,
   },
   topBar: {
     enabled: true,
@@ -75,8 +75,8 @@ export const navbarConfig: NavbarConfig = {
       },
       {
         id: "email",
-        label: "ptchc@hcmute.edu.vn",
-        href: "mailto:ptchc@hcmute.edu.vn",
+        label: "bmc@hcmute.edu.vn",
+        href: "mailto:bmc@hcmute.edu.vn",
         icon: Mail,
         isExternal: true,
       },
