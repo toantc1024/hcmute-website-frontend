@@ -109,12 +109,12 @@ export default function HomePage() {
       <main className="relative z-0">
         <HeroCarousel />
         <UniversityStats />
-        <NewsSection />
         <FeatureShowcase />
         <CoreValues />
         <VideoIntroduction />
-        <UnitsSection />
         <UniversityLeadership />
+        <UnitsSection />
+        <NewsSection />
         <PartnerLogos />
       </main>
     </div>
