@@ -5,6 +5,12 @@ import {
   User,
   Home,
   LogOut,
+  BarChart2,
+  Sparkles,
+  Settings,
+  Newspaper,
+  LayoutTemplate,
+  Globe,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { UserRole } from "@/features/user";
@@ -33,6 +39,20 @@ export const quickNavItems: SidebarMenuItem[] = [
     href: "/manage",
     icon: LayoutDashboard,
   },
+  {
+    id: "traffic",
+    titleKey: "navigation.traffic",
+    href: "/manage/luot-truy-cap",
+    icon: BarChart2,
+    requiredRoles: ['UNIT_ADMIN', 'SCHOOL_ADMIN', 'SYSTEM_ADMIN'],
+  },
+  {
+    id: "utilities",
+    titleKey: "navigation.utilities",
+    href: "/manage/tien-ich",
+    icon: Sparkles,
+    requiredRoles: ['UNIT_ADMIN', 'SCHOOL_ADMIN', 'SYSTEM_ADMIN'],
+  },
 ];
 
 export const sidebarMenuGroups: SidebarMenuGroup[] = [
@@ -55,6 +75,36 @@ export const sidebarMenuGroups: SidebarMenuGroup[] = [
         titleKey: "navigation.users",
         href: "/manage/users",
         icon: Users,
+        requiredRoles: ['UNIT_ADMIN', 'SCHOOL_ADMIN', 'SYSTEM_ADMIN'],
+      },
+    ],
+  },
+  {
+    id: "adminTools",
+    titleKey: "sidebar.adminTools",
+    icon: Settings,
+    defaultOpen: false,
+    requiredRoles: ['UNIT_ADMIN', 'SCHOOL_ADMIN', 'SYSTEM_ADMIN'],
+    items: [
+      {
+        id: "news",
+        titleKey: "navigation.news",
+        href: "/manage/tin-tuc",
+        icon: Newspaper,
+        requiredRoles: ['UNIT_ADMIN', 'SCHOOL_ADMIN', 'SYSTEM_ADMIN'],
+      },
+      {
+        id: "homepageContent",
+        titleKey: "navigation.homepageContent",
+        href: "/manage/noi-dung-trang-chu",
+        icon: LayoutTemplate,
+        requiredRoles: ['UNIT_ADMIN', 'SCHOOL_ADMIN', 'SYSTEM_ADMIN'],
+      },
+      {
+        id: "websiteManagement",
+        titleKey: "navigation.websiteManagement",
+        href: "/manage/quan-ly-website",
+        icon: Globe,
         requiredRoles: ['UNIT_ADMIN', 'SCHOOL_ADMIN', 'SYSTEM_ADMIN'],
       },
     ],

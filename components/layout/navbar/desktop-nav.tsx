@@ -42,9 +42,9 @@ function NavItems({ items }: { items: MenuItem[] }) {
               onClick={() => handleClick(item.id)}
              
                 className={
-                  activeMenu === item.id ? " !bg-primary !text-primary-foreground" : "bg-background"
+                  activeMenu === item.id ? " !bg-primary !text-primary-foreground" : "bg-transparent"
                 }
-                variant="outline"
+                variant="ghost"
             >
               {item.label}
               <motion.div
