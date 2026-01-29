@@ -75,7 +75,7 @@ export default function NewsPage() {
         setLoading(false);
       }
     },
-    [selectedCategory, selectedTags, searchQuery]
+    [selectedCategory, selectedTags, searchQuery],
   );
 
   const fetchFilters = useCallback(async () => {
@@ -116,7 +116,7 @@ export default function NewsPage() {
     setSelectedTags((prev) =>
       prev.includes(tagId)
         ? prev.filter((id) => id !== tagId)
-        : [...prev, tagId]
+        : [...prev, tagId],
     );
   };
 
@@ -147,8 +147,8 @@ export default function NewsPage() {
               Tin tức & Sự kiện
             </h1>
             <p className="text-blue-100 text-lg lg:text-xl leading-relaxed">
-              Cập nhật những tin tức, sự kiện và thông báo mới nhất từ Trường Đại
-              học Sư phạm Kỹ thuật TP.HCM
+              Cập nhật những tin tức, sự kiện và thông báo mới nhất từ Trường
+              Đại học Sư phạm Kỹ thuật TP.HCM
             </p>
           </motion.div>
 
@@ -369,7 +369,7 @@ export default function NewsPage() {
                                 </span>
                               </div>
                             )}
-                            {post.categories[0] && (
+                            {post.categories?.[0] && (
                               <span className="absolute top-3 left-3 px-3 py-1 bg-white/95 backdrop-blur-sm rounded-full text-xs font-medium text-gray-700">
                                 {post.categories[0].name}
                               </span>
@@ -379,9 +379,7 @@ export default function NewsPage() {
                             <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
                               <span className="flex items-center gap-1">
                                 <Calendar className="w-3.5 h-3.5" />
-                                {formatDate(
-                                  post.publishedAt || post.createdAt
-                                )}
+                                {formatDate(post.publishedAt || post.createdAt)}
                               </span>
                               {post.viewCount > 0 && (
                                 <span className="flex items-center gap-1">

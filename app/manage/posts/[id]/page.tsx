@@ -22,6 +22,8 @@ import {
   ChevronDown,
   ChevronUp,
   RefreshCw,
+  Rocket,
+  AlertCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -79,7 +81,7 @@ import {
 } from "@/components/ui/collapsible";
 
 function getStatusBadgeVariant(
-  status: PostStatus
+  status: PostStatus,
 ): "default" | "secondary" | "destructive" | "outline" {
   switch (status) {
     case PostStatus.PUBLISHED:
@@ -202,7 +204,9 @@ function ReviewSessionDetailsPanel({
 
       {session.comments && session.comments.length > 0 && (
         <div className="space-y-3">
-          <h4 className="font-medium">Nhận xét chi tiết ({session.comments.length})</h4>
+          <h4 className="font-medium">
+            Nhận xét chi tiết ({session.comments.length})
+          </h4>
           {session.comments.map((comment) => {
             const isResolved = comment.status === ReviewCommentStatus.RESOLVED;
             return (
@@ -212,8 +216,12 @@ function ReviewSessionDetailsPanel({
               >
                 {comment.selectedText && (
                   <div className="mb-2 p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded text-sm">
-                    <span className="text-muted-foreground">Văn bản được chọn: </span>
-                    <span className="font-medium">&quot;{comment.selectedText}&quot;</span>
+                    <span className="text-muted-foreground">
+                      Văn bản được chọn:{" "}
+                    </span>
+                    <span className="font-medium">
+                      &quot;{comment.selectedText}&quot;
+                    </span>
                   </div>
                 )}
                 <p className="text-sm">{comment.content}</p>
@@ -268,34 +276,45 @@ export default function PostDetailPage() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const [reviewSessions, setReviewSessions] = useState<PostReviewSessionAuditView[]>([]);
+  const [reviewSessions, setReviewSessions] = useState<
+    PostReviewSessionAuditView[]
+  >([]);
   const [isLoadingReviews, setIsLoadingReviews] = useState(false);
-  const [selectedSession, setSelectedSession] = useState<PostReviewSessionDetailView | null>(null);
+  const [selectedSession, setSelectedSession] =
+    useState<PostReviewSessionDetailView | null>(null);
   const [isLoadingSessionDetails, setIsLoadingSessionDetails] = useState(false);
 
   const [showSubmitDialog, setShowSubmitDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const fetchPost = useCallback(async (showRefreshState = false) => {
-    try {
-      if (showRefreshState) {
-        setIsRefreshing(true);
-      } else {
-        setIsLoading(true);
+  const [showPublishDialog, setShowPublishDialog] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
+
+  const fetchPost = useCallback(
+    async (showRefreshState = false) => {
+      try {
+        if (showRefreshState) {
+          setIsRefreshing(true);
+        } else {
+          setIsLoading(true);
+        }
+        setError(null);
+        const data = await postsApi.getPostById(postId);
+        setPost(data);
+        if (showRefreshState) {
+          toast.success("Đã cập nhật dữ liệu");
+        }
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Đã xảy ra lỗi khi tải bài viết",
+        );
+      } finally {
+        setIsLoading(false);
+        setIsRefreshing(false);
       }
-      setError(null);
-      const data = await postsApi.getPostById(postId);
-      setPost(data);
-      if (showRefreshState) {
-        toast.success("Đã cập nhật dữ liệu");
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Đã xảy ra lỗi khi tải bài viết");
-    } finally {
-      setIsLoading(false);
-      setIsRefreshing(false);
-    }
-  }, [postId]);
+    },
+    [postId],
+  );
 
   const handleRefresh = useCallback(() => {
     fetchPost(true);
@@ -327,7 +346,9 @@ export default function PostDetailPage() {
     }
   }, [postId]);
 
-  const handleViewSessionDetails = async (session: PostReviewSessionAuditView) => {
+  const handleViewSessionDetails = async (
+    session: PostReviewSessionAuditView,
+  ) => {
     try {
       setIsLoadingSessionDetails(true);
       const details = await postsApi.getReviewSessionById(session.id);
@@ -343,9 +364,11 @@ export default function PostDetailPage() {
     try {
       await postsApi.resolveReviewComment(commentId);
       toast.success("Đã đánh dấu nhận xét đã xử lý");
-      
+
       if (selectedSession) {
-        const updatedDetails = await postsApi.getReviewSessionById(selectedSession.id);
+        const updatedDetails = await postsApi.getReviewSessionById(
+          selectedSession.id,
+        );
         setSelectedSession(updatedDetails);
       }
     } catch (err) {
@@ -360,7 +383,9 @@ export default function PostDetailPage() {
       toast.success("Đã xóa bài viết");
       router.push("/manage/posts");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Đã xảy ra lỗi khi xóa bài viết");
+      setError(
+        err instanceof Error ? err.message : "Đã xảy ra lỗi khi xóa bài viết",
+      );
       setIsDeleting(false);
       setShowDeleteDialog(false);
     }
@@ -373,14 +398,58 @@ export default function PostDetailPage() {
       setIsSubmitting(true);
       await postsApi.submitPost(postId, { version: post.version });
       toast.success("Đã gửi bài viết để duyệt");
-      
+
       const updatedPost = await postsApi.getPostById(postId);
       setPost(updatedPost);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Đã xảy ra lỗi khi gửi duyệt");
+      toast.error(
+        err instanceof Error ? err.message : "Đã xảy ra lỗi khi gửi duyệt",
+      );
     } finally {
       setIsSubmitting(false);
       setShowSubmitDialog(false);
+    }
+  };
+
+  // TEMPORARY_POST: Force publish handler
+  const handleForcePublish = async () => {
+    if (!post) return;
+
+    try {
+      setIsPublishing(true);
+      await postsApi.forcePublish(postId);
+      toast.success("Đã đăng bài viết thành công!");
+
+      const updatedPost = await postsApi.getPostById(postId);
+      setPost(updatedPost);
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Đã xảy ra lỗi khi đăng bài",
+      );
+    } finally {
+      setIsPublishing(false);
+      setShowPublishDialog(false);
+    }
+  };
+
+  // Unpublish handler
+  const handleUnpublish = async () => {
+    if (!post) return;
+
+    try {
+      setIsPublishing(true);
+      await postsApi.unpublishPost(postId);
+      toast.success("Đã hủy đăng bài viết!");
+
+      const updatedPost = await postsApi.getPostById(postId);
+      setPost(updatedPost);
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Đã xảy ra lỗi khi hủy đăng bài",
+      );
+    } finally {
+      setIsPublishing(false);
+      setShowPublishDialog(false);
     }
   };
 
@@ -401,7 +470,9 @@ export default function PostDetailPage() {
   if (error || !post) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
-        <p className="text-destructive mb-4">{error || "Không tìm thấy bài viết"}</p>
+        <p className="text-destructive mb-4">
+          {error || "Không tìm thấy bài viết"}
+        </p>
         <Button variant="outline" asChild>
           <Link href="/manage/posts">
             <ArrowLeft className="mr-2 size-4" />
@@ -431,7 +502,9 @@ export default function PostDetailPage() {
               <Badge variant={getStatusBadgeVariant(post.status)}>
                 {getPostStatusLabel(post.status)}
               </Badge>
-              {post.allowCloning && <Badge variant="secondary">Cho phép sao chép</Badge>}
+              {post.allowCloning && (
+                <Badge variant="secondary">Cho phép sao chép</Badge>
+              )}
             </div>
           </div>
         </div>
@@ -442,7 +515,9 @@ export default function PostDetailPage() {
             onClick={handleRefresh}
             disabled={isRefreshing}
           >
-            <RefreshCw className={`size-4 ${isRefreshing ? "animate-spin" : ""}`} />
+            <RefreshCw
+              className={`size-4 ${isRefreshing ? "animate-spin" : ""}`}
+            />
           </Button>
           <Sheet>
             <SheetTrigger asChild>
@@ -509,6 +584,26 @@ export default function PostDetailPage() {
               Gửi duyệt
             </Button>
           )}
+          {/* TEMPORARY_POST: Force Publish / Unpublish Button */}
+          {post.status === PostStatus.PUBLISHED ? (
+            <Button
+              variant="outline"
+              className="border-orange-500 text-orange-600 hover:bg-orange-50 hover:text-orange-700"
+              onClick={() => setShowPublishDialog(true)}
+            >
+              <XCircle className="mr-2 size-4" />
+              Hủy đăng bài
+            </Button>
+          ) : (
+            <Button
+              variant="default"
+              className="bg-green-600 hover:bg-green-700"
+              onClick={() => setShowPublishDialog(true)}
+            >
+              <Rocket className="mr-2 size-4" />
+              Đăng bài
+            </Button>
+          )}
           <Button variant="outline" asChild>
             <Link href={`/manage/posts/${postId}/edit`}>
               <Edit className="mr-2 size-4" />
@@ -527,10 +622,7 @@ export default function PostDetailPage() {
 
       <Card>
         <CardContent>
-          <WorkflowProgress
-            status={post.status}
-            reviewers={post.reviewers}
-          />
+          <WorkflowProgress status={post.status} reviewers={post.reviewers} />
         </CardContent>
       </Card>
 
@@ -582,7 +674,9 @@ export default function PostDetailPage() {
               <div className="flex items-center gap-3">
                 <User className="size-4 text-muted-foreground" />
                 <div>
-                  <p className="text-sm text-muted-foreground">{t.posts.postAuthor}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {t.posts.postAuthor}
+                  </p>
                   <p className="font-medium">{owner?.fullName || "N/A"}</p>
                 </div>
               </div>
@@ -590,7 +684,9 @@ export default function PostDetailPage() {
               <div className="flex items-center gap-3">
                 <Calendar className="size-4 text-muted-foreground" />
                 <div>
-                  <p className="text-sm text-muted-foreground">{t.posts.postDate}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {t.posts.postDate}
+                  </p>
                   <p className="font-medium">{formatDate(post.createdDate)}</p>
                 </div>
               </div>
@@ -603,7 +699,9 @@ export default function PostDetailPage() {
                       <p className="text-sm text-muted-foreground">
                         {t.posts.publishedAt}
                       </p>
-                      <p className="font-medium">{formatDate(post.publishedAt)}</p>
+                      <p className="font-medium">
+                        {formatDate(post.publishedAt)}
+                      </p>
                     </div>
                   </div>
                 </>
@@ -613,7 +711,9 @@ export default function PostDetailPage() {
                 <Eye className="size-4 text-muted-foreground" />
                 <div>
                   <p className="text-sm text-muted-foreground">Lượt xem</p>
-                  <p className="font-medium">{post.viewCount.toLocaleString()}</p>
+                  <p className="font-medium">
+                    {post.viewCount.toLocaleString()}
+                  </p>
                 </div>
               </div>
               <Separator />
@@ -649,7 +749,9 @@ export default function PostDetailPage() {
               <CardContent>
                 <div className="flex flex-wrap gap-2">
                   {post.categories.map((category) => (
-                    <Badge key={category.id} variant="outline">{category.name}</Badge>
+                    <Badge key={category.id} variant="outline">
+                      {category.name}
+                    </Badge>
                   ))}
                 </div>
               </CardContent>
@@ -700,7 +802,9 @@ export default function PostDetailPage() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t.posts.deletePost}</AlertDialogTitle>
-            <AlertDialogDescription>{t.posts.confirmDelete}</AlertDialogDescription>
+            <AlertDialogDescription>
+              {t.posts.confirmDelete}
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isDeleting}>
@@ -727,15 +831,18 @@ export default function PostDetailPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Gửi bài viết để duyệt?</AlertDialogTitle>
             <AlertDialogDescription>
-              Bài viết sẽ được gửi đến người phê duyệt. Bạn sẽ không thể chỉnh sửa
-              cho đến khi bài viết được phê duyệt hoặc bị từ chối.
+              Bài viết sẽ được gửi đến người phê duyệt. Bạn sẽ không thể chỉnh
+              sửa cho đến khi bài viết được phê duyệt hoặc bị từ chối.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isSubmitting}>
               {t.common.cancel}
             </AlertDialogCancel>
-            <AlertDialogAction onClick={handleSubmitForReview} disabled={isSubmitting}>
+            <AlertDialogAction
+              onClick={handleSubmitForReview}
+              disabled={isSubmitting}
+            >
               {isSubmitting ? (
                 <Loader2 className="mr-2 size-4 animate-spin" />
               ) : (
@@ -743,6 +850,70 @@ export default function PostDetailPage() {
               )}
               Gửi duyệt
             </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* TEMPORARY_POST: Force Publish / Unpublish Dialog */}
+      <AlertDialog open={showPublishDialog} onOpenChange={setShowPublishDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertCircle
+                className={`size-5 ${post.status === PostStatus.PUBLISHED ? "text-orange-500" : "text-yellow-500"}`}
+              />
+              {post.status === PostStatus.PUBLISHED
+                ? "Hủy đăng bài?"
+                : "Đăng bài ngay?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {post.status === PostStatus.PUBLISHED ? (
+                <>
+                  Bài viết sẽ được gỡ khỏi trang công khai. Người dùng sẽ không
+                  thể xem bài viết này cho đến khi bạn đăng lại.
+                </>
+              ) : (
+                <>
+                  <span className="text-yellow-600 font-medium">
+                    [TEMPORARY_POST]
+                  </span>{" "}
+                  Bạn đang sử dụng tính năng đăng bài nhanh. Bài viết sẽ được
+                  xuất bản ngay lập tức mà không cần qua quy trình phê duyệt.
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isPublishing}>
+              {t.common.cancel}
+            </AlertDialogCancel>
+            {post.status === PostStatus.PUBLISHED ? (
+              <AlertDialogAction
+                onClick={handleUnpublish}
+                disabled={isPublishing}
+                className="bg-orange-600 hover:bg-orange-700"
+              >
+                {isPublishing ? (
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                ) : (
+                  <XCircle className="mr-2 size-4" />
+                )}
+                Hủy đăng bài
+              </AlertDialogAction>
+            ) : (
+              <AlertDialogAction
+                onClick={handleForcePublish}
+                disabled={isPublishing}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                {isPublishing ? (
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                ) : (
+                  <Rocket className="mr-2 size-4" />
+                )}
+                Đăng bài
+              </AlertDialogAction>
+            )}
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -4,13 +4,11 @@ export enum PostStatus {
   APPROVED_BY_UNIT_EDITOR = 2,
   APPROVED_BY_UNIT_LEADER = 3,
   APPROVED_BY_UNIT_ADMIN = 4,
-  APPROVED_BY_SCHOOL_ADMIN = 5,
-  PUBLISHED = 6,
-  REJECTED = 7,
-  HIDDEN = 8,
-  ARCHIVED = 9,
-  SCHEDULED = 10,
-  EXPIRED = 11,
+  APPROVED_BY_SCHOOL_ADMIN = 7,
+  WAITING_PUBLISH = 8,
+  PUBLISHED = 9,
+  REJECTED = 10,
+  HIDDEN = 11,
 }
 
 export enum ContentFormat {
@@ -417,24 +415,22 @@ export interface RejectPostPromotionRequest {
 }
 
 export const POST_STATUS_LABELS: Record<PostStatus, string> = {
-  [PostStatus.DRAFT]: 'Nháp',
-  [PostStatus.PENDING]: 'Chờ duyệt',
-  [PostStatus.APPROVED_BY_UNIT_EDITOR]: 'Biên tập viên duyệt',
-  [PostStatus.APPROVED_BY_UNIT_LEADER]: 'Trưởng đơn vị duyệt',
-  [PostStatus.APPROVED_BY_UNIT_ADMIN]: 'Quản trị đơn vị duyệt',
-  [PostStatus.APPROVED_BY_SCHOOL_ADMIN]: 'Quản trị trường duyệt',
-  [PostStatus.PUBLISHED]: 'Đã xuất bản',
-  [PostStatus.REJECTED]: 'Từ chối',
-  [PostStatus.HIDDEN]: 'Ẩn',
-  [PostStatus.ARCHIVED]: 'Lưu trữ',
-  [PostStatus.SCHEDULED]: 'Lên lịch',
-  [PostStatus.EXPIRED]: 'Hết hạn',
+  [PostStatus.DRAFT]: "Nháp",
+  [PostStatus.PENDING]: "Chờ duyệt",
+  [PostStatus.APPROVED_BY_UNIT_EDITOR]: "Biên tập viên duyệt",
+  [PostStatus.APPROVED_BY_UNIT_LEADER]: "Trưởng đơn vị duyệt",
+  [PostStatus.APPROVED_BY_UNIT_ADMIN]: "Quản trị đơn vị duyệt",
+  [PostStatus.APPROVED_BY_SCHOOL_ADMIN]: "Quản trị trường duyệt",
+  [PostStatus.WAITING_PUBLISH]: "Chờ xuất bản",
+  [PostStatus.PUBLISHED]: "Đã xuất bản",
+  [PostStatus.REJECTED]: "Từ chối",
+  [PostStatus.HIDDEN]: "Ẩn",
 };
 
 export const CONTENT_FORMAT_LABELS: Record<ContentFormat, string> = {
-  [ContentFormat.PLAIN_TEXT]: 'Văn bản thuần',
-  [ContentFormat.HTML]: 'HTML',
-  [ContentFormat.TIPTAP_JSON]: 'Tiptap JSON',
+  [ContentFormat.PLAIN_TEXT]: "Văn bản thuần",
+  [ContentFormat.HTML]: "HTML",
+  [ContentFormat.TIPTAP_JSON]: "Tiptap JSON",
 };
 
 export function getPostStatusLabel(status: PostStatus): string {

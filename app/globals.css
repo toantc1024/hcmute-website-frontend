@@ -320,6 +320,20 @@
   animation: background-position-spin 3s linear infinite;
 }
 
+/* Workflow dashed line animation */
+@keyframes dash-flow {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 18px 0;
+  }
+}
+
+.animate-dash-flow {
+  animation: dash-flow 0.5s linear infinite;
+}
+
 html {
   scroll-behavior: smooth;
 }

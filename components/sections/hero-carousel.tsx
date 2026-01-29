@@ -77,7 +77,7 @@ export default function HeroCarousel() {
   };
 
   return (
-    <section id="hero" className="relative h-screen w-full overflow-x-hidden bg-gray-900">
+    <section id="hero" className="relative w-full overflow-x-hidden bg-gray-900 h-[50vh] sm:h-[60vh] md:h-[70vh] lg:h-[80vh] xl:h-screen">
       <AnimatePresence initial={false} mode="wait">
         <motion.div
           key={currentSlide}
@@ -97,29 +97,29 @@ export default function HeroCarousel() {
               src={slides[currentSlide].image}
               alt={slides[currentSlide].title}
               fill
-              className="object-cover"
+              className="object-cover object-center"
               priority
               quality={90}
-              sizes="100vw"
+              sizes="(max-width: 768px) 1600px, 1920px"
             />
           </motion.div>
           <div className="absolute inset-0 bg-black/40" />
 
           <div className="relative z-10 h-full flex items-center">
-            <div className="w-full px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40">
+            <div className="w-full px-4 sm:px-8 md:px-12 lg:px-24 xl:px-32 2xl:px-40">
               <div className="max-w-3xl">
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3, duration: 0.4 }}
                 >
-                  <span className="inline-block px-4 py-2 bg-blue-600/90 text-white rounded-full text-sm font-medium mb-6">
+                  <span className="inline-block px-3 py-1.5 sm:px-4 sm:py-2 bg-blue-600/90 text-white rounded-full text-xs sm:text-sm font-medium mb-3 sm:mb-6">
                     {slides[currentSlide].subtitle}
                   </span>
                 </motion.div>
 
                 <motion.h1
-                  className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight"
+                  className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-3 sm:mb-4 md:mb-6 leading-tight"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3, duration: 0.5 }}
@@ -128,7 +128,7 @@ export default function HeroCarousel() {
                 </motion.h1>
 
                 <motion.p
-                  className="text-lg lg:text-xl text-gray-200 mb-8 leading-relaxed max-w-2xl"
+                  className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-200 mb-4 sm:mb-6 md:mb-8 leading-relaxed max-w-2xl line-clamp-2 sm:line-clamp-3 md:line-clamp-none"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.4, duration: 0.5 }}
@@ -137,7 +137,7 @@ export default function HeroCarousel() {
                 </motion.p>
 
                 <motion.div
-                  className="flex flex-col sm:flex-row gap-4"
+                  className="flex flex-col sm:flex-row gap-3 sm:gap-4"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.5, duration: 0.5 }}
@@ -145,10 +145,10 @@ export default function HeroCarousel() {
                   <Button
                     variant="outline"
                     size="lg"
-                    className="!text-white rounded-3xl backdrop-blur-md bg-white/20 text-white px-8 py-4 hover:bg-white/30 border-white/30 hover:border-white/50 transition-all duration-300"
+                    className="!text-white rounded-3xl backdrop-blur-md bg-white/20 text-white px-5 py-2.5 sm:px-6 sm:py-3 md:px-8 md:py-4 text-sm sm:text-base hover:bg-white/30 border-white/30 hover:border-white/50 transition-all duration-300"
                   >
                     {slides[currentSlide].cta}
-                    <ArrowRight className="w-5 h-5 ml-2" />
+                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
                   </Button>
                 </motion.div>
               </div>
@@ -159,28 +159,28 @@ export default function HeroCarousel() {
 
       <ArrowButton
         direction="left"
-        className="absolute left-6 lg:left-12 xl:left-16 top-1/2 -translate-y-1/2 z-20"
+        className="absolute left-2 sm:left-4 md:left-6 lg:left-12 xl:left-16 top-1/2 -translate-y-1/2 z-20"
         onClick={prevSlide}
         onMouseEnter={() => setIsAutoPlay(false)}
         onMouseLeave={() => setIsAutoPlay(true)}
       />
 
       <ArrowButton
-        className="absolute right-6 lg:right-12 xl:right-16 top-1/2 -translate-y-1/2 z-20"
+        className="absolute right-2 sm:right-4 md:right-6 lg:right-12 xl:right-16 top-1/2 -translate-y-1/2 z-20"
         direction="right"
         onClick={nextSlide}
         onMouseEnter={() => setIsAutoPlay(false)}
         onMouseLeave={() => setIsAutoPlay(true)}
       />
 
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[10] flex space-x-3">
+      <div className="absolute bottom-4 sm:bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 z-[10] flex space-x-2 sm:space-x-3">
         {slides.map((_, index) => (
           <button
             key={index}
             onClick={() => goToSlide(index)}
             onMouseEnter={() => setIsAutoPlay(false)}
             onMouseLeave={() => setIsAutoPlay(true)}
-            className={`w-3 h-3 rounded-full transition-all duration-300 ${
+            className={`w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 rounded-full transition-all duration-300 ${
               index === currentSlide
                 ? "bg-white scale-125"
                 : "bg-white/50 hover:bg-white/80"

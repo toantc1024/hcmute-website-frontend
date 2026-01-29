@@ -27,7 +27,7 @@ interface WorkflowStep {
 
 function getWorkflowSteps(
   postStatus: PostStatus,
-  reviewers: PostReviewerView[] = []
+  reviewers: PostReviewerView[] = [],
 ): WorkflowStep[] {
   const steps: WorkflowStep[] = [
     {
@@ -45,28 +45,36 @@ function getWorkflowSteps(
       label: "Biên tập viên",
       status: "pending",
       reviewLevel: ReviewLevel.UNIT_EDITOR,
-      reviewers: reviewers.filter((r) => r.reviewLevel === ReviewLevel.UNIT_EDITOR),
+      reviewers: reviewers.filter(
+        (r) => r.reviewLevel === ReviewLevel.UNIT_EDITOR,
+      ),
     },
     {
       id: "unit_leader",
       label: "Trưởng đơn vị",
       status: "pending",
       reviewLevel: ReviewLevel.UNIT_LEADER,
-      reviewers: reviewers.filter((r) => r.reviewLevel === ReviewLevel.UNIT_LEADER),
+      reviewers: reviewers.filter(
+        (r) => r.reviewLevel === ReviewLevel.UNIT_LEADER,
+      ),
     },
     {
       id: "unit_admin",
       label: "Quản trị đơn vị",
       status: "pending",
       reviewLevel: ReviewLevel.UNIT_ADMIN,
-      reviewers: reviewers.filter((r) => r.reviewLevel === ReviewLevel.UNIT_ADMIN),
+      reviewers: reviewers.filter(
+        (r) => r.reviewLevel === ReviewLevel.UNIT_ADMIN,
+      ),
     },
     {
       id: "school_admin",
       label: "Quản trị trường",
       status: "pending",
       reviewLevel: ReviewLevel.SCHOOL_ADMIN,
-      reviewers: reviewers.filter((r) => r.reviewLevel === ReviewLevel.SCHOOL_ADMIN),
+      reviewers: reviewers.filter(
+        (r) => r.reviewLevel === ReviewLevel.SCHOOL_ADMIN,
+      ),
     },
     {
       id: "published",
@@ -130,7 +138,9 @@ function getWorkflowSteps(
   }
 
   reviewers.forEach((reviewer) => {
-    const stepIndex = steps.findIndex((s) => s.reviewLevel === reviewer.reviewLevel);
+    const stepIndex = steps.findIndex(
+      (s) => s.reviewLevel === reviewer.reviewLevel,
+    );
     if (stepIndex !== -1) {
       if (reviewer.status === ReviewerDecision.REJECTED) {
         steps[stepIndex].status = "rejected";
@@ -174,11 +184,23 @@ function ReviewerInfo({ reviewer }: { reviewer: PostReviewerView }) {
   const getDecisionBadge = () => {
     switch (reviewer.status) {
       case ReviewerDecision.APPROVED:
-        return <Badge variant="default" className="bg-green-500 text-xs">Đã duyệt</Badge>;
+        return (
+          <Badge variant="default" className="bg-green-500 text-xs">
+            Đã duyệt
+          </Badge>
+        );
       case ReviewerDecision.REJECTED:
-        return <Badge variant="destructive" className="text-xs">Từ chối</Badge>;
+        return (
+          <Badge variant="destructive" className="text-xs">
+            Từ chối
+          </Badge>
+        );
       default:
-        return <Badge variant="secondary" className="text-xs">Chờ duyệt</Badge>;
+        return (
+          <Badge variant="secondary" className="text-xs">
+            Chờ duyệt
+          </Badge>
+        );
     }
   };
 
@@ -190,7 +212,9 @@ function ReviewerInfo({ reviewer }: { reviewer: PostReviewerView }) {
           {reviewer.fullName?.slice(0, 2).toUpperCase() || "??"}
         </AvatarFallback>
       </Avatar>
-      <span className="text-sm truncate max-w-[120px]">{reviewer.fullName}</span>
+      <span className="text-sm truncate max-w-[120px]">
+        {reviewer.fullName}
+      </span>
       {getDecisionBadge()}
     </div>
   );
@@ -205,7 +229,7 @@ interface WorkflowProgressProps {
 
 function getLineStyles(
   currentStepStatus: WorkflowStep["status"],
-  nextStepStatus: WorkflowStep["status"]
+  nextStepStatus: WorkflowStep["status"],
 ): { bgColor: string; animate: boolean } {
   if (currentStepStatus === "completed" && nextStepStatus === "completed") {
     return { bgColor: "bg-green-500", animate: false };
@@ -222,32 +246,32 @@ function getLineStyles(
   return { bgColor: "bg-muted", animate: false };
 }
 
-function ConnectorLine({ 
-  currentStatus, 
-  nextStatus 
-}: { 
-  currentStatus: WorkflowStep["status"]; 
+function ConnectorLine({
+  currentStatus,
+  nextStatus,
+}: {
+  currentStatus: WorkflowStep["status"];
   nextStatus: WorkflowStep["status"];
 }) {
   const { bgColor, animate } = getLineStyles(currentStatus, nextStatus);
 
   return (
     <div className="flex-1 flex items-center mx-1">
-      <div 
-        className={cn(
-          "h-0.5 w-full relative overflow-hidden rounded-full",
-          bgColor
-        )}
-      >
-        {animate && (
-          <div 
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent"
+      {animate ? (
+        // Running dashed line animation for active step - thicker and primary colored
+        <div className="relative w-full h-1.5 overflow-hidden rounded-full bg-primary/30">
+          <div
+            className="absolute inset-0 rounded-full animate-dash-flow"
             style={{
-              animation: "flow-shimmer 1.5s ease-in-out infinite",
+              backgroundImage:
+                "repeating-linear-gradient(90deg, hsl(var(--primary)) 0px, hsl(var(--primary)) 10px, transparent 10px, transparent 18px)",
+              backgroundSize: "18px 100%",
             }}
           />
-        )}
-      </div>
+        </div>
+      ) : (
+        <div className={cn("h-1.5 w-full rounded-full", bgColor)} />
+      )}
     </div>
   );
 }
@@ -264,26 +288,32 @@ export function WorkflowProgress({
     const completedSteps = steps.filter((s) => s.status === "completed").length;
     const totalSteps = steps.length;
     const progress = (completedSteps / totalSteps) * 100;
-    const currentStep = steps.find((s) => s.status === "current") || steps.find((s) => s.status === "rejected");
+    const currentStep =
+      steps.find((s) => s.status === "current") ||
+      steps.find((s) => s.status === "rejected");
 
     return (
       <div className={cn("space-y-2", className)}>
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">Tiến trình</span>
-          <span className="font-medium">{completedSteps}/{totalSteps}</span>
+          <span className="font-medium">
+            {completedSteps}/{totalSteps}
+          </span>
         </div>
         <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
           <div
             className={cn(
               "h-full transition-all duration-500",
-              status === PostStatus.REJECTED ? "bg-destructive" : "bg-primary"
+              status === PostStatus.REJECTED ? "bg-destructive" : "bg-primary",
             )}
             style={{ width: `${progress}%` }}
           />
         </div>
         {currentStep && (
           <p className="text-xs text-muted-foreground">
-            {currentStep.status === "rejected" ? "Bị từ chối tại: " : "Đang ở: "}
+            {currentStep.status === "rejected"
+              ? "Bị từ chối tại: "
+              : "Đang ở: "}
             <span className="font-medium">{currentStep.label}</span>
           </p>
         )}
@@ -302,14 +332,17 @@ export function WorkflowProgress({
             {status === PostStatus.PUBLISHED
               ? "Hoàn thành"
               : status === PostStatus.REJECTED
-              ? "Bị từ chối"
-              : "Đang xử lý"}
+                ? "Bị từ chối"
+                : "Đang xử lý"}
           </Badge>
         </div>
 
         <div className="flex items-start">
           {steps.map((step, index) => (
-            <div key={step.id} className="flex items-start flex-1 last:flex-initial">
+            <div
+              key={step.id}
+              className="flex items-start flex-1 last:flex-initial"
+            >
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex flex-col items-center gap-2">
@@ -320,7 +353,7 @@ export function WorkflowProgress({
                         step.status === "current" && "font-medium text-primary",
                         step.status === "completed" && "text-green-600",
                         step.status === "rejected" && "text-destructive",
-                        step.status === "pending" && "text-muted-foreground"
+                        step.status === "pending" && "text-muted-foreground",
                       )}
                     >
                       {step.label}
@@ -332,18 +365,21 @@ export function WorkflowProgress({
                     <div className="space-y-2">
                       <p className="font-medium text-sm">Người đánh giá:</p>
                       {step.reviewers.map((reviewer) => (
-                        <ReviewerInfo key={reviewer.userId} reviewer={reviewer} />
+                        <ReviewerInfo
+                          key={reviewer.userId}
+                          reviewer={reviewer}
+                        />
                       ))}
                     </div>
                   </TooltipContent>
                 )}
               </Tooltip>
-              
+
               {index < steps.length - 1 && (
                 <div className="flex-1 pt-4 px-1">
-                  <ConnectorLine 
-                    currentStatus={step.status} 
-                    nextStatus={steps[index + 1].status} 
+                  <ConnectorLine
+                    currentStatus={step.status}
+                    nextStatus={steps[index + 1].status}
                   />
                 </div>
               )}
@@ -378,7 +414,7 @@ export function WorkflowProgressVertical({
               <div
                 className={cn(
                   "w-0.5 flex-1 min-h-[24px]",
-                  step.status === "completed" ? "bg-green-500" : "bg-muted"
+                  step.status === "completed" ? "bg-green-500" : "bg-muted",
                 )}
               />
             )}
@@ -390,7 +426,7 @@ export function WorkflowProgressVertical({
                 step.status === "current" && "text-primary",
                 step.status === "completed" && "text-green-600",
                 step.status === "rejected" && "text-destructive",
-                step.status === "pending" && "text-muted-foreground"
+                step.status === "pending" && "text-muted-foreground",
               )}
             >
               {step.label}

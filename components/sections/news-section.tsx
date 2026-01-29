@@ -1,14 +1,8 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "motion/react";
-import {
-  Calendar,
-  ArrowRight,
-  Clock,
-  TrendingUp,
-  Hash,
-  AxeIcon,
-} from "lucide-react";
+import { Calendar, ArrowRight, Clock, TrendingUp, Hash } from "lucide-react";
 import Image from "next/image";
 import CardSwap, { Card } from "@/components/ui/card-swap";
 import Link from "next/link";
@@ -16,69 +10,7 @@ import { DotPattern } from "../ui/dot-pattern";
 import { cn } from "@/lib/utils";
 import { NeonGradientCard } from "../ui/neon-gradient-card";
 import { AuroraText } from "../ui/aurora-text";
-
-interface NewsItem {
-  id: number;
-  title: string;
-  excerpt: string;
-  date: string;
-  category: string;
-  image: string;
-  readTime: string;
-  views?: number;
-  tags?: string[];
-}
-
-const newsItems: NewsItem[] = [
-  {
-    id: 101,
-    title: "HCMUTE ký kết hợp tác với Đại học Tokyo - Nhật Bản",
-    excerpt:
-      "Chương trình hợp tác tạo cơ hội trao đổi sinh viên, giảng viên và phát triển các dự án nghiên cứu chung trong lĩnh vực kỹ thuật và công nghệ.",
-    date: "2024-01-15",
-    category: "Hợp tác quốc tế",
-    image: "/news/hoi-thao-ute.jpg",
-    readTime: "3 phút",
-    views: 245,
-    tags: ["hợp-tác", "quốc-tế", "tokyo"],
-  },
-  {
-    id: 102,
-    title: "Sinh viên HCMUTE đạt giải Nhất cuộc thi Robotics Việt Nam 2024",
-    excerpt:
-      "Đội thi của Khoa Cơ khí xuất sắc giành giải Nhất với dự án robot tự động phân loại rác thải thông minh.",
-    date: "2024-01-12",
-    category: "Thành tích sinh viên",
-    image: "/news/giai-nha-robot.jpeg",
-    readTime: "2 phút",
-    views: 189,
-    tags: ["robotics", "giải-thưởng", "sinh-viên"],
-  },
-  {
-    id: 103,
-    title: "Hội thảo quốc tế về AI và IoT trong giáo dục kỹ thuật",
-    excerpt:
-      "Sự kiện quy tụ hơn 200 chuyên gia trong nước và quốc tế thảo luận về xu hướng ứng dụng công nghệ trong đào tạo kỹ thuật.",
-    date: "2024-01-10",
-    category: "Sự kiện",
-    image: "/news/vina-ute.png",
-    readTime: "4 phút",
-    views: 312,
-    tags: ["ai", "iot", "giáo-dục"],
-  },
-  {
-    id: 104,
-    title: "HCMUTE khai giảng chương trình đào tạo Kỹ sư chất lượng cao",
-    excerpt:
-      "Chương trình đào tạo Kỹ sư chất lượng cao với 100% giảng dạy bằng tiếng Anh, hợp tác cùng các doanh nghiệp hàng đầu trong và ngoài nước.",
-    date: "2024-01-08",
-    category: "Đào tạo",
-    image: "/news/hoi-thao-ute.jpg",
-    readTime: "5 phút",
-    views: 428,
-    tags: ["đào-tạo", "kỹ-sư", "chất-lượng-cao"],
-  },
-];
+import { postsApi, type PostAuditView } from "@/lib/api-client";
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -89,9 +21,95 @@ const formatDate = (dateString: string) => {
   });
 };
 
+const calculateReadTime = (wordCount: number = 500) => {
+  const minutes = Math.ceil(wordCount / 200);
+  return `${minutes} phút`;
+};
+
 export default function NewsSection() {
-  const featured = newsItems[0];
-  const spotlight = newsItems;
+  const [posts, setPosts] = useState<PostAuditView[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLatestPosts = async () => {
+      try {
+        const response = await postsApi.getPublishedPosts({ limit: 4 });
+        setPosts(response.content);
+      } catch (error) {
+        console.error("Failed to fetch latest posts:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLatestPosts();
+  }, []);
+
+  // Fallback data when no posts are available
+  const fallbackPosts: PostAuditView[] = [
+    {
+      id: "1",
+      title: "HCMUTE ký kết hợp tác với Đại học Tokyo - Nhật Bản",
+      slug: "hcmute-ky-ket-hop-tac-tokyo",
+      coverImageUrl: "/news/hoi-thao-ute.jpg",
+      publishedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      viewCount: 245,
+      status: "PUBLISHED",
+      categories: [
+        { id: "1", name: "Hợp tác quốc tế", slug: "hop-tac-quoc-te" },
+      ],
+      tags: [{ id: "1", name: "hợp-tác", slug: "hop-tac" }],
+      authors: [],
+    },
+    {
+      id: "2",
+      title: "Sinh viên HCMUTE đạt giải Nhất cuộc thi Robotics Việt Nam 2024",
+      slug: "sinh-vien-hcmute-giai-nhat-robotics",
+      coverImageUrl: "/news/giai-nha-robot.jpeg",
+      publishedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      viewCount: 189,
+      status: "PUBLISHED",
+      categories: [
+        { id: "2", name: "Thành tích sinh viên", slug: "thanh-tich-sinh-vien" },
+      ],
+      tags: [{ id: "2", name: "robotics", slug: "robotics" }],
+      authors: [],
+    },
+    {
+      id: "3",
+      title: "Hội thảo quốc tế về AI và IoT trong giáo dục kỹ thuật",
+      slug: "hoi-thao-ai-iot-giao-duc",
+      coverImageUrl: "/news/vina-ute.png",
+      publishedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      viewCount: 312,
+      status: "PUBLISHED",
+      categories: [{ id: "3", name: "Sự kiện", slug: "su-kien" }],
+      tags: [{ id: "3", name: "ai", slug: "ai" }],
+      authors: [],
+    },
+    {
+      id: "4",
+      title: "HCMUTE khai giảng chương trình đào tạo Kỹ sư chất lượng cao",
+      slug: "hcmute-khai-giang-ky-su-chat-luong-cao",
+      coverImageUrl: "/news/hoi-thao-ute.jpg",
+      publishedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      viewCount: 428,
+      status: "PUBLISHED",
+      categories: [{ id: "4", name: "Đào tạo", slug: "dao-tao" }],
+      tags: [{ id: "4", name: "đào-tạo", slug: "dao-tao" }],
+      authors: [],
+    },
+  ];
+
+  const displayPosts = posts.length > 0 ? posts : fallbackPosts;
 
   return (
     <section className="relative overflow-hidden ">
@@ -132,7 +150,7 @@ export default function NewsSection() {
               cy={1}
               cr={1}
               className={cn(
-                "mt-2 [mask-image:linear-gradient(to_top_right,white,transparent,transparent)]"
+                "mt-2 [mask-image:linear-gradient(to_top_right,white,transparent,transparent)]",
               )}
             />
             {/* Right Side - Featured News Cards */}
@@ -153,12 +171,15 @@ export default function NewsSection() {
                     delay={6000}
                     className="w-full max-w-[460px]  sm:max-w-[320px]"
                   >
-                    {spotlight.map((item) => (
+                    {displayPosts.map((post) => (
                       <Card
-                        key={item.id}
+                        key={post.id}
                         customClass=" !border-gray-300  bg-white/50 overflow-hidden cursor-pointer"
                       >
-                        <Link href={`/tin-tuc/${item.id}`} className="block h-full w-full">
+                        <Link
+                          href={`/tin-tuc/${post.slug}`}
+                          className="block h-full w-full"
+                        >
                           <div className="relative h-full w-full">
                             <div className="flex flex-col h-full">
                               <div className="rounded-t-3xl bg-transparent backdrop-blur-md flex items-center gap-0 w-full">
@@ -168,18 +189,26 @@ export default function NewsSection() {
                                   alt="UTE Logo"
                                 />
                                 <h3 className="text-lg text-start font-bold text-gray-700/85 leading-tight line-clamp-2">
-                                  {item.title}
+                                  {post.title}
                                 </h3>
                               </div>
 
                               <div className="flex-1 relative">
-                                <Image
-                                  src={item.image}
-                                  alt={item.title}
-                                  fill
-                                  className="object-cover"
-                                  sizes="(max-width: 768px) 100vw, 420px"
-                                />
+                                {post.coverImageUrl ? (
+                                  <Image
+                                    src={post.coverImageUrl}
+                                    alt={post.title}
+                                    fill
+                                    className="object-cover"
+                                    sizes="(max-width: 768px) 100vw, 420px"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                                    <span className="text-white/50 text-2xl font-bold">
+                                      HCM-UTE
+                                    </span>
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -200,8 +229,8 @@ export default function NewsSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          {newsItems.map((item, index) => (
-            <Link key={item.id} href={`/tin-tuc/${item.id}`}>
+          {displayPosts.map((post, index) => (
+            <Link key={post.id} href={`/tin-tuc/${post.slug}`}>
               <motion.article
                 className="group relative rounded-2xl overflow-hidden bg-white border border-gray-200 transition-all duration-500 hover:shadow-xl cursor-pointer aspect-[3/4]"
                 initial={{ opacity: 0, y: 40 }}
@@ -210,55 +239,65 @@ export default function NewsSection() {
                 transition={{ duration: 0.6, delay: index * 0.1 }}
               >
                 <div className="relative rounded-2xl h-full w-full overflow-hidden">
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
+                  {post.coverImageUrl ? (
+                    <Image
+                      src={post.coverImageUrl}
+                      alt={post.title}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                      <span className="text-white/50 text-4xl font-bold">
+                        HCM-UTE
+                      </span>
+                    </div>
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
                   {/* Views Indicator - Top Right */}
-                  {item.views && (
+                  {post.viewCount > 0 && (
                     <div className="absolute top-2 right-2 lg:top-3 lg:right-3 flex items-center gap-1 px-2 py-1 rounded-2xl bg-black/50 backdrop-blur-sm border border-white/20 z-10">
                       <span className="text-[10px] lg:text-xs font-medium text-white">
-                        {item.views}
+                        {post.viewCount}
                       </span>
                       <TrendingUp className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-white/80" />
                     </div>
                   )}
 
                   {/* Category Badge - Top Left */}
-                  <div className="absolute top-2 left-2 lg:top-3 lg:left-3 z-10">
-                    <span className="inline-flex rounded-2xl items-center px-2 py-1 lg:px-2.5 lg:py-1 bg-white/95 backdrop-blur-sm text-[10px] lg:text-xs font-semibold uppercase tracking-wider text-gray-800 border border-white/30 shadow-sm">
-                      {item.category}
-                    </span>
-                  </div>
+                  {post.categories?.[0] && (
+                    <div className="absolute top-2 left-2 lg:top-3 lg:left-3 z-10">
+                      <span className="inline-flex rounded-2xl items-center px-2 py-1 lg:px-2.5 lg:py-1 bg-white/95 backdrop-blur-sm text-[10px] lg:text-xs font-semibold uppercase tracking-wider text-gray-800 border border-white/30 shadow-sm">
+                        {post.categories[0].name}
+                      </span>
+                    </div>
+                  )}
 
                   {/* Content Overlay - Bottom */}
                   <div className="absolute bottom-0 left-0 right-0 p-3 lg:p-4 bg-gradient-to-t from-black/90 via-black/70 to-transparent">
                     {/* Date */}
                     <div className="flex items-center justify-end mb-1.5 lg:mb-2">
                       <span className="text-[10px] lg:text-xs font-medium text-white/80">
-                        {formatDate(item.date)}
+                        {formatDate(post.publishedAt || post.createdAt)}
                       </span>
                     </div>
 
                     {/* Title */}
                     <h3 className="text-sm lg:text-base font-bold text-white leading-tight line-clamp-2 mb-1.5">
-                      {item.title}
+                      {post.title}
                     </h3>
 
                     {/* Tags - Hidden on mobile */}
-                    {item.tags && item.tags.length > 0 && (
+                    {post.tags && post.tags.length > 0 && (
                       <div className="hidden lg:flex flex-wrap items-center gap-1.5 mb-2">
-                        {item.tags.slice(0, 2).map((tag, tagIndex) => (
+                        {post.tags.slice(0, 2).map((tag) => (
                           <span
-                            key={tagIndex}
+                            key={tag.id}
                             className="inline-flex rounded-xl items-center gap-0.5 px-1.5 py-0.5 bg-white/20 backdrop-blur-sm text-[10px] font-medium text-white border border-white/30"
                           >
                             <Hash className="w-2 h-2" />
-                            {tag}
+                            {tag.name}
                           </span>
                         ))}
                       </div>
@@ -267,7 +306,7 @@ export default function NewsSection() {
                     {/* Read Time */}
                     <div className="flex items-center gap-1 text-[10px] lg:text-xs text-white/70">
                       <Clock className="w-2.5 h-2.5 lg:w-3 lg:h-3" />
-                      {item.readTime}
+                      {calculateReadTime()}
                     </div>
                   </div>
 
