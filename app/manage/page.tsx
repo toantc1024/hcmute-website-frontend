@@ -88,7 +88,9 @@ function StatCard({ title, value, icon, description, trend }: StatCardProps) {
             <div className="flex items-center gap-1 mt-2">
               <TrendingUp
                 className={`size-3 ${
-                  trend.isPositive ? "text-green-500" : "text-red-500 rotate-180"
+                  trend.isPositive
+                    ? "text-green-500"
+                    : "text-red-500 rotate-180"
                 }`}
               />
               <span
@@ -96,9 +98,12 @@ function StatCard({ title, value, icon, description, trend }: StatCardProps) {
                   trend.isPositive ? "text-green-500" : "text-red-500"
                 }`}
               >
-                {trend.isPositive ? "+" : "-"}{Math.abs(trend.value)}%
+                {trend.isPositive ? "+" : "-"}
+                {Math.abs(trend.value)}%
               </span>
-              <span className="text-xs text-muted-foreground">so với tháng trước</span>
+              <span className="text-xs text-muted-foreground">
+                so với tháng trước
+              </span>
             </div>
           )}
         </CardContent>
@@ -224,7 +229,8 @@ export default function DashboardPage() {
           {t.dashboard.welcome}, {user?.name || user?.preferred_username}!
         </h1>
         <p className="text-muted-foreground mt-2">
-          Đây là bảng điều khiển của bạn. Quản lý bài viết và theo dõi hiệu suất.
+          Đây là bảng điều khiển của bạn. Quản lý bài viết và theo dõi hiệu
+          suất.
         </p>
       </motion.div>
 
@@ -247,7 +253,10 @@ export default function DashboardPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <ChartContainer config={viewsChartConfig} className="h-[250px] w-full">
+              <ChartContainer
+                config={viewsChartConfig}
+                className="h-[250px] w-full"
+              >
                 <AreaChart
                   accessibilityLayer
                   data={viewsChartData}
@@ -291,7 +300,10 @@ export default function DashboardPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <ChartContainer config={postsChartConfig} className="h-[250px] w-full">
+              <ChartContainer
+                config={postsChartConfig}
+                className="h-[250px] w-full"
+              >
                 <BarChart
                   accessibilityLayer
                   data={postsChartData}
@@ -321,7 +333,9 @@ export default function DashboardPage() {
       </div>
 
       <motion.div variants={itemVariants}>
-        <h2 className="text-xl font-semibold mb-4">{t.dashboard.quickActions}</h2>
+        <h2 className="text-xl font-semibold mb-4">
+          {t.dashboard.quickActions}
+        </h2>
         <div className="grid gap-4 sm:grid-cols-2">
           {quickActions.map((action) => (
             <QuickAction key={action.title} {...action} />
@@ -333,9 +347,7 @@ export default function DashboardPage() {
         <Card>
           <CardHeader>
             <CardTitle>{t.dashboard.recentPosts}</CardTitle>
-            <CardDescription>
-              Các bài viết gần đây nhất của bạn
-            </CardDescription>
+            <CardDescription>Các bài viết gần đây nhất của bạn</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -356,9 +368,7 @@ export default function DashboardPage() {
                     </div>
                   </div>
                   <Button variant="ghost" size="sm" asChild>
-                    <Link href={`/manage/posts/${i}`}>
-                      {t.common.view}
-                    </Link>
+                    <Link href={`/manage/posts/${i}`}>{t.common.view}</Link>
                   </Button>
                 </div>
               ))}

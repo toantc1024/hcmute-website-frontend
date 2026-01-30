@@ -62,11 +62,27 @@ const colorOptions = [
 ];
 
 const socialLinks = [
-  { id: "facebook", name: "Facebook", placeholder: "https://facebook.com/hcmute" },
-  { id: "youtube", name: "YouTube", placeholder: "https://youtube.com/@hcmute" },
-  { id: "linkedin", name: "LinkedIn", placeholder: "https://linkedin.com/school/hcmute" },
+  {
+    id: "facebook",
+    name: "Facebook",
+    placeholder: "https://facebook.com/hcmute",
+  },
+  {
+    id: "youtube",
+    name: "YouTube",
+    placeholder: "https://youtube.com/@hcmute",
+  },
+  {
+    id: "linkedin",
+    name: "LinkedIn",
+    placeholder: "https://linkedin.com/school/hcmute",
+  },
   { id: "twitter", name: "Twitter/X", placeholder: "https://x.com/hcmute" },
-  { id: "instagram", name: "Instagram", placeholder: "https://instagram.com/hcmute" },
+  {
+    id: "instagram",
+    name: "Instagram",
+    placeholder: "https://instagram.com/hcmute",
+  },
 ];
 
 export default function WebsiteManagementPage() {
@@ -79,10 +95,17 @@ export default function WebsiteManagementPage() {
       animate="visible"
       className="space-y-8"
     >
-      <motion.div variants={itemVariants} className="flex items-center justify-between">
+      <motion.div
+        variants={itemVariants}
+        className="flex items-center justify-between"
+      >
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">{t.websiteManagement.title}</h1>
-          <p className="text-muted-foreground mt-1">{t.websiteManagement.description}</p>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {t.websiteManagement.title}
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            {t.websiteManagement.description}
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline">
@@ -125,12 +148,16 @@ export default function WebsiteManagementPage() {
             <Card>
               <CardHeader>
                 <CardTitle>{t.websiteManagement.general}</CardTitle>
-                <CardDescription>Cấu hình thông tin cơ bản của website</CardDescription>
+                <CardDescription>
+                  Cấu hình thông tin cơ bản của website
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="siteName">{t.websiteManagement.siteName}</Label>
+                    <Label htmlFor="siteName">
+                      {t.websiteManagement.siteName}
+                    </Label>
                     <Input
                       id="siteName"
                       defaultValue="Trường Đại học Công nghệ Kỹ Thuật TP.HCM"
@@ -138,14 +165,13 @@ export default function WebsiteManagementPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="siteUrl">URL Website</Label>
-                    <Input
-                      id="siteUrl"
-                      defaultValue="https://hcmute.edu.vn"
-                    />
+                    <Input id="siteUrl" defaultValue="https://hcmute.edu.vn" />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="siteDescription">{t.websiteManagement.siteDescription}</Label>
+                  <Label htmlFor="siteDescription">
+                    {t.websiteManagement.siteDescription}
+                  </Label>
                   <Textarea
                     id="siteDescription"
                     defaultValue="Trường Đại học Công nghệ Kỹ Thuật TP. Hồ Chí Minh (HCMUTE) - Đào tạo nguồn nhân lực chất lượng cao trong lĩnh vực kỹ thuật và công nghệ."
@@ -219,7 +245,9 @@ export default function WebsiteManagementPage() {
                         defaultValue="#3b82f6"
                         className="size-10 p-1 cursor-pointer"
                       />
-                      <span className="text-sm text-muted-foreground">Tùy chỉnh</span>
+                      <span className="text-sm text-muted-foreground">
+                        Tùy chỉnh
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -230,8 +258,12 @@ export default function WebsiteManagementPage() {
                       <Moon className="size-5" />
                     </div>
                     <div>
-                      <p className="font-medium">{t.websiteManagement.darkMode}</p>
-                      <p className="text-sm text-muted-foreground">Cho phép người dùng chuyển sang chế độ tối</p>
+                      <p className="font-medium">
+                        {t.websiteManagement.darkMode}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Cho phép người dùng chuyển sang chế độ tối
+                      </p>
                     </div>
                   </div>
                   <Switch defaultChecked />
@@ -286,7 +318,9 @@ export default function WebsiteManagementPage() {
                     id="metaTitle"
                     defaultValue="HCMUTE - Trường Đại học Công nghệ Kỹ Thuật TP.HCM"
                   />
-                  <p className="text-xs text-muted-foreground">Khuyến nghị: 50-60 ký tự</p>
+                  <p className="text-xs text-muted-foreground">
+                    Khuyến nghị: 50-60 ký tự
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="metaDescription">Meta Description</Label>
@@ -295,7 +329,9 @@ export default function WebsiteManagementPage() {
                     defaultValue="Trường Đại học Công nghệ Kỹ Thuật TP. Hồ Chí Minh - Đào tạo kỹ sư, cử nhân chất lượng cao trong các lĩnh vực kỹ thuật, công nghệ và sư phạm."
                     rows={3}
                   />
-                  <p className="text-xs text-muted-foreground">Khuyến nghị: 150-160 ký tự</p>
+                  <p className="text-xs text-muted-foreground">
+                    Khuyến nghị: 150-160 ký tự
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="keywords">Keywords</Label>
@@ -315,21 +351,27 @@ export default function WebsiteManagementPage() {
                         <Upload className="size-4 mr-2" />
                         Tải lên
                       </Button>
-                      <p className="text-xs text-muted-foreground">Khuyến nghị: 1200x630px</p>
+                      <p className="text-xs text-muted-foreground">
+                        Khuyến nghị: 1200x630px
+                      </p>
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center justify-between p-4 rounded-lg border">
                   <div>
                     <p className="font-medium">Sitemap tự động</p>
-                    <p className="text-sm text-muted-foreground">Tự động tạo sitemap.xml cho Google</p>
+                    <p className="text-sm text-muted-foreground">
+                      Tự động tạo sitemap.xml cho Google
+                    </p>
                   </div>
                   <Switch defaultChecked />
                 </div>
                 <div className="flex items-center justify-between p-4 rounded-lg border">
                   <div>
                     <p className="font-medium">Robots.txt</p>
-                    <p className="text-sm text-muted-foreground">Cho phép bot tìm kiếm index website</p>
+                    <p className="text-sm text-muted-foreground">
+                      Cho phép bot tìm kiếm index website
+                    </p>
                   </div>
                   <Switch defaultChecked />
                 </div>
@@ -343,7 +385,9 @@ export default function WebsiteManagementPage() {
             <Card>
               <CardHeader>
                 <CardTitle>{t.websiteManagement.socialLinks}</CardTitle>
-                <CardDescription>Liên kết đến các trang mạng xã hội</CardDescription>
+                <CardDescription>
+                  Liên kết đến các trang mạng xã hội
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {socialLinks.map((social) => (
@@ -387,19 +431,13 @@ export default function WebsiteManagementPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="phone">Điện thoại</Label>
-                    <Input
-                      id="phone"
-                      defaultValue="(028) 3896 8641"
-                    />
+                    <Input id="phone" defaultValue="(028) 3896 8641" />
                   </div>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      defaultValue="info@hcmute.edu.vn"
-                    />
+                    <Input id="email" defaultValue="info@hcmute.edu.vn" />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="workingHours">Giờ làm việc</Label>

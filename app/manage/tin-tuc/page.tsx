@@ -71,7 +71,8 @@ const mockNews: NewsItem[] = [
   {
     id: "1",
     title: "Thông báo tuyển sinh đại học chính quy năm 2026",
-    excerpt: "Trường Đại học Công nghệ Kỹ Thuật TP.HCM thông báo tuyển sinh đại học chính quy năm 2026 với nhiều ngành học mới...",
+    excerpt:
+      "Trường Đại học Công nghệ Kỹ Thuật TP.HCM thông báo tuyển sinh đại học chính quy năm 2026 với nhiều ngành học mới...",
     category: "Tuyển sinh",
     author: "Admin",
     status: "published",
@@ -82,7 +83,8 @@ const mockNews: NewsItem[] = [
   {
     id: "2",
     title: "Lễ khai giảng năm học 2025-2026",
-    excerpt: "Trường long trọng tổ chức lễ khai giảng năm học mới với sự tham dự của hàng nghìn tân sinh viên...",
+    excerpt:
+      "Trường long trọng tổ chức lễ khai giảng năm học mới với sự tham dự của hàng nghìn tân sinh viên...",
     category: "Sự kiện",
     author: "Phòng CTSV",
     status: "published",
@@ -93,7 +95,8 @@ const mockNews: NewsItem[] = [
   {
     id: "3",
     title: "Hội thảo quốc tế về AI trong giáo dục",
-    excerpt: "Trường phối hợp tổ chức hội thảo quốc tế về ứng dụng trí tuệ nhân tạo trong giáo dục...",
+    excerpt:
+      "Trường phối hợp tổ chức hội thảo quốc tế về ứng dụng trí tuệ nhân tạo trong giáo dục...",
     category: "Nghiên cứu",
     author: "Phòng KHCN",
     status: "pending",
@@ -104,7 +107,8 @@ const mockNews: NewsItem[] = [
   {
     id: "4",
     title: "Thông báo lịch nghỉ Tết Nguyên đán 2026",
-    excerpt: "Thông báo về lịch nghỉ Tết Nguyên đán năm 2026 cho toàn thể cán bộ, giảng viên và sinh viên...",
+    excerpt:
+      "Thông báo về lịch nghỉ Tết Nguyên đán năm 2026 cho toàn thể cán bộ, giảng viên và sinh viên...",
     category: "Thông báo",
     author: "Admin",
     status: "draft",
@@ -207,7 +211,10 @@ export default function NewsPage() {
       animate="visible"
       className="space-y-8"
     >
-      <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <motion.div
+        variants={itemVariants}
+        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+      >
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{t.news.title}</h1>
           <p className="text-muted-foreground mt-1">{t.news.description}</p>
@@ -224,10 +231,7 @@ export default function NewsPage() {
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                <Input
-                  placeholder="Tìm kiếm tin tức..."
-                  className="pl-9"
-                />
+                <Input placeholder="Tìm kiếm tin tức..." className="pl-9" />
               </div>
               <Select defaultValue="all">
                 <SelectTrigger className="w-full sm:w-[180px]">

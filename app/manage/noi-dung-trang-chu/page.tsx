@@ -93,11 +93,29 @@ interface QuickLink {
 }
 
 const mockQuickLinks: QuickLink[] = [
-  { id: "1", title: "Cổng thông tin sinh viên", icon: "user", href: "#", active: true },
+  {
+    id: "1",
+    title: "Cổng thông tin sinh viên",
+    icon: "user",
+    href: "#",
+    active: true,
+  },
   { id: "2", title: "E-Learning", icon: "book", href: "#", active: true },
-  { id: "3", title: "Thư viện điện tử", icon: "library", href: "#", active: true },
+  {
+    id: "3",
+    title: "Thư viện điện tử",
+    icon: "library",
+    href: "#",
+    active: true,
+  },
   { id: "4", title: "Email HCMUTE", icon: "mail", href: "#", active: true },
-  { id: "5", title: "Đăng ký tín chỉ", icon: "calendar", href: "#", active: false },
+  {
+    id: "5",
+    title: "Đăng ký tín chỉ",
+    icon: "calendar",
+    href: "#",
+    active: false,
+  },
 ];
 
 interface StatItem {
@@ -141,8 +159,12 @@ function BannerCard({ banner }: { banner: BannerSlide }) {
                   </Badge>
                 )}
               </div>
-              <p className="text-sm text-muted-foreground truncate">{banner.subtitle}</p>
-              <p className="text-xs text-muted-foreground mt-1">Link: {banner.link}</p>
+              <p className="text-sm text-muted-foreground truncate">
+                {banner.subtitle}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Link: {banner.link}
+              </p>
             </div>
             <div className="flex items-center gap-2">
               <Switch checked={banner.active} />
@@ -171,8 +193,12 @@ export default function HomepageContentPage() {
       className="space-y-8"
     >
       <motion.div variants={itemVariants}>
-        <h1 className="text-3xl font-bold tracking-tight">{t.homepageContent.title}</h1>
-        <p className="text-muted-foreground mt-1">{t.homepageContent.description}</p>
+        <h1 className="text-3xl font-bold tracking-tight">
+          {t.homepageContent.title}
+        </h1>
+        <p className="text-muted-foreground mt-1">
+          {t.homepageContent.description}
+        </p>
       </motion.div>
 
       <Tabs defaultValue="banner" className="space-y-6">
@@ -205,7 +231,9 @@ export default function HomepageContentPage() {
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                   <CardTitle>{t.homepageContent.banner}</CardTitle>
-                  <CardDescription>Quản lý các slide banner trên trang chủ</CardDescription>
+                  <CardDescription>
+                    Quản lý các slide banner trên trang chủ
+                  </CardDescription>
                 </div>
                 <Button>
                   <Plus className="size-4 mr-2" />
@@ -227,7 +255,9 @@ export default function HomepageContentPage() {
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                   <CardTitle>{t.homepageContent.featuredNews}</CardTitle>
-                  <CardDescription>Chọn tin tức hiển thị nổi bật trên trang chủ</CardDescription>
+                  <CardDescription>
+                    Chọn tin tức hiển thị nổi bật trên trang chủ
+                  </CardDescription>
                 </div>
                 <Button variant="outline">
                   Quản lý tin tức
@@ -237,14 +267,19 @@ export default function HomepageContentPage() {
               <CardContent>
                 <div className="space-y-3">
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="flex items-center justify-between p-3 rounded-lg border">
+                    <div
+                      key={i}
+                      className="flex items-center justify-between p-3 rounded-lg border"
+                    >
                       <div className="flex items-center gap-3">
                         <div className="size-12 rounded bg-muted flex items-center justify-center">
                           <Newspaper className="size-6 text-muted-foreground" />
                         </div>
                         <div>
                           <p className="font-medium">Tin tức nổi bật {i}</p>
-                          <p className="text-sm text-muted-foreground">Đăng ngày 25/01/2026</p>
+                          <p className="text-sm text-muted-foreground">
+                            Đăng ngày 25/01/2026
+                          </p>
                         </div>
                       </div>
                       <Switch defaultChecked={i <= 2} />
@@ -262,7 +297,9 @@ export default function HomepageContentPage() {
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                   <CardTitle>{t.homepageContent.announcements}</CardTitle>
-                  <CardDescription>Quản lý thông báo hiển thị trên trang chủ</CardDescription>
+                  <CardDescription>
+                    Quản lý thông báo hiển thị trên trang chủ
+                  </CardDescription>
                 </div>
                 <Button>
                   <Plus className="size-4 mr-2" />
@@ -272,16 +309,30 @@ export default function HomepageContentPage() {
               <CardContent>
                 <div className="space-y-3">
                   {[
-                    { title: "Thông báo nghỉ Tết Nguyên đán 2026", type: "Quan trọng" },
-                    { title: "Lịch thi học kỳ 1 năm học 2025-2026", type: "Học vụ" },
-                    { title: "Thông báo đóng học phí học kỳ 2", type: "Tài chính" },
+                    {
+                      title: "Thông báo nghỉ Tết Nguyên đán 2026",
+                      type: "Quan trọng",
+                    },
+                    {
+                      title: "Lịch thi học kỳ 1 năm học 2025-2026",
+                      type: "Học vụ",
+                    },
+                    {
+                      title: "Thông báo đóng học phí học kỳ 2",
+                      type: "Tài chính",
+                    },
                   ].map((item, i) => (
-                    <div key={i} className="flex items-center justify-between p-3 rounded-lg border">
+                    <div
+                      key={i}
+                      className="flex items-center justify-between p-3 rounded-lg border"
+                    >
                       <div className="flex items-center gap-3">
                         <Bell className="size-5 text-muted-foreground" />
                         <div>
                           <p className="font-medium">{item.title}</p>
-                          <Badge variant="outline" className="mt-1">{item.type}</Badge>
+                          <Badge variant="outline" className="mt-1">
+                            {item.type}
+                          </Badge>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -304,7 +355,9 @@ export default function HomepageContentPage() {
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                   <CardTitle>{t.homepageContent.quickLinks}</CardTitle>
-                  <CardDescription>Quản lý các liên kết nhanh trên trang chủ</CardDescription>
+                  <CardDescription>
+                    Quản lý các liên kết nhanh trên trang chủ
+                  </CardDescription>
                 </div>
                 <Button>
                   <Plus className="size-4 mr-2" />
@@ -314,7 +367,10 @@ export default function HomepageContentPage() {
               <CardContent>
                 <div className="grid gap-3 md:grid-cols-2">
                   {mockQuickLinks.map((link) => (
-                    <div key={link.id} className="flex items-center justify-between p-3 rounded-lg border">
+                    <div
+                      key={link.id}
+                      className="flex items-center justify-between p-3 rounded-lg border"
+                    >
                       <div className="flex items-center gap-3">
                         <GripVertical className="size-5 text-muted-foreground cursor-grab" />
                         <div className="size-10 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -342,7 +398,9 @@ export default function HomepageContentPage() {
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                   <CardTitle>{t.homepageContent.statistics}</CardTitle>
-                  <CardDescription>Chỉnh sửa số liệu thống kê hiển thị trên trang chủ</CardDescription>
+                  <CardDescription>
+                    Chỉnh sửa số liệu thống kê hiển thị trên trang chủ
+                  </CardDescription>
                 </div>
                 <Button>
                   <Plus className="size-4 mr-2" />
@@ -352,14 +410,19 @@ export default function HomepageContentPage() {
               <CardContent>
                 <div className="grid gap-4 md:grid-cols-2">
                   {mockStats.map((stat) => (
-                    <div key={stat.id} className="flex items-center justify-between p-4 rounded-lg border">
+                    <div
+                      key={stat.id}
+                      className="flex items-center justify-between p-4 rounded-lg border"
+                    >
                       <div className="flex items-center gap-3">
                         <div className="size-12 rounded-lg bg-primary/10 flex items-center justify-center">
                           <BarChart3 className="size-6 text-primary" />
                         </div>
                         <div>
                           <p className="text-2xl font-bold">{stat.value}</p>
-                          <p className="text-sm text-muted-foreground">{stat.label}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {stat.label}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">

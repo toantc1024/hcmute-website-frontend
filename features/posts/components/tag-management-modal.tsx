@@ -1,10 +1,23 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { Plus, Edit2, Trash2, Loader2, Tag, X, Check, Search } from "lucide-react";
+import {
+  Plus,
+  Edit2,
+  Trash2,
+  Loader2,
+  Tag,
+  X,
+  Check,
+  Search,
+} from "lucide-react";
 import { toast } from "sonner";
 
-import { tagsApi, type TagSimpleView, type TagAuditView } from "@/features/posts";
+import {
+  tagsApi,
+  type TagSimpleView,
+  type TagAuditView,
+} from "@/features/posts";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -62,11 +75,19 @@ export function TagManagementModal({
   const [searchQuery, setSearchQuery] = useState("");
   const [newTagName, setNewTagName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
-  
+  const [localSelectedIds, setLocalSelectedIds] = useState<string[]>([]);
+
+  // Initialize local selection when modal opens
+  useEffect(() => {
+    if (open) {
+      setLocalSelectedIds(selectedTagIds);
+    }
+  }, [open, selectedTagIds]);
+
   const [editingTag, setEditingTag] = useState<TagAuditView | null>(null);
   const [editName, setEditName] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
-  
+
   const [deleteTag, setDeleteTag] = useState<TagAuditView | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -81,7 +102,7 @@ export function TagManagementModal({
       setIsLoading(true);
       const data = await tagsApi.getAdminTags({ size: 100 });
       setTags(data);
-      
+
       if (onTagsChange) {
         const simpleTags: TagSimpleView[] = data.map((t) => ({
           id: t.id,
@@ -111,7 +132,7 @@ export function TagManagementModal({
     }
 
     const existing = tags.find(
-      (t) => t.name.toLowerCase() === trimmedName.toLowerCase()
+      (t) => t.name.toLowerCase() === trimmedName.toLowerCase(),
     );
     if (existing) {
       toast.error("Thẻ đã tồn tại");
@@ -124,8 +145,8 @@ export function TagManagementModal({
       setTags((prev) => [...prev, createdTag]);
       setNewTagName("");
       toast.success(`Đã tạo thẻ "${createdTag.name}"`);
-      
-      onSelectionChange([...selectedTagIds, createdTag.id]);
+
+      setLocalSelectedIds((prev) => [...prev, createdTag.id]);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Không thể tạo thẻ";
       toast.error(message);
@@ -136,7 +157,7 @@ export function TagManagementModal({
 
   const handleUpdateTag = async () => {
     if (!editingTag) return;
-    
+
     const trimmedName = editName.trim();
     if (!trimmedName) {
       toast.error("Vui lòng nhập tên thẻ");
@@ -149,7 +170,9 @@ export function TagManagementModal({
     }
 
     const existing = tags.find(
-      (t) => t.id !== editingTag.id && t.name.toLowerCase() === trimmedName.toLowerCase()
+      (t) =>
+        t.id !== editingTag.id &&
+        t.name.toLowerCase() === trimmedName.toLowerCase(),
     );
     if (existing) {
       toast.error("Thẻ đã tồn tại");
@@ -162,14 +185,15 @@ export function TagManagementModal({
         name: trimmedName,
         version: editingTag.version,
       });
-      
+
       setTags((prev) =>
-        prev.map((t) => (t.id === editingTag.id ? updatedTag : t))
+        prev.map((t) => (t.id === editingTag.id ? updatedTag : t)),
       );
       setEditingTag(null);
       toast.success(`Đã cập nhật thẻ "${updatedTag.name}"`);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Không thể cập nhật thẻ";
+      const message =
+        err instanceof Error ? err.message : "Không thể cập nhật thẻ";
       toast.error(message);
     } finally {
       setIsUpdating(false);
@@ -182,10 +206,10 @@ export function TagManagementModal({
     try {
       setIsDeleting(true);
       await tagsApi.deleteTag(deleteTag.id);
-      
+
       setTags((prev) => prev.filter((t) => t.id !== deleteTag.id));
-      onSelectionChange(selectedTagIds.filter((id) => id !== deleteTag.id));
-      
+      setLocalSelectedIds((prev) => prev.filter((id) => id !== deleteTag.id));
+
       toast.success(`Đã xóa thẻ "${deleteTag.name}"`);
       setDeleteTag(null);
     } catch (err) {
@@ -197,11 +221,21 @@ export function TagManagementModal({
   };
 
   const handleToggleTag = (tagId: string) => {
-    if (selectedTagIds.includes(tagId)) {
-      onSelectionChange(selectedTagIds.filter((id) => id !== tagId));
+    if (localSelectedIds.includes(tagId)) {
+      setLocalSelectedIds((prev) => prev.filter((id) => id !== tagId));
     } else {
-      onSelectionChange([...selectedTagIds, tagId]);
+      setLocalSelectedIds((prev) => [...prev, tagId]);
     }
+  };
+
+  const handleSave = () => {
+    onSelectionChange(localSelectedIds);
+    onOpenChange(false);
+  };
+
+  const handleCancel = () => {
+    setLocalSelectedIds(selectedTagIds);
+    onOpenChange(false);
   };
 
   const startEdit = (tag: TagAuditView) => {
@@ -234,7 +268,7 @@ export function TagManagementModal({
                 value={newTagName}
                 onChange={(e) => setNewTagName(e.target.value)}
                 placeholder="Nhập tên thẻ mới..."
-                className="flex-1"
+                className="flex-1 rounded-xl"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
@@ -245,6 +279,7 @@ export function TagManagementModal({
               <Button
                 onClick={handleCreateTag}
                 disabled={isCreating || !newTagName.trim()}
+                className="rounded-xl"
               >
                 {isCreating ? (
                   <Loader2 className="size-4 animate-spin" />
@@ -260,11 +295,11 @@ export function TagManagementModal({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Tìm kiếm thẻ..."
-                className="pl-9"
+                className="pl-9 rounded-xl"
               />
             </div>
 
-            <ScrollArea className="h-[240px] rounded-md border p-4">
+            <ScrollArea className="h-[280px] rounded-xl border p-3">
               {isLoading ? (
                 <div className="flex items-center justify-center py-8">
                   <Loader2 className="size-6 animate-spin text-muted-foreground" />
@@ -278,21 +313,21 @@ export function TagManagementModal({
                   Không tìm thấy thẻ phù hợp
                 </p>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   {filteredTags.map((tag) => {
-                    const isSelected = selectedTagIds.includes(tag.id);
+                    const isSelected = localSelectedIds.includes(tag.id);
                     const isEditing = editingTag?.id === tag.id;
 
                     if (isEditing) {
                       return (
                         <div
                           key={tag.id}
-                          className="flex items-center gap-2 p-2 rounded-md bg-muted"
+                          className="flex items-center gap-2 p-3 rounded-xl bg-muted border border-border"
                         >
                           <Input
                             value={editName}
                             onChange={(e) => setEditName(e.target.value)}
-                            className="h-8 flex-1"
+                            className="h-9 flex-1 rounded-lg"
                             autoFocus
                             onKeyDown={(e) => {
                               if (e.key === "Enter") {
@@ -307,7 +342,7 @@ export function TagManagementModal({
                           <Button
                             size="icon"
                             variant="ghost"
-                            className="size-8"
+                            className="size-8 rounded-lg"
                             onClick={handleUpdateTag}
                             disabled={isUpdating}
                           >
@@ -320,7 +355,7 @@ export function TagManagementModal({
                           <Button
                             size="icon"
                             variant="ghost"
-                            className="size-8"
+                            className="size-8 rounded-lg"
                             onClick={cancelEdit}
                             disabled={isUpdating}
                           >
@@ -333,30 +368,50 @@ export function TagManagementModal({
                     return (
                       <div
                         key={tag.id}
-                        className="flex items-center gap-2 p-2 rounded-md hover:bg-muted/50 group"
+                        onClick={() => handleToggleTag(tag.id)}
+                        className={`
+                          group flex items-center gap-3 p-3 rounded-xl cursor-pointer
+                          border transition-all duration-200
+                          ${
+                            isSelected
+                              ? "bg-primary/10 border-primary/30 ring-1 ring-primary/20"
+                              : "bg-background border-border hover:bg-muted/50 hover:border-muted-foreground/20"
+                          }
+                        `}
                       >
-                        <Badge
-                          variant={isSelected ? "default" : "outline"}
-                          className="cursor-pointer flex-1 justify-start"
-                          onClick={() => handleToggleTag(tag.id)}
+                        <div
+                          className={`
+                          flex items-center justify-center size-9 rounded-lg shrink-0
+                          ${isSelected ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"}
+                        `}
                         >
-                          <Tag className="mr-1 size-3" />
+                          <Tag className="size-4" />
+                        </div>
+                        <span
+                          className={`font-medium text-sm flex-1 ${isSelected ? "text-primary" : ""}`}
+                        >
                           {tag.name}
-                        </Badge>
-                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        </span>
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                           <Button
                             size="icon"
                             variant="ghost"
-                            className="size-7"
-                            onClick={() => startEdit(tag)}
+                            className="size-7 rounded-lg"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              startEdit(tag);
+                            }}
                           >
                             <Edit2 className="size-3.5" />
                           </Button>
                           <Button
                             size="icon"
                             variant="ghost"
-                            className="size-7 text-destructive hover:text-destructive"
-                            onClick={() => setDeleteTag(tag)}
+                            className="size-7 rounded-lg text-destructive hover:text-destructive hover:bg-destructive/10"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeleteTag(tag);
+                            }}
                           >
                             <Trash2 className="size-3.5" />
                           </Button>
@@ -368,29 +423,35 @@ export function TagManagementModal({
               )}
             </ScrollArea>
 
-            {selectedTagIds.length > 0 && (
-              <div className="pt-2 border-t">
-                <p className="text-sm text-muted-foreground mb-2">
-                  Đã chọn {selectedTagIds.length} thẻ:
-                </p>
-                <div className="flex flex-wrap gap-1">
-                  {selectedTagIds.map((tagId) => {
+            {localSelectedIds.length > 0 && (
+              <div className="pt-3 border-t">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-muted-foreground">
+                    Đã chọn ({localSelectedIds.length})
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 px-2 rounded-lg text-muted-foreground hover:text-foreground"
+                    onClick={() => setLocalSelectedIds([])}
+                  >
+                    <X className="size-3.5 mr-1" />
+                    Bỏ chọn tất cả
+                  </Button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {localSelectedIds.map((tagId) => {
                     const tag = tags.find((t) => t.id === tagId);
                     if (!tag) return null;
                     return (
                       <Badge
                         key={tag.id}
                         variant="secondary"
-                        className="cursor-pointer gap-1 pr-1"
+                        className="cursor-pointer rounded-full bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 px-3 py-1.5"
+                        onClick={() => handleToggleTag(tag.id)}
                       >
                         {tag.name}
-                        <button
-                          type="button"
-                          onClick={() => handleToggleTag(tag.id)}
-                          className="ml-1 rounded-full p-0.5 hover:bg-muted-foreground/20"
-                        >
-                          <X className="size-3" />
-                        </button>
+                        <X className="size-3 ml-1.5" />
                       </Badge>
                     );
                   })}
@@ -399,28 +460,38 @@ export function TagManagementModal({
             )}
           </div>
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Đóng
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              className="rounded-xl"
+              onClick={handleCancel}
+            >
+              Hủy
+            </Button>
+            <Button className="rounded-xl" onClick={handleSave}>
+              Lưu
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       <AlertDialog open={!!deleteTag} onOpenChange={() => setDeleteTag(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="rounded-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle>Xóa thẻ?</AlertDialogTitle>
             <AlertDialogDescription>
-              Bạn có chắc chắn muốn xóa thẻ &quot;{deleteTag?.name}&quot;? Hành động này không thể hoàn tác.
+              Bạn có chắc chắn muốn xóa thẻ &quot;{deleteTag?.name}&quot;? Hành
+              động này không thể hoàn tác.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Hủy</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting} className="rounded-lg">
+              Hủy
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteTag}
               disabled={isDeleting}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-lg"
             >
               {isDeleting ? (
                 <Loader2 className="mr-2 size-4 animate-spin" />

@@ -167,7 +167,9 @@ export default function UtilitiesPage() {
       className="space-y-8"
     >
       <motion.div variants={itemVariants}>
-        <h1 className="text-3xl font-bold tracking-tight">{t.utilities.title}</h1>
+        <h1 className="text-3xl font-bold tracking-tight">
+          {t.utilities.title}
+        </h1>
         <p className="text-muted-foreground mt-1">{t.utilities.description}</p>
       </motion.div>
 

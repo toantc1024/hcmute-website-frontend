@@ -111,6 +111,7 @@ export interface PostAuditView {
   photoCredit?: string;
   metaTitle?: string;
   metaDescription?: string;
+  extendedAttributes?: ExtendedAttributes;
   allowCloning: boolean;
   viewCount: number;
   publishedAt?: string;
@@ -206,13 +207,20 @@ export interface MediaMetadataRequest {
   sortOrder?: number;
 }
 
+export interface ExtendedAttributes {
+  Author?: string;
+  Photographer?: string;
+  [key: string]: string | undefined;
+}
+
 export interface CreatePostRequest {
   title: string;
   slug: string;
   description?: string;
   content?: string;
   contentFormat: ContentFormat;
-  allowCloning: boolean;
+  extendedAttributes?: ExtendedAttributes;
+  allowCloning?: boolean;
   coverImageId?: string;
   photoCredit?: string;
   metaTitle?: string;
@@ -227,6 +235,7 @@ export interface UpdatePostRequest {
   description?: string;
   content?: string;
   contentFormat?: ContentFormat;
+  extendedAttributes?: ExtendedAttributes;
   allowCloning?: boolean;
   coverImageId?: string;
   photoCredit?: string;

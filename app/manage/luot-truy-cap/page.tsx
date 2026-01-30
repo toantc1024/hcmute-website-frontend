@@ -81,7 +81,9 @@ function StatCard({ title, value, icon, description, trend }: StatCardProps) {
             <div className="flex items-center gap-1 mt-2">
               <TrendingUp
                 className={`size-3 ${
-                  trend.isPositive ? "text-green-500" : "text-red-500 rotate-180"
+                  trend.isPositive
+                    ? "text-green-500"
+                    : "text-red-500 rotate-180"
                 }`}
               />
               <span
@@ -89,9 +91,12 @@ function StatCard({ title, value, icon, description, trend }: StatCardProps) {
                   trend.isPositive ? "text-green-500" : "text-red-500"
                 }`}
               >
-                {trend.isPositive ? "+" : "-"}{Math.abs(trend.value)}%
+                {trend.isPositive ? "+" : "-"}
+                {Math.abs(trend.value)}%
               </span>
-              <span className="text-xs text-muted-foreground">so với hôm qua</span>
+              <span className="text-xs text-muted-foreground">
+                so với hôm qua
+              </span>
             </div>
           )}
         </CardContent>
@@ -207,7 +212,10 @@ export default function TrafficPage() {
               <CardDescription>Thống kê 7 ngày gần nhất</CardDescription>
             </CardHeader>
             <CardContent>
-              <ChartContainer config={visitsChartConfig} className="h-[280px] w-full">
+              <ChartContainer
+                config={visitsChartConfig}
+                className="h-[280px] w-full"
+              >
                 <AreaChart
                   accessibilityLayer
                   data={visitsChartData}
@@ -249,7 +257,10 @@ export default function TrafficPage() {
               <CardDescription>Trang được xem nhiều nhất</CardDescription>
             </CardHeader>
             <CardContent>
-              <ChartContainer config={topPagesConfig} className="h-[280px] w-full">
+              <ChartContainer
+                config={topPagesConfig}
+                className="h-[280px] w-full"
+              >
                 <BarChart
                   accessibilityLayer
                   data={topPagesData}
@@ -270,11 +281,7 @@ export default function TrafficPage() {
                     cursor={false}
                     content={<ChartTooltipContent hideLabel />}
                   />
-                  <Bar
-                    dataKey="views"
-                    fill="hsl(var(--primary))"
-                    radius={4}
-                  />
+                  <Bar dataKey="views" fill="hsl(var(--primary))" radius={4} />
                 </BarChart>
               </ChartContainer>
             </CardContent>
@@ -293,7 +300,10 @@ export default function TrafficPage() {
           </CardHeader>
           <CardContent>
             <div className="flex flex-col md:flex-row items-center gap-8">
-              <ChartContainer config={deviceConfig} className="h-[200px] w-[200px]">
+              <ChartContainer
+                config={deviceConfig}
+                className="h-[200px] w-[200px]"
+              >
                 <PieChart>
                   <Pie
                     data={deviceData}
@@ -318,7 +328,9 @@ export default function TrafficPage() {
                   </div>
                   <div>
                     <p className="font-medium">Desktop</p>
-                    <p className="text-sm text-muted-foreground">55% (6,849 lượt)</p>
+                    <p className="text-sm text-muted-foreground">
+                      55% (6,849 lượt)
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -327,7 +339,9 @@ export default function TrafficPage() {
                   </div>
                   <div>
                     <p className="font-medium">Mobile</p>
-                    <p className="text-sm text-muted-foreground">35% (4,359 lượt)</p>
+                    <p className="text-sm text-muted-foreground">
+                      35% (4,359 lượt)
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -336,7 +350,9 @@ export default function TrafficPage() {
                   </div>
                   <div>
                     <p className="font-medium">Tablet</p>
-                    <p className="text-sm text-muted-foreground">10% (1,245 lượt)</p>
+                    <p className="text-sm text-muted-foreground">
+                      10% (1,245 lượt)
+                    </p>
                   </div>
                 </div>
               </div>

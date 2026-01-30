@@ -96,7 +96,8 @@ export default function ExtensionsPage() {
   const installedExtensions: ExtensionCardProps[] = [
     {
       name: "SEO Optimizer",
-      description: "Tối ưu hóa SEO cho bài viết với phân tích từ khóa và gợi ý cải thiện",
+      description:
+        "Tối ưu hóa SEO cho bài viết với phân tích từ khóa và gợi ý cải thiện",
       version: "1.2.0",
       author: "HCM-UTE Team",
       isInstalled: true,
@@ -123,7 +124,8 @@ export default function ExtensionsPage() {
   const availableExtensions: ExtensionCardProps[] = [
     {
       name: "Analytics Dashboard",
-      description: "Bảng điều khiển phân tích chi tiết về lượt xem và tương tác",
+      description:
+        "Bảng điều khiển phân tích chi tiết về lượt xem và tương tác",
       version: "3.1.0",
       author: "HCM-UTE Team",
       isInstalled: false,
@@ -152,7 +154,9 @@ export default function ExtensionsPage() {
       className="space-y-8"
     >
       <motion.div variants={itemVariants}>
-        <h1 className="text-3xl font-bold tracking-tight">{t.extensions.title}</h1>
+        <h1 className="text-3xl font-bold tracking-tight">
+          {t.extensions.title}
+        </h1>
         <p className="text-muted-foreground mt-1">
           Quản lý các tiện ích mở rộng để tăng cường chức năng
         </p>

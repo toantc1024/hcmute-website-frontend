@@ -71,7 +71,8 @@ export default function MediaPage() {
             </div>
             <div className="mt-4 text-sm text-muted-foreground">
               <p>
-                <strong>{t.media.supportedFormats}:</strong> JPG, PNG, GIF, WEBP, MP4, PDF
+                <strong>{t.media.supportedFormats}:</strong> JPG, PNG, GIF,
+                WEBP, MP4, PDF
               </p>
               <p>
                 <strong>{t.media.maxFileSize}:</strong> 10MB
@@ -88,9 +89,7 @@ export default function MediaPage() {
               <FolderOpen className="size-5" />
               {t.media.library}
             </CardTitle>
-            <CardDescription>
-              Các tệp đã tải lên của bạn
-            </CardDescription>
+            <CardDescription>Các tệp đã tải lên của bạn</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col items-center justify-center py-12 text-center">

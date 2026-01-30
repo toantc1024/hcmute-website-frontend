@@ -46,9 +46,9 @@ export default function UserLayout({
       <UserProfileProvider>
         <SidebarProvider>
           <UserSidebar />
-          <SidebarInset>
+          <SidebarInset className="flex flex-col h-svh overflow-hidden">
             <UserHeader />
-            <main className="flex-1 overflow-auto p-4 md:p-6">
+            <main className="flex-1 min-h-0 overflow-auto p-4 md:p-6">
               {children}
             </main>
           </SidebarInset>

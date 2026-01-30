@@ -27,6 +27,9 @@ import {
   CodeSquare,
   Minus,
   Loader2,
+  Sparkles,
+  Wand2,
+  ChevronDown,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -38,17 +41,40 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ImageUploadDialog } from "./image-upload-dialog";
 
 interface ToolbarProps {
   editor: Editor | null;
   onImageUpload?: (file: File) => Promise<string>;
+  onAIAssist?: (action: AIAction, selectedText?: string) => Promise<string>;
 }
+
+export type AIAction =
+  | "improve"
+  | "shorten"
+  | "expand"
+  | "translate_vi"
+  | "translate_en"
+  | "fix_grammar"
+  | "make_formal"
+  | "make_casual"
+  | "summarize"
+  | "generate";
 
 interface ToolbarButtonProps {
   onClick: () => void;
@@ -72,10 +98,7 @@ function ToolbarButton({
           type="button"
           variant="ghost"
           size="icon"
-          className={cn(
-            "size-8",
-            isActive && "bg-muted text-muted-foreground"
-          )}
+          className={cn("size-8", isActive && "bg-muted text-muted-foreground")}
           onClick={onClick}
           disabled={disabled}
         >
@@ -89,10 +112,13 @@ function ToolbarButton({
   );
 }
 
-export function Toolbar({ editor, onImageUpload }: ToolbarProps) {
+export function Toolbar({ editor, onImageUpload, onAIAssist }: ToolbarProps) {
   const [linkUrl, setLinkUrl] = useState("");
   const [isLinkPopoverOpen, setIsLinkPopoverOpen] = useState(false);
-  const [isImageUploading, setIsImageUploading] = useState(false);
+  const [showImageDialog, setShowImageDialog] = useState(false);
+  const [isAILoading, setIsAILoading] = useState(false);
+  const [showAIPrompt, setShowAIPrompt] = useState(false);
+  const [aiPrompt, setAIPrompt] = useState("");
 
   const setLink = useCallback(() => {
     if (!editor) return;
@@ -112,36 +138,66 @@ export function Toolbar({ editor, onImageUpload }: ToolbarProps) {
     setIsLinkPopoverOpen(false);
   }, [editor, linkUrl]);
 
-  const handleImageUpload = useCallback(async () => {
-    if (!onImageUpload) return;
+  const handleImageInsert = useCallback(
+    (url: string, caption?: string, photoCredit?: string) => {
+      editor
+        ?.chain()
+        .focus()
+        .setImageBlock({ src: url, caption, photoCredit })
+        .run();
+    },
+    [editor],
+  );
 
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*";
+  const handleAIAction = useCallback(
+    async (action: AIAction) => {
+      if (!onAIAssist || !editor) return;
 
-    input.onchange = async (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (!file) return;
+      const { from, to } = editor.state.selection;
+      const selectedText = editor.state.doc.textBetween(from, to, " ");
 
       try {
-        setIsImageUploading(true);
-        const url = await onImageUpload(file);
-        editor?.chain().focus().setImage({ src: url }).run();
-      } catch (error) {
-        console.error("Failed to upload image:", error);
-      } finally {
-        setIsImageUploading(false);
-      }
-    };
+        setIsAILoading(true);
+        const result = await onAIAssist(action, selectedText || undefined);
 
-    input.click();
-  }, [editor, onImageUpload]);
+        if (selectedText) {
+          // Replace selected text with AI result
+          editor.chain().focus().deleteSelection().insertContent(result).run();
+        } else {
+          // Insert at cursor position
+          editor.chain().focus().insertContent(result).run();
+        }
+      } catch (error) {
+        console.error("AI assist failed:", error);
+      } finally {
+        setIsAILoading(false);
+      }
+    },
+    [editor, onAIAssist],
+  );
+
+  const handleAIGenerate = useCallback(async () => {
+    if (!onAIAssist || !editor || !aiPrompt.trim()) return;
+
+    try {
+      setIsAILoading(true);
+      const result = await onAIAssist("generate", aiPrompt);
+      editor.chain().focus().insertContent(result).run();
+      setAIPrompt("");
+      setShowAIPrompt(false);
+    } catch (error) {
+      console.error("AI generate failed:", error);
+    } finally {
+      setIsAILoading(false);
+    }
+  }, [editor, onAIAssist, aiPrompt]);
 
   if (!editor) return null;
 
   return (
     <TooltipProvider delayDuration={0}>
-      <div className="flex flex-wrap items-center gap-0.5 border-b p-1 bg-muted/30">
+      <div className="flex flex-wrap items-center gap-0.5 border-b border-border p-1 bg-muted/30">
+        {/* Undo/Redo */}
         <ToolbarButton
           onClick={() => editor.chain().focus().undo().run()}
           disabled={!editor.can().undo()}
@@ -159,6 +215,7 @@ export function Toolbar({ editor, onImageUpload }: ToolbarProps) {
 
         <Separator orientation="vertical" className="mx-1 h-6" />
 
+        {/* Basic Formatting */}
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleBold().run()}
           isActive={editor.isActive("bold")}
@@ -180,60 +237,66 @@ export function Toolbar({ editor, onImageUpload }: ToolbarProps) {
         >
           <Underline className="size-4" />
         </ToolbarButton>
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleStrike().run()}
-          isActive={editor.isActive("strike")}
-          tooltip="Gạch ngang"
-        >
-          <Strikethrough className="size-4" />
-        </ToolbarButton>
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleHighlight().run()}
-          isActive={editor.isActive("highlight")}
-          tooltip="Đánh dấu"
-        >
-          <Highlighter className="size-4" />
-        </ToolbarButton>
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleCode().run()}
-          isActive={editor.isActive("code")}
-          tooltip="Mã inline"
-        >
-          <Code className="size-4" />
-        </ToolbarButton>
 
         <Separator orientation="vertical" className="mx-1 h-6" />
 
-        <ToolbarButton
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 1 }).run()
-          }
-          isActive={editor.isActive("heading", { level: 1 })}
-          tooltip="Tiêu đề 1"
-        >
-          <Heading1 className="size-4" />
-        </ToolbarButton>
-        <ToolbarButton
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 2 }).run()
-          }
-          isActive={editor.isActive("heading", { level: 2 })}
-          tooltip="Tiêu đề 2"
-        >
-          <Heading2 className="size-4" />
-        </ToolbarButton>
-        <ToolbarButton
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 3 }).run()
-          }
-          isActive={editor.isActive("heading", { level: 3 })}
-          tooltip="Tiêu đề 3"
-        >
-          <Heading3 className="size-4" />
-        </ToolbarButton>
+        {/* Headings Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className={cn(
+                "h-8 gap-1 px-2",
+                (editor.isActive("heading", { level: 1 }) ||
+                  editor.isActive("heading", { level: 2 }) ||
+                  editor.isActive("heading", { level: 3 })) &&
+                  "bg-muted",
+              )}
+            >
+              <Heading1 className="size-4" />
+              <ChevronDown className="size-3" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuItem
+              onClick={() =>
+                editor.chain().focus().toggleHeading({ level: 1 }).run()
+              }
+              className={cn(
+                editor.isActive("heading", { level: 1 }) && "bg-muted",
+              )}
+            >
+              <Heading1 className="mr-2 size-4" />
+              Tiêu đề 1
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() =>
+                editor.chain().focus().toggleHeading({ level: 2 }).run()
+              }
+              className={cn(
+                editor.isActive("heading", { level: 2 }) && "bg-muted",
+              )}
+            >
+              <Heading2 className="mr-2 size-4" />
+              Tiêu đề 2
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() =>
+                editor.chain().focus().toggleHeading({ level: 3 }).run()
+              }
+              className={cn(
+                editor.isActive("heading", { level: 3 }) && "bg-muted",
+              )}
+            >
+              <Heading3 className="mr-2 size-4" />
+              Tiêu đề 3
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
-        <Separator orientation="vertical" className="mx-1 h-6" />
-
+        {/* Lists */}
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           isActive={editor.isActive("bulletList")}
@@ -248,60 +311,10 @@ export function Toolbar({ editor, onImageUpload }: ToolbarProps) {
         >
           <ListOrdered className="size-4" />
         </ToolbarButton>
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleBlockquote().run()}
-          isActive={editor.isActive("blockquote")}
-          tooltip="Trích dẫn"
-        >
-          <Quote className="size-4" />
-        </ToolbarButton>
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-          isActive={editor.isActive("codeBlock")}
-          tooltip="Khối mã"
-        >
-          <CodeSquare className="size-4" />
-        </ToolbarButton>
-        <ToolbarButton
-          onClick={() => editor.chain().focus().setHorizontalRule().run()}
-          tooltip="Đường kẻ ngang"
-        >
-          <Minus className="size-4" />
-        </ToolbarButton>
 
         <Separator orientation="vertical" className="mx-1 h-6" />
 
-        <ToolbarButton
-          onClick={() => editor.chain().focus().setTextAlign("left").run()}
-          isActive={editor.isActive({ textAlign: "left" })}
-          tooltip="Căn trái"
-        >
-          <AlignLeft className="size-4" />
-        </ToolbarButton>
-        <ToolbarButton
-          onClick={() => editor.chain().focus().setTextAlign("center").run()}
-          isActive={editor.isActive({ textAlign: "center" })}
-          tooltip="Căn giữa"
-        >
-          <AlignCenter className="size-4" />
-        </ToolbarButton>
-        <ToolbarButton
-          onClick={() => editor.chain().focus().setTextAlign("right").run()}
-          isActive={editor.isActive({ textAlign: "right" })}
-          tooltip="Căn phải"
-        >
-          <AlignRight className="size-4" />
-        </ToolbarButton>
-        <ToolbarButton
-          onClick={() => editor.chain().focus().setTextAlign("justify").run()}
-          isActive={editor.isActive({ textAlign: "justify" })}
-          tooltip="Căn đều"
-        >
-          <AlignJustify className="size-4" />
-        </ToolbarButton>
-
-        <Separator orientation="vertical" className="mx-1 h-6" />
-
+        {/* Link */}
         <Popover open={isLinkPopoverOpen} onOpenChange={setIsLinkPopoverOpen}>
           <PopoverTrigger asChild>
             <Button
@@ -310,7 +323,7 @@ export function Toolbar({ editor, onImageUpload }: ToolbarProps) {
               size="icon"
               className={cn(
                 "size-8",
-                editor.isActive("link") && "bg-muted text-muted-foreground"
+                editor.isActive("link") && "bg-muted text-muted-foreground",
               )}
             >
               <LinkIcon className="size-4" />
@@ -347,20 +360,244 @@ export function Toolbar({ editor, onImageUpload }: ToolbarProps) {
           </ToolbarButton>
         )}
 
+        {/* Image */}
         {onImageUpload && (
           <ToolbarButton
-            onClick={handleImageUpload}
-            disabled={isImageUploading}
+            onClick={() => setShowImageDialog(true)}
             tooltip="Chèn hình ảnh"
           >
-            {isImageUploading ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <ImageIcon className="size-4" />
-            )}
+            <ImageIcon className="size-4" />
           </ToolbarButton>
         )}
+
+        <Separator orientation="vertical" className="mx-1 h-6" />
+
+        {/* AI Button */}
+        {onAIAssist && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  "h-8 gap-1.5 px-2 font-medium",
+                  "bg-gradient-to-r from-violet-500/10 to-purple-500/10",
+                  "hover:from-violet-500/20 hover:to-purple-500/20",
+                  "text-violet-600 dark:text-violet-400",
+                )}
+                disabled={isAILoading}
+              >
+                {isAILoading ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Sparkles className="size-4" />
+                )}
+                AI
+                <ChevronDown className="size-3" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem onClick={() => handleAIAction("improve")}>
+                <Wand2 className="mr-2 size-4" />
+                Cải thiện văn bản
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleAIAction("fix_grammar")}>
+                <Wand2 className="mr-2 size-4" />
+                Sửa lỗi ngữ pháp
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => handleAIAction("shorten")}>
+                Rút gọn
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleAIAction("expand")}>
+                Mở rộng
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleAIAction("summarize")}>
+                Tóm tắt
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => handleAIAction("make_formal")}>
+                Chuyển sang văn phong trang trọng
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleAIAction("make_casual")}>
+                Chuyển sang văn phong thân thiện
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => handleAIAction("translate_vi")}>
+                🇻🇳 Dịch sang Tiếng Việt
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleAIAction("translate_en")}>
+                🇬🇧 Dịch sang Tiếng Anh
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setShowAIPrompt(true)}>
+                <Sparkles className="mr-2 size-4" />
+                Viết với AI...
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+
+        {/* More Tools Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-8 gap-1 px-2"
+            >
+              Công cụ khác
+              <ChevronDown className="size-3" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem
+              onClick={() => editor.chain().focus().toggleStrike().run()}
+              className={cn(editor.isActive("strike") && "bg-muted")}
+            >
+              <Strikethrough className="mr-2 size-4" />
+              Gạch ngang
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => editor.chain().focus().toggleHighlight().run()}
+              className={cn(editor.isActive("highlight") && "bg-muted")}
+            >
+              <Highlighter className="mr-2 size-4" />
+              Đánh dấu
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => editor.chain().focus().toggleCode().run()}
+              className={cn(editor.isActive("code") && "bg-muted")}
+            >
+              <Code className="mr-2 size-4" />
+              Mã inline
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => editor.chain().focus().toggleBlockquote().run()}
+              className={cn(editor.isActive("blockquote") && "bg-muted")}
+            >
+              <Quote className="mr-2 size-4" />
+              Trích dẫn
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+              className={cn(editor.isActive("codeBlock") && "bg-muted")}
+            >
+              <CodeSquare className="mr-2 size-4" />
+              Khối mã
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => editor.chain().focus().setHorizontalRule().run()}
+            >
+              <Minus className="mr-2 size-4" />
+              Đường kẻ ngang
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => editor.chain().focus().setTextAlign("left").run()}
+              className={cn(
+                editor.isActive({ textAlign: "left" }) && "bg-muted",
+              )}
+            >
+              <AlignLeft className="mr-2 size-4" />
+              Căn trái
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() =>
+                editor.chain().focus().setTextAlign("center").run()
+              }
+              className={cn(
+                editor.isActive({ textAlign: "center" }) && "bg-muted",
+              )}
+            >
+              <AlignCenter className="mr-2 size-4" />
+              Căn giữa
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => editor.chain().focus().setTextAlign("right").run()}
+              className={cn(
+                editor.isActive({ textAlign: "right" }) && "bg-muted",
+              )}
+            >
+              <AlignRight className="mr-2 size-4" />
+              Căn phải
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() =>
+                editor.chain().focus().setTextAlign("justify").run()
+              }
+              className={cn(
+                editor.isActive({ textAlign: "justify" }) && "bg-muted",
+              )}
+            >
+              <AlignJustify className="mr-2 size-4" />
+              Căn đều
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* AI Generate Prompt Popover */}
+        {onAIAssist && (
+          <Popover open={showAIPrompt} onOpenChange={setShowAIPrompt}>
+            <PopoverTrigger asChild>
+              <span />
+            </PopoverTrigger>
+            <PopoverContent className="w-96" align="end">
+              <div className="space-y-3">
+                <div className="space-y-1">
+                  <Label className="flex items-center gap-1.5">
+                    <Sparkles className="size-3.5" />
+                    Viết với AI
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    Mô tả nội dung bạn muốn AI viết
+                  </p>
+                </div>
+                <Textarea
+                  placeholder="Ví dụ: Viết đoạn giới thiệu về trường HCMUTE với phong cách chuyên nghiệp..."
+                  value={aiPrompt}
+                  onChange={(e) => setAIPrompt(e.target.value)}
+                  rows={3}
+                />
+                <div className="flex justify-end gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowAIPrompt(false)}
+                  >
+                    Hủy
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={handleAIGenerate}
+                    disabled={isAILoading || !aiPrompt.trim()}
+                  >
+                    {isAILoading ? (
+                      <Loader2 className="mr-1.5 size-3.5 animate-spin" />
+                    ) : (
+                      <Sparkles className="mr-1.5 size-3.5" />
+                    )}
+                    Tạo nội dung
+                  </Button>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+        )}
       </div>
+
+      {/* Image Upload Dialog */}
+      {onImageUpload && (
+        <ImageUploadDialog
+          open={showImageDialog}
+          onOpenChange={setShowImageDialog}
+          onImageInsert={handleImageInsert}
+          onUpload={onImageUpload}
+        />
+      )}
     </TooltipProvider>
   );
 }

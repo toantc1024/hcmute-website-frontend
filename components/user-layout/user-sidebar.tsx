@@ -5,7 +5,6 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ChevronDown, Home, LogOut, ChevronRight } from "lucide-react";
 
-import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/features/auth";
 import { useUserProfile } from "@/features/user";
 import { cn } from "@/lib/utils";
@@ -44,33 +43,27 @@ import {
   getFilteredMenuGroups,
   quickNavItems,
   profileNavItem,
+  sidebarFooterItems,
   type SidebarMenuGroup,
 } from "./sidebar-config";
 
-function getNestedTranslation(obj: Record<string, unknown>, path: string): string {
-  const keys = path.split(".");
-  let result: unknown = obj;
+// Role labels in Vietnamese
+const roleLabels: Record<string, string> = {
+  contributor: "Cộng tác viên",
+  editor: "Biên tập viên",
+  leader: "Trưởng đơn vị",
+  unit_admin: "Quản trị đơn vị",
+  school_admin: "Quản trị trường",
+  system_admin: "Quản trị hệ thống",
+};
 
-  for (const key of keys) {
-    if (result && typeof result === "object" && key in result) {
-      result = (result as Record<string, unknown>)[key];
-    } else {
-      return path;
-    }
-  }
-
-  return typeof result === "string" ? result : path;
-}
-
-function getRoleLabel(role: string, t: Record<string, unknown>): string {
+function getRoleLabel(role: string): string {
   const roleKey = role.toLowerCase();
-  const roles = t.roles as Record<string, string> | undefined;
-  return roles?.[roleKey] || role;
+  return roleLabels[roleKey] || role;
 }
 
 export function UserSidebar() {
   const pathname = usePathname();
-  const { t } = useI18n();
   const { logout } = useAuth();
   const { profile, roles, highestRole, isLoading } = useUserProfile();
   const { state } = useSidebar();
@@ -126,10 +119,7 @@ export function UserSidebar() {
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">HCM-UTE</span>
                   <span className="truncate text-xs text-muted-foreground">
-                    {getNestedTranslation(
-                      t as unknown as Record<string, unknown>,
-                      "dashboard.title"
-                    )}
+                    Bảng điều khiển
                   </span>
                 </div>
               </Link>
@@ -151,19 +141,11 @@ export function UserSidebar() {
                     <SidebarMenuButton
                       asChild
                       isActive={active}
-                      tooltip={getNestedTranslation(
-                        t as unknown as Record<string, unknown>,
-                        item.titleKey
-                      )}
+                      tooltip={item.title}
                     >
                       <Link href={item.href}>
                         <Icon className="size-4" />
-                        <span>
-                          {getNestedTranslation(
-                            t as unknown as Record<string, unknown>,
-                            item.titleKey
-                          )}
-                        </span>
+                        <span>{item.title}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -178,7 +160,6 @@ export function UserSidebar() {
             key={group.id}
             group={group}
             pathname={pathname}
-            t={t}
             isActive={isActive}
           />
         ))}
@@ -190,19 +171,11 @@ export function UserSidebar() {
                 <SidebarMenuButton
                   asChild
                   isActive={isActive(profileNavItem.href)}
-                  tooltip={getNestedTranslation(
-                    t as unknown as Record<string, unknown>,
-                    profileNavItem.titleKey
-                  )}
+                  tooltip={profileNavItem.title}
                 >
                   <Link href={profileNavItem.href}>
                     <profileNavItem.icon className="size-4" />
-                    <span>
-                      {getNestedTranslation(
-                        t as unknown as Record<string, unknown>,
-                        profileNavItem.titleKey
-                      )}
-                    </span>
+                    <span>{profileNavItem.title}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -216,19 +189,11 @@ export function UserSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              tooltip={getNestedTranslation(
-                t as unknown as Record<string, unknown>,
-                "navigation.home"
-              )}
+              tooltip={sidebarFooterItems.backToHome.title}
             >
               <Link href="/">
                 <Home className="size-4" />
-                <span>
-                  {getNestedTranslation(
-                    t as unknown as Record<string, unknown>,
-                    "navigation.home"
-                  )}
-                </span>
+                <span>{sidebarFooterItems.backToHome.title}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -249,16 +214,15 @@ export function UserSidebar() {
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">{displayName}</span>
+                    <span className="truncate font-semibold">
+                      {displayName}
+                    </span>
                     <div className="flex items-center gap-1">
                       <Badge
                         variant="secondary"
                         className="text-[10px] px-1 py-0 h-4"
                       >
-                        {getRoleLabel(
-                          highestRole,
-                          t as unknown as Record<string, unknown>
-                        )}
+                        {getRoleLabel(highestRole)}
                       </Badge>
                     </div>
                   </div>
@@ -276,10 +240,7 @@ export function UserSidebar() {
                   className="cursor-pointer text-destructive focus:text-destructive"
                 >
                   <LogOut className="mr-2 size-4" />
-                  {getNestedTranslation(
-                    t as unknown as Record<string, unknown>,
-                    "auth.logout"
-                  )}
+                  {sidebarFooterItems.logout.title}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -295,11 +256,10 @@ export function UserSidebar() {
 interface NavGroupProps {
   group: SidebarMenuGroup;
   pathname: string;
-  t: unknown;
   isActive: (href: string) => boolean;
 }
 
-function NavGroup({ group, pathname, t, isActive }: NavGroupProps) {
+function NavGroup({ group, pathname, isActive }: NavGroupProps) {
   const Icon = group.icon;
   const hasActiveChild = group.items.some((item) => isActive(item.href));
 
@@ -313,19 +273,9 @@ function NavGroup({ group, pathname, t, isActive }: NavGroupProps) {
         >
           <SidebarMenuItem>
             <CollapsibleTrigger asChild>
-              <SidebarMenuButton
-                tooltip={getNestedTranslation(
-                  t as Record<string, unknown>,
-                  group.titleKey
-                )}
-              >
+              <SidebarMenuButton tooltip={group.title}>
                 <Icon className="size-4" />
-                <span>
-                  {getNestedTranslation(
-                    t as Record<string, unknown>,
-                    group.titleKey
-                  )}
-                </span>
+                <span>{group.title}</span>
                 <ChevronRight className="ml-auto size-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
               </SidebarMenuButton>
             </CollapsibleTrigger>
@@ -340,12 +290,7 @@ function NavGroup({ group, pathname, t, isActive }: NavGroupProps) {
                       <SidebarMenuSubButton asChild isActive={active}>
                         <Link href={item.href}>
                           <ItemIcon className="size-4" />
-                          <span>
-                            {getNestedTranslation(
-                              t as Record<string, unknown>,
-                              item.titleKey
-                            )}
-                          </span>
+                          <span>{item.title}</span>
                         </Link>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>

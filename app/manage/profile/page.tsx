@@ -87,7 +87,9 @@ export default function ProfilePage() {
   };
 
   if (isProfileLoading) {
-    return <Loader size="lg" text="Đang tải hồ sơ..." className="min-h-[400px]" />;
+    return (
+      <Loader size="lg" text="Đang tải hồ sơ..." className="min-h-[400px]" />
+    );
   }
 
   return (
@@ -137,7 +139,9 @@ export default function ProfilePage() {
                   <h3 className="font-semibold text-lg">
                     {profile?.displayName}
                   </h3>
-                  <p className="text-muted-foreground">{profile?.account?.email}</p>
+                  <p className="text-muted-foreground">
+                    {profile?.account?.email}
+                  </p>
                   <Button variant="outline" size="sm" className="mt-2">
                     {t.profile.changeAvatar}
                   </Button>
@@ -148,7 +152,9 @@ export default function ProfilePage() {
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">{t.profile.firstName}</label>
+                  <label className="text-sm font-medium">
+                    {t.profile.firstName}
+                  </label>
                   <Input
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
@@ -156,7 +162,9 @@ export default function ProfilePage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">{t.profile.lastName}</label>
+                  <label className="text-sm font-medium">
+                    {t.profile.lastName}
+                  </label>
                   <Input
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
@@ -239,8 +247,12 @@ export default function ProfilePage() {
               <div className="flex items-center gap-3">
                 <Clock className="size-4 text-muted-foreground" />
                 <div>
-                  <p className="text-sm text-muted-foreground">Đăng nhập gần nhất</p>
-                  <p className="font-medium">{formatDate(profile?.account?.lastLoginAt)}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Đăng nhập gần nhất
+                  </p>
+                  <p className="font-medium">
+                    {formatDate(profile?.account?.lastLoginAt)}
+                  </p>
                 </div>
               </div>
               <Separator />
@@ -248,7 +260,9 @@ export default function ProfilePage() {
                 <Calendar className="size-4 text-muted-foreground" />
                 <div>
                   <p className="text-sm text-muted-foreground">Ngày tham gia</p>
-                  <p className="font-medium">{formatDate(profile?.createdAt)}</p>
+                  <p className="font-medium">
+                    {formatDate(profile?.createdAt)}
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -260,8 +274,8 @@ export default function ProfilePage() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground mb-4">
-                Mật khẩu và bảo mật tài khoản được quản lý thông qua tài khoản Google
-                của bạn.
+                Mật khẩu và bảo mật tài khoản được quản lý thông qua tài khoản
+                Google của bạn.
               </p>
               <Button variant="outline" className="w-full" disabled>
                 {t.profile.changePassword}

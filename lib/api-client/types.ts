@@ -2,6 +2,7 @@ export interface ApiResponse<T> {
   result: boolean;
   data: T;
   message: string;
+  code?: string;
 }
 
 export interface ApiError {

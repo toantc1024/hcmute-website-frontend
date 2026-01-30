@@ -16,7 +16,13 @@ import {
 } from "lucide-react";
 
 import { useI18n } from "@/lib/i18n";
-import { postsApi, type PostAuditView, PostStatus, AuthorType, getPostStatusLabel } from "@/features/posts";
+import {
+  postsApi,
+  type PostAuditView,
+  PostStatus,
+  AuthorType,
+  getPostStatusLabel,
+} from "@/features/posts";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -42,7 +48,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PageLoader } from "@/components/ui/loader";
 
 function getStatusBadgeVariant(
-  status: PostStatus
+  status: PostStatus,
 ): "default" | "secondary" | "destructive" | "outline" {
   switch (status) {
     case PostStatus.PUBLISHED:
@@ -97,7 +103,9 @@ function PostsContent() {
       setHasNextPage(response.hasMore);
       setTotalElements(response.content.length);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Đã xảy ra lỗi khi tải bài viết");
+      setError(
+        err instanceof Error ? err.message : "Đã xảy ra lỗi khi tải bài viết",
+      );
       setPosts([]);
     } finally {
       setIsLoading(false);
@@ -117,7 +125,9 @@ function PostsContent() {
       setDeletePostId(null);
       fetchPosts();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Đã xảy ra lỗi khi xóa bài viết");
+      setError(
+        err instanceof Error ? err.message : "Đã xảy ra lỗi khi xóa bài viết",
+      );
     } finally {
       setIsDeleting(false);
     }
@@ -126,7 +136,7 @@ function PostsContent() {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     if (isNaN(date.getTime())) return "Invalid date";
-  
+
     return date.toLocaleDateString("vi-VN", {
       year: "numeric",
       month: "short",
@@ -169,19 +179,19 @@ function PostsContent() {
         enableFiltering: false,
         enableSorting: false,
         cell: ({ row }) => {
-          const owner = row.authors.find((a) => a.authorType === AuthorType.OWNER);
+          const owner = row.authors.find(
+            (a) => a.authorType === AuthorType.OWNER,
+          );
           if (!owner) return "-";
           return (
             <div className="flex items-start gap-2">
               {/* <Avatar className="size-6"> */}
-                {/* <AvatarImage src={owner.avatarUrl} /> */}
-                {/* <AvatarFallback className="text-xs">
+              {/* <AvatarImage src={owner.avatarUrl} /> */}
+              {/* <AvatarFallback className="text-xs">
                   {owner.fullName?.slice(0, 2).toUpperCase() || "??"}
                 </AvatarFallback> */}
               {/* </Avatar> */}
-              <span className="text-sm">
-                {owner.fullName}
-              </span>
+              <span className="text-sm">{owner.fullName}</span>
             </div>
           );
         },
@@ -222,7 +232,7 @@ function PostsContent() {
         ),
       },
     ],
-    [t, statusFilterOptions]
+    [t, statusFilterOptions],
   );
 
   const renderActions = (row: PostAuditView) => (
@@ -283,7 +293,6 @@ function PostsContent() {
 
   return (
     <div className="space-y-6">
-
       <DataTable
         data={posts}
         columns={columns}
@@ -305,14 +314,21 @@ function PostsContent() {
         syncWithUrl={true}
       />
 
-      <AlertDialog open={!!deletePostId} onOpenChange={() => setDeletePostId(null)}>
+      <AlertDialog
+        open={!!deletePostId}
+        onOpenChange={() => setDeletePostId(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t.posts.deletePost}</AlertDialogTitle>
-            <AlertDialogDescription>{t.posts.confirmDelete}</AlertDialogDescription>
+            <AlertDialogDescription>
+              {t.posts.confirmDelete}
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>{t.common.cancel}</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>
+              {t.common.cancel}
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={isDeleting}

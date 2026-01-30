@@ -6,7 +6,7 @@ import type { JSONContent } from "@tiptap/react";
 
 import { cn } from "@/lib/utils";
 import { getExtensions } from "./extensions";
-import { Toolbar } from "./toolbar";
+import { Toolbar, type AIAction } from "./toolbar";
 
 import "./styles.css";
 
@@ -15,6 +15,7 @@ export interface TiptapEditorProps {
   contentJson?: JSONContent;
   onChange?: (html: string, json: JSONContent) => void;
   onImageUpload?: (file: File) => Promise<string>;
+  onAIAssist?: (action: AIAction, selectedText?: string) => Promise<string>;
   placeholder?: string;
   editable?: boolean;
   className?: string;
@@ -28,11 +29,12 @@ export function TiptapEditor({
   contentJson,
   onChange,
   onImageUpload,
+  onAIAssist,
   placeholder,
   editable = true,
   className,
   minHeight = 300,
-  maxHeight = 600,
+  maxHeight,
   showToolbar = true,
 }: TiptapEditorProps) {
   const editor = useEditor({
@@ -44,9 +46,8 @@ export function TiptapEditor({
       attributes: {
         class: cn(
           "prose prose-sm dark:prose-invert max-w-none focus:outline-none",
-          "px-4 py-3"
+          "px-4 py-3 h-full",
         ),
-        style: `min-height: ${minHeight}px; max-height: ${maxHeight}px; overflow-y: auto;`,
       },
     },
     onUpdate: ({ editor }) => {
@@ -75,15 +76,27 @@ export function TiptapEditor({
   return (
     <div
       className={cn(
-        "rounded-md border bg-background overflow-hidden",
+        "rounded-lg border border-border bg-background flex flex-col min-w-0 w-full overflow-hidden",
         !editable && "opacity-60",
-        className
+        className,
       )}
+      style={{ minHeight: minHeight ? `${minHeight}px` : undefined }}
     >
       {showToolbar && editable && (
-        <Toolbar editor={editor} onImageUpload={onImageUpload} />
+        <div className="shrink-0">
+          <Toolbar
+            editor={editor}
+            onImageUpload={onImageUpload}
+            onAIAssist={onAIAssist}
+          />
+        </div>
       )}
-      <EditorContent editor={editor} />
+      <div
+        className="flex-1 overflow-y-auto overflow-x-hidden min-h-0"
+        style={{ maxHeight: maxHeight ? `${maxHeight}px` : undefined }}
+      >
+        <EditorContent editor={editor} className="h-full" />
+      </div>
     </div>
   );
 }
@@ -104,10 +117,7 @@ export function TiptapViewer({
     immediatelyRender: false,
     editorProps: {
       attributes: {
-        class: cn(
-          "prose prose-sm dark:prose-invert max-w-none",
-          "px-4 py-3"
-        ),
+        class: cn("prose prose-sm dark:prose-invert max-w-none", "px-4 py-3"),
       },
     },
   });
