@@ -1,4 +1,6 @@
 import { Node, mergeAttributes } from "@tiptap/core";
+import { ReactNodeViewRenderer } from "@tiptap/react";
+import ImageBlockView from "./image-block-view";
 
 export interface ImageBlockOptions {
   HTMLAttributes: Record<string, unknown>;
@@ -61,12 +63,27 @@ export const ImageBlock = Node.create<ImageBlockOptions>({
     return [
       {
         tag: "figure[data-type='image-block']",
+        getAttrs: (node) => {
+          if (typeof node === "string") return false;
+          const img = node.querySelector("img");
+          const captionEl = node.querySelector("figcaption .caption");
+          const photoCreditEl = node.querySelector("figcaption .photo-credit");
+
+          return {
+            src: img?.getAttribute("src") || null,
+            alt: img?.getAttribute("alt") || "",
+            width: img?.getAttribute("width") || "100%",
+            caption: captionEl?.textContent || "",
+            photoCredit:
+              photoCreditEl?.textContent?.replace(/^Ảnh:\s*/, "") || "",
+          };
+        },
       },
     ];
   },
 
   renderHTML({ HTMLAttributes }) {
-    const { caption, photoCredit, ...imgAttrs } = HTMLAttributes;
+    const { caption, photoCredit, align, width, ...imgAttrs } = HTMLAttributes;
 
     const figcaptionContent: (
       | string
@@ -92,7 +109,15 @@ export const ImageBlock = Node.create<ImageBlockOptions>({
           Record<string, unknown>,
           ...(string | [string, Record<string, unknown>, string])[],
         ]
-    )[] = [["img", imgAttrs as Record<string, unknown>]];
+    )[] = [
+      [
+        "img",
+        { ...imgAttrs, style: `max-width: ${width || "100%"}` } as Record<
+          string,
+          unknown
+        >,
+      ],
+    ];
 
     if (figcaptionContent.length > 0) {
       content.push(["figcaption", {}, ...figcaptionContent]);
@@ -102,7 +127,8 @@ export const ImageBlock = Node.create<ImageBlockOptions>({
       "figure",
       mergeAttributes(this.options.HTMLAttributes, {
         "data-type": "image-block",
-        class: "image-block",
+        class: `image-block align-${align || "center"}`,
+        style: `max-width: ${width || "100%"}`,
       }),
       ...content,
     ];
@@ -129,5 +155,9 @@ export const ImageBlock = Node.create<ImageBlockOptions>({
           return commands.updateAttributes(this.name, { photoCredit });
         },
     };
+  },
+
+  addNodeView() {
+    return ReactNodeViewRenderer(ImageBlockView);
   },
 });

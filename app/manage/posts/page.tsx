@@ -164,11 +164,6 @@ function PostsContent() {
           <div className="flex items-center gap-3">
             <div className="min-w-0">
               <p className="font-medium line-clamp-1">{row.title}</p>
-              {row.description && (
-                <p className="text-sm text-muted-foreground line-clamp-1">
-                  {row.description}
-                </p>
-              )}
             </div>
           </div>
         ),
@@ -282,13 +277,80 @@ function PostsContent() {
     </DropdownMenu>
   );
 
+  const handleStatusFilter = (status: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (status === "all") {
+      params.delete("status");
+    } else {
+      params.set("status", status);
+    }
+    params.set("page", "0");
+    router.push(`${window.location.pathname}?${params.toString()}`);
+  };
+
   const createButton = (
-    <Button asChild>
-      <Link href="/manage/posts/create">
-        <Plus className="mr-2 size-4" />
-        {t.posts.createPost}
-      </Link>
-    </Button>
+    <div className="flex items-center gap-2">
+      <div className="flex items-center rounded-lg border bg-muted/30 p-1">
+        <Button
+          variant={
+            !statusFilter || statusFilter === "all" ? "secondary" : "ghost"
+          }
+          size="sm"
+          className="h-7 px-3 text-xs"
+          onClick={() => handleStatusFilter("all")}
+        >
+          Tất cả
+        </Button>
+        <Button
+          variant={
+            statusFilter === String(PostStatus.DRAFT) ? "secondary" : "ghost"
+          }
+          size="sm"
+          className="h-7 px-3 text-xs"
+          onClick={() => handleStatusFilter(String(PostStatus.DRAFT))}
+        >
+          Nháp
+        </Button>
+        <Button
+          variant={
+            statusFilter === String(PostStatus.PENDING) ? "secondary" : "ghost"
+          }
+          size="sm"
+          className="h-7 px-3 text-xs"
+          onClick={() => handleStatusFilter(String(PostStatus.PENDING))}
+        >
+          Chờ duyệt
+        </Button>
+        <Button
+          variant={
+            statusFilter === String(PostStatus.PUBLISHED)
+              ? "secondary"
+              : "ghost"
+          }
+          size="sm"
+          className="h-7 px-3 text-xs"
+          onClick={() => handleStatusFilter(String(PostStatus.PUBLISHED))}
+        >
+          Đã xuất bản
+        </Button>
+        <Button
+          variant={
+            statusFilter === String(PostStatus.REJECTED) ? "secondary" : "ghost"
+          }
+          size="sm"
+          className="h-7 px-3 text-xs"
+          onClick={() => handleStatusFilter(String(PostStatus.REJECTED))}
+        >
+          Từ chối
+        </Button>
+      </div>
+      <Button asChild>
+        <Link href="/manage/posts/create">
+          <Plus className="mr-2 size-4" />
+          {t.posts.createPost}
+        </Link>
+      </Button>
+    </div>
   );
 
   return (

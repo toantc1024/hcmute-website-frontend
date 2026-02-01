@@ -5,12 +5,10 @@ import { NodeViewWrapper, NodeViewProps } from "@tiptap/react";
 import {
   Pencil,
   Trash2,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
   GripVertical,
   Camera,
   Type,
+  ImageIcon,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -35,7 +33,7 @@ export default function ImageBlockView({
   deleteNode,
   selected,
 }: NodeViewProps) {
-  const { src, alt, caption, photoCredit, width, align } = node.attrs;
+  const { src, alt, caption, photoCredit, width } = node.attrs;
   const [isEditing, setIsEditing] = useState(false);
   const [tempCaption, setTempCaption] = useState(caption || "");
   const [tempPhotoCredit, setTempPhotoCredit] = useState(photoCredit || "");
@@ -50,10 +48,6 @@ export default function ImageBlockView({
     setIsEditing(false);
   }, [tempCaption, tempPhotoCredit, tempAlt, updateAttributes]);
 
-  const handleAlignChange = (newAlign: string) => {
-    updateAttributes({ align: newAlign });
-  };
-
   const handleDoubleClick = useCallback(() => {
     setTempCaption(caption || "");
     setTempPhotoCredit(photoCredit || "");
@@ -61,94 +55,48 @@ export default function ImageBlockView({
     setIsEditing(true);
   }, [caption, photoCredit, alt]);
 
-  const getAlignClass = () => {
-    switch (align) {
-      case "left":
-        return "mr-auto";
-      case "right":
-        return "ml-auto";
-      default:
-        return "mx-auto";
-    }
-  };
-
   return (
     <NodeViewWrapper>
       <figure
         className={cn(
-          "image-block relative group my-4",
+          "image-block relative group my-4 mx-auto",
           selected && "ring-2 ring-primary ring-offset-2 rounded-xl",
-          getAlignClass(),
         )}
         style={{ maxWidth: width }}
         data-drag-handle
         onDoubleClick={handleDoubleClick}
       >
-        {/* Toolbar */}
+        {/* Toolbar - Centered on image */}
         <div
           className={cn(
-            "absolute -top-10 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-popover border rounded-lg p-1 shadow-lg z-10 transition-opacity",
+            "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-1 bg-popover/95 backdrop-blur-sm border rounded-lg p-1.5 shadow-lg z-10 transition-opacity",
             selected ? "opacity-100" : "opacity-0 group-hover:opacity-100",
           )}
         >
           <TooltipProvider delayDuration={0}>
-            <div className="flex items-center gap-0.5">
-              <div className="px-1 cursor-grab">
-                <GripVertical className="size-4 text-muted-foreground" />
-              </div>
-
-              <div className="w-px h-4 bg-border mx-1" />
-
+            <div className="flex items-center gap-1">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className={cn("size-7", align === "left" && "bg-muted")}
-                    onClick={() => handleAlignChange("left")}
-                  >
-                    <AlignLeft className="size-4" />
-                  </Button>
+                  <div className="px-1.5 cursor-grab">
+                    <GripVertical className="size-4 text-muted-foreground" />
+                  </div>
                 </TooltipTrigger>
-                <TooltipContent>Căn trái</TooltipContent>
+                <TooltipContent>Kéo để di chuyển</TooltipContent>
               </Tooltip>
 
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className={cn("size-7", align === "center" && "bg-muted")}
-                    onClick={() => handleAlignChange("center")}
-                  >
-                    <AlignCenter className="size-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Căn giữa</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className={cn("size-7", align === "right" && "bg-muted")}
-                    onClick={() => handleAlignChange("right")}
-                  >
-                    <AlignRight className="size-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Căn phải</TooltipContent>
-              </Tooltip>
-
-              <div className="w-px h-4 bg-border mx-1" />
+              <div className="w-px h-5 bg-border" />
 
               <Popover open={isEditing} onOpenChange={setIsEditing}>
-                <PopoverTrigger asChild>
-                  <Button variant="ghost" size="icon" className="size-7">
-                    <Pencil className="size-4" />
-                  </Button>
-                </PopoverTrigger>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <PopoverTrigger asChild>
+                      <Button variant="ghost" size="icon" className="size-8">
+                        <Pencil className="size-4" />
+                      </Button>
+                    </PopoverTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>Chỉnh sửa</TooltipContent>
+                </Tooltip>
                 <PopoverContent className="w-80" align="center">
                   <div className="space-y-4">
                     <div className="space-y-2">
@@ -193,7 +141,7 @@ export default function ImageBlockView({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="size-7 text-destructive hover:text-destructive"
+                    className="size-8 text-destructive hover:text-destructive hover:bg-destructive/10"
                     onClick={deleteNode}
                   >
                     <Trash2 className="size-4" />
@@ -206,12 +154,25 @@ export default function ImageBlockView({
         </div>
 
         {/* Image */}
-        <img
-          src={src}
-          alt={alt || caption || ""}
-          className="w-full rounded-xl object-cover cursor-pointer"
-          title="Nhấn đúp để chỉnh sửa"
-        />
+        {src ? (
+          <img
+            src={src}
+            alt={alt || caption || ""}
+            className="w-full rounded-xl object-cover cursor-pointer"
+            title="Nhấn đúp để chỉnh sửa"
+            onError={(e) => {
+              // Handle image load error
+              const target = e.target as HTMLImageElement;
+              target.style.display = "none";
+              target.nextElementSibling?.classList.remove("hidden");
+            }}
+          />
+        ) : (
+          <div className="w-full aspect-video bg-muted rounded-xl flex flex-col items-center justify-center gap-2 text-muted-foreground">
+            <ImageIcon className="size-12" />
+            <span className="text-sm">Không thể tải ảnh</span>
+          </div>
+        )}
 
         {/* Caption & Photo Credit - Italic style like [url](text) */}
         {(caption || photoCredit) && (

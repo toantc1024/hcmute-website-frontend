@@ -179,7 +179,7 @@ export default function NewsPage() {
               <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                 <div className="flex items-center gap-2 mb-4">
                   <Folder className="w-5 h-5 text-blue-600" />
-                  <h3 className="font-semibold text-gray-900">Danh mục</h3>
+                  <h3 className="font-semibold text-foreground">Danh mục</h3>
                 </div>
                 <div className="space-y-1">
                   <button
@@ -216,7 +216,7 @@ export default function NewsPage() {
               <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                 <div className="flex items-center gap-2 mb-4">
                   <Tag className="w-5 h-5 text-blue-600" />
-                  <h3 className="font-semibold text-gray-900">Thẻ</h3>
+                  <h3 className="font-semibold text-foreground">Thẻ</h3>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {tags.map((tag) => (
@@ -330,7 +330,7 @@ export default function NewsPage() {
                 <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
                   <Search className="w-10 h-10 text-gray-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                <h3 className="text-xl font-semibold text-foreground mb-2">
                   Không tìm thấy bài viết
                 </h3>
                 <p className="text-gray-500 mb-6">
@@ -388,7 +388,7 @@ export default function NewsPage() {
                                 </span>
                               )}
                             </div>
-                            <h3 className="font-semibold text-gray-900 line-clamp-2 mb-2 group-hover:text-blue-600 transition-colors">
+                            <h3 className="font-semibold text-foreground line-clamp-2 mb-2 group-hover:text-blue-600 transition-colors">
                               {post.title}
                             </h3>
                             {post.excerpt && (
@@ -440,7 +440,7 @@ export default function NewsPage() {
             className="absolute right-0 top-0 h-full w-80 max-w-full bg-white shadow-xl"
           >
             <div className="flex items-center justify-between p-4 border-b">
-              <h3 className="font-semibold text-gray-900">Bộ lọc</h3>
+              <h3 className="font-semibold text-foreground">Bộ lọc</h3>
               <button
                 onClick={() => setShowMobileFilters(false)}
                 className="p-2 hover:bg-gray-100 rounded-full"
@@ -452,7 +452,7 @@ export default function NewsPage() {
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <Folder className="w-5 h-5 text-blue-600" />
-                  <h4 className="font-medium text-gray-900">Danh mục</h4>
+                  <h4 className="font-medium text-foreground">Danh mục</h4>
                 </div>
                 <div className="space-y-1">
                   <button
@@ -484,7 +484,7 @@ export default function NewsPage() {
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <Tag className="w-5 h-5 text-blue-600" />
-                  <h4 className="font-medium text-gray-900">Thẻ</h4>
+                  <h4 className="font-medium text-foreground">Thẻ</h4>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {tags.map((tag) => (

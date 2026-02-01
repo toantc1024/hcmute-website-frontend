@@ -12,7 +12,6 @@ import {
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
-  Filter,
   X,
   FileX2,
 } from "lucide-react";
@@ -94,17 +93,19 @@ export function DataTable<T>({
     return [];
   });
 
-  const [columnFilters, setColumnFilters] = useState<Record<string, string>>(() => {
-    if (!syncWithUrl) return {};
-    const filters: Record<string, string> = {};
-    columns.forEach((col) => {
-      if (col.enableFiltering !== false) {
-        const value = searchParams.get(col.id);
-        if (value) filters[col.id] = value;
-      }
-    });
-    return filters;
-  });
+  const [columnFilters, setColumnFilters] = useState<Record<string, string>>(
+    () => {
+      if (!syncWithUrl) return {};
+      const filters: Record<string, string> = {};
+      columns.forEach((col) => {
+        if (col.enableFiltering !== false) {
+          const value = searchParams.get(col.id);
+          if (value) filters[col.id] = value;
+        }
+      });
+      return filters;
+    },
+  );
 
   const pageSize = syncWithUrl
     ? parseInt(searchParams.get("size") || String(initialPageSize), 10)
@@ -116,7 +117,7 @@ export function DataTable<T>({
 
   const visibleColumns = useMemo(
     () => columns.filter((col) => !col.hidden),
-    [columns]
+    [columns],
   );
 
   const getRowKey = useCallback(
@@ -126,7 +127,7 @@ export function DataTable<T>({
       }
       return String(row[rowKey]);
     },
-    [rowKey]
+    [rowKey],
   );
 
   const getCellValue = useCallback((row: T, column: ColumnDef<T>): unknown => {
@@ -142,7 +143,7 @@ export function DataTable<T>({
   const updateUrl = useCallback(
     (updates: Record<string, string | null>) => {
       if (!syncWithUrl) return;
-      
+
       const params = new URLSearchParams(searchParams.toString());
       Object.entries(updates).forEach(([key, value]) => {
         if (value === null || value === "" || value === "all") {
@@ -153,7 +154,7 @@ export function DataTable<T>({
       });
       router.push(`${pathname}?${params.toString()}`);
     },
-    [router, pathname, searchParams, syncWithUrl]
+    [router, pathname, searchParams, syncWithUrl],
   );
 
   const handleSort = useCallback(
@@ -170,16 +171,18 @@ export function DataTable<T>({
       }
 
       setSorting(newSorting);
-      
+
       if (newSorting.length > 0) {
-        updateUrl({ sort: `${newSorting[0].id},${newSorting[0].desc ? "desc" : "asc"}` });
+        updateUrl({
+          sort: `${newSorting[0].id},${newSorting[0].desc ? "desc" : "asc"}`,
+        });
       } else {
         updateUrl({ sort: null });
       }
-      
+
       onSortChange?.(newSorting);
     },
-    [sorting, onSortChange, updateUrl]
+    [sorting, onSortChange, updateUrl],
   );
 
   const handleColumnFilter = useCallback(
@@ -193,10 +196,10 @@ export function DataTable<T>({
       setColumnFilters(newFilters);
       updateUrl({ [columnId]: value || null, page: "0" });
       onFilterChange?.(
-        Object.entries(newFilters).map(([id, val]) => ({ id, value: val }))
+        Object.entries(newFilters).map(([id, val]) => ({ id, value: val })),
       );
     },
-    [columnFilters, onFilterChange, updateUrl]
+    [columnFilters, onFilterChange, updateUrl],
   );
 
   const clearFilters = useCallback(() => {
@@ -214,7 +217,7 @@ export function DataTable<T>({
       updateUrl({ page: String(page) });
       onPageChange?.(page);
     },
-    [onPageChange, updateUrl]
+    [onPageChange, updateUrl],
   );
 
   const handlePageSizeChange = useCallback(
@@ -222,12 +225,12 @@ export function DataTable<T>({
       updateUrl({ size: String(size), page: "0" });
       onPageSizeChange?.(size);
     },
-    [onPageSizeChange, updateUrl]
+    [onPageSizeChange, updateUrl],
   );
 
   const isRowSelected = useCallback(
     (row: T) => selectedRows.some((r) => getRowKey(r) === getRowKey(row)),
-    [selectedRows, getRowKey]
+    [selectedRows, getRowKey],
   );
 
   const toggleRowSelection = useCallback(
@@ -239,7 +242,7 @@ export function DataTable<T>({
         : [...selectedRows, row];
       onSelectedRowsChange?.(newSelected);
     },
-    [selectedRows, getRowKey, onSelectedRowsChange]
+    [selectedRows, getRowKey, onSelectedRowsChange],
   );
 
   const toggleAllRows = useCallback(() => {
@@ -275,7 +278,9 @@ export function DataTable<T>({
               onClick={onRefresh}
               disabled={isLoading}
             >
-              <RefreshCw className={cn("size-4", isLoading && "animate-spin")} />
+              <RefreshCw
+                className={cn("size-4", isLoading && "animate-spin")}
+              />
             </Button>
           )}
           {bulkActions && selectedRows.length > 0 && (
@@ -290,7 +295,12 @@ export function DataTable<T>({
 
         <div className="flex items-center gap-2 overflow-x-auto">
           {hasActiveFilters && (
-            <Button variant="outline" size="sm" onClick={clearFilters} className="shrink-0">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={clearFilters}
+              className="shrink-0"
+            >
               <X className="mr-1 size-4" />
               Xóa bộ lọc ({activeFilterCount})
             </Button>
@@ -301,7 +311,9 @@ export function DataTable<T>({
       <div className="rounded-md border overflow-hidden">
         <div className={cn("overflow-auto", stickyHeader && "max-h-[600px]")}>
           <Table className="[&_th]:border-r [&_th:last-child]:border-r-0 [&_td]:border-r [&_td:last-child]:border-r-0">
-            <TableHeader className={cn(stickyHeader && "sticky top-0 bg-background z-10")}>
+            <TableHeader
+              className={cn(stickyHeader && "sticky top-0 bg-background z-10")}
+            >
               <TableRow>
                 {enableRowSelection && (
                   <TableHead className="w-12">
@@ -326,27 +338,34 @@ export function DataTable<T>({
                       <div
                         className={cn(
                           "flex items-center gap-1 flex-1",
-                          column.enableSorting !== false && "cursor-pointer select-none"
+                          column.enableSorting !== false &&
+                            "cursor-pointer select-none",
                         )}
                         onClick={() =>
-                          column.enableSorting !== false && handleSort(column.id)
+                          column.enableSorting !== false &&
+                          handleSort(column.id)
                         }
                       >
                         <span>{column.header}</span>
-                        {column.enableSorting !== false && getSortIcon(column.id)}
+                        {column.enableSorting !== false &&
+                          getSortIcon(column.id)}
                       </div>
 
                       {column.enableFiltering !== false && (
                         <ColumnFilter
                           column={column}
                           value={columnFilters[column.id] || ""}
-                          onChange={(value) => handleColumnFilter(column.id, value)}
+                          onChange={(value) =>
+                            handleColumnFilter(column.id, value)
+                          }
                         />
                       )}
                     </div>
                   </TableHead>
                 ))}
-                {actions && <TableHead className="w-12 text-right">Hành động</TableHead>}
+                {actions && (
+                  <TableHead className="w-12 text-right">Hành động</TableHead>
+                )}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -406,7 +425,7 @@ export function DataTable<T>({
                     className={cn(
                       "group",
                       onRowClick && "cursor-pointer hover:bg-muted/50",
-                      isRowSelected(row) && "bg-primary/5"
+                      isRowSelected(row) && "bg-primary/5",
                     )}
                     onClick={() => onRowClick?.(row)}
                   >
@@ -569,7 +588,7 @@ function ColumnFilter<T>({ column, value, onChange }: ColumnFilterProps<T>) {
             size="icon"
             className={cn("size-6", hasFilter && "text-primary")}
           >
-            <Filter className="size-3" />
+            <Search className="size-3" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-52 p-3" align="start">
@@ -615,7 +634,7 @@ function ColumnFilter<T>({ column, value, onChange }: ColumnFilterProps<T>) {
           size="icon"
           className={cn("size-6", hasFilter && "text-primary")}
         >
-          <Filter className="size-3" />
+          <Search className="size-3" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-52 p-3" align="start">

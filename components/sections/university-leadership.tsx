@@ -34,14 +34,17 @@ export default function UniversityLeadership() {
 
   const prevSlide = () => {
     setCurrentSlide(
-      (prev) => (prev - 1 + leadershipData.length) % leadershipData.length
+      (prev) => (prev - 1 + leadershipData.length) % leadershipData.length,
     );
   };
 
   const currentLeader = leadershipData[currentSlide];
 
   return (
-    <section id="leadership" className="py-12 lg:py-20 relative overflow-hidden">
+    <section
+      id="leadership"
+      className="py-12 lg:py-20 relative overflow-hidden"
+    >
       <div className="w-full px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40 relative">
         <motion.div
           className="text-center  mb-12"
@@ -50,7 +53,7 @@ export default function UniversityLeadership() {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-4">
             LÃNH ĐẠO CỦA
             <AuroraText className="px-2" colors={["#002e7dff", "#ae0303ff"]}>
               HCM-UTE

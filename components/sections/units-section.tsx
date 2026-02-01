@@ -108,7 +108,8 @@ const UNIT_GROUPS: UnitGroup[] = [
       },
       {
         name: "Trung tâm Ngoại ngữ",
-        description: "Đào tạo ngoại ngữ, chứng chỉ quốc tế và giao lưu văn hóa.",
+        description:
+          "Đào tạo ngoại ngữ, chứng chỉ quốc tế và giao lưu văn hóa.",
         href: "/trung-tam/ngoai-ngu",
         initials: "NN",
       },
@@ -125,13 +126,15 @@ const UNIT_GROUPS: UnitGroup[] = [
     items: [
       {
         name: "Đoàn Thanh niên",
-        description: "Tổ chức các hoạt động thanh niên, tình nguyện và phong trào.",
+        description:
+          "Tổ chức các hoạt động thanh niên, tình nguyện và phong trào.",
         href: "/doan-thanh-nien",
         initials: "YOUTH",
       },
       {
         name: "Hội Sinh viên",
-        description: "Đại diện quyền lợi sinh viên, tổ chức hoạt động và sự kiện.",
+        description:
+          "Đại diện quyền lợi sinh viên, tổ chức hoạt động và sự kiện.",
         href: "/hoi-sinh-vien",
         initials: "SVU",
       },
@@ -238,7 +241,7 @@ export default function UnitsSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-xl sm:text-2xl text-center md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-xl sm:text-2xl text-center md:text-3xl lg:text-4xl font-bold text-foreground mb-4">
               <AuroraText
                 className="px-2"
                 colors={["#0c4ebfff", "#1760dfff", "#ae0303ff"]}
@@ -280,8 +283,8 @@ export default function UnitsSection() {
                     }}
                     className={`relative z-10 px-2 lg:px-4 py-2 text-xs lg:text-sm transition-all duration-200 flex items-center justify-center flex-1 whitespace-nowrap ${
                       activeTab === index
-                        ? "text-gray-900 font-bold"
-                        : "text-gray-600 hover:text-gray-900 font-normal"
+                        ? "text-foreground font-bold"
+                        : "text-gray-600 hover:text-foreground font-normal"
                     }`}
                   >
                     {group.title}
@@ -378,7 +381,7 @@ export default function UnitsSection() {
               <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col border border-white/20">
                 <div className="px-8 py-6 flex items-center justify-between bg-gradient-to-r from-blue-50/50 via-white to-white">
                   <div>
-                    <h3 className="text-3xl font-bold text-gray-900 mb-1">
+                    <h3 className="text-3xl font-bold text-foreground mb-1">
                       {selectedGroup.title}
                     </h3>
                   </div>
@@ -411,7 +414,7 @@ export default function UnitsSection() {
                                 </span>
                               </div>
                               <div className="flex-1 min-w-0">
-                                <h4 className="font-bold text-gray-900 text-base leading-tight mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
+                                <h4 className="font-bold text-foreground text-base leading-tight mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
                                   {unit.name}
                                 </h4>
                               </div>

@@ -19,7 +19,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { postsApi, type PostDetailView, type PostAuditView } from "@/lib/api-client";
+import {
+  postsApi,
+  type PostDetailView,
+  type PostAuditView,
+} from "@/lib/api-client";
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -70,7 +74,7 @@ export default function NewsDetailPage() {
   const [activeHeading, setActiveHeading] = useState<string>("");
   const [copied, setCopied] = useState(false);
   const [tableOfContents, setTableOfContents] = useState<TableOfContentsItem[]>(
-    []
+    [],
   );
 
   const fetchPost = useCallback(async () => {
@@ -87,7 +91,7 @@ export default function NewsDetailPage() {
           limit: 4,
         });
         setRelatedPosts(
-          related.content.filter((p) => p.id !== data.id).slice(0, 3)
+          related.content.filter((p) => p.id !== data.id).slice(0, 3),
         );
       }
     } catch (err) {
@@ -136,14 +140,14 @@ export default function NewsDetailPage() {
   const shareOnFacebook = () => {
     window.open(
       `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`,
-      "_blank"
+      "_blank",
     );
   };
 
   const shareOnTwitter = () => {
     window.open(
       `https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(post?.title || "")}`,
-      "_blank"
+      "_blank",
     );
   };
 
@@ -171,7 +175,7 @@ export default function NewsDetailPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+          <h1 className="text-2xl font-bold text-foreground mb-4">
             {error || "Không tìm thấy bài viết"}
           </h1>
           <Link href="/tin-tuc">
@@ -287,7 +291,7 @@ export default function NewsDetailPage() {
                 </div>
               )}
 
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight mb-4">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground leading-tight mb-4">
                 {post.title}
               </h1>
 
@@ -399,7 +403,9 @@ export default function NewsDetailPage() {
             <div className="sticky top-24">
               {tableOfContents.length > 0 && (
                 <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-                  <h3 className="font-semibold text-gray-900 mb-4">Mục lục</h3>
+                  <h3 className="font-semibold text-foreground mb-4">
+                    Mục lục
+                  </h3>
                   <nav className="space-y-2">
                     {tableOfContents.map((item) => (
                       <a
@@ -407,12 +413,10 @@ export default function NewsDetailPage() {
                         href={`#${item.id}`}
                         className={`block text-sm transition-colors ${
                           item.level === 3 ? "pl-4" : ""
-                        } ${
-                          item.level === 4 ? "pl-8" : ""
-                        } ${
+                        } ${item.level === 4 ? "pl-8" : ""} ${
                           activeHeading === item.id
                             ? "text-blue-600 font-medium"
-                            : "text-gray-600 hover:text-gray-900"
+                            : "text-gray-600 hover:text-foreground"
                         }`}
                       >
                         {item.text}
@@ -429,7 +433,7 @@ export default function NewsDetailPage() {
       {relatedPosts.length > 0 && (
         <section className="bg-white border-t py-12">
           <div className="px-4 sm:px-8 lg:px-16 xl:px-24">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">
+            <h2 className="text-2xl font-bold text-foreground mb-8">
               Bài viết liên quan
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -454,10 +458,10 @@ export default function NewsDetailPage() {
                     <div className="p-5">
                       <div className="text-xs text-gray-500 mb-2">
                         {formatDate(
-                          relatedPost.publishedAt || relatedPost.createdAt
+                          relatedPost.publishedAt || relatedPost.createdAt,
                         )}
                       </div>
-                      <h3 className="font-semibold text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                      <h3 className="font-semibold text-foreground line-clamp-2 group-hover:text-blue-600 transition-colors">
                         {relatedPost.title}
                       </h3>
                     </div>

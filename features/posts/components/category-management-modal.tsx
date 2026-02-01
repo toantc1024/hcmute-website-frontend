@@ -40,15 +40,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
-const NO_PARENT_VALUE = "__none__";
 
 function generateSlug(name: string): string {
   return name
@@ -82,12 +73,16 @@ export function CategoryManagementModal({
   const [categories, setCategories] = useState<CategoryAuditView[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [localSelectedIds, setLocalSelectedIds] = useState<string[]>([]);
+
+  // Create modal state
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategoryDescription, setNewCategoryDescription] = useState("");
-  const [newParentId, setNewParentId] = useState<string>(NO_PARENT_VALUE);
   const [isCreating, setIsCreating] = useState(false);
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [localSelectedIds, setLocalSelectedIds] = useState<string[]>([]);
+
+  // Edit modal state
+  const [showEditModal, setShowEditModal] = useState(false);
 
   // Initialize local selection when modal opens
   useEffect(() => {
@@ -162,20 +157,21 @@ export function CategoryManagementModal({
 
     try {
       setIsCreating(true);
-      const createdCategory = await categoriesApi.createCategory({
+      const createdCategoryId = await categoriesApi.createCategory({
         name: trimmedName,
         slug: generateSlug(trimmedName),
         description: newCategoryDescription.trim() || undefined,
-        parentId: newParentId !== NO_PARENT_VALUE ? newParentId : undefined,
       });
-      setCategories((prev) => [...prev, createdCategory]);
       setNewCategoryName("");
       setNewCategoryDescription("");
-      setNewParentId(NO_PARENT_VALUE);
-      setShowCreateForm(false);
-      toast.success(`Đã tạo danh mục "${createdCategory.name}"`);
+      setShowCreateModal(false);
+      toast.success(`Đã tạo danh mục "${trimmedName}"`);
 
-      setLocalSelectedIds((prev) => [...prev, createdCategory.id]);
+      // Add the new category to selection
+      setLocalSelectedIds((prev) => [...prev, createdCategoryId]);
+
+      // Refetch to get the latest data
+      await fetchCategories();
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Không thể tạo danh mục";
@@ -214,20 +210,18 @@ export function CategoryManagementModal({
 
     try {
       setIsUpdating(true);
-      const updatedCategory = await categoriesApi.updateCategory(
-        editingCategory.id,
-        {
-          name: trimmedName,
-          description: editDescription.trim() || undefined,
-          version: editingCategory.version,
-        },
-      );
+      await categoriesApi.updateCategory(editingCategory.id, {
+        name: trimmedName,
+        description: editDescription.trim() || undefined,
+        version: editingCategory.version,
+      });
 
-      setCategories((prev) =>
-        prev.map((c) => (c.id === editingCategory.id ? updatedCategory : c)),
-      );
       setEditingCategory(null);
-      toast.success(`Đã cập nhật danh mục "${updatedCategory.name}"`);
+      setShowEditModal(false);
+      toast.success(`Đã cập nhật danh mục "${trimmedName}"`);
+
+      // Refetch to get the latest data
+      await fetchCategories();
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Không thể cập nhật danh mục";
@@ -284,18 +278,14 @@ export function CategoryManagementModal({
     setEditingCategory(category);
     setEditName(category.name);
     setEditDescription(category.description || "");
+    setShowEditModal(true);
   };
 
   const cancelEdit = () => {
     setEditingCategory(null);
     setEditName("");
     setEditDescription("");
-  };
-
-  const getParentName = (parentId?: string) => {
-    if (!parentId) return null;
-    const parent = categories.find((c) => c.id === parentId);
-    return parent?.name;
+    setShowEditModal(false);
   };
 
   return (
@@ -313,70 +303,14 @@ export function CategoryManagementModal({
           </DialogHeader>
 
           <div className="space-y-4">
-            {!showCreateForm ? (
-              <Button
-                variant="outline"
-                className="w-full rounded-xl"
-                onClick={() => setShowCreateForm(true)}
-              >
-                <Plus className="mr-2 size-4" />
-                Tạo danh mục mới
-              </Button>
-            ) : (
-              <div className="space-y-3 p-4 border rounded-xl bg-muted/30">
-                <Input
-                  value={newCategoryName}
-                  onChange={(e) => setNewCategoryName(e.target.value)}
-                  placeholder="Tên danh mục *"
-                  className="rounded-lg"
-                />
-                <Input
-                  value={newCategoryDescription}
-                  onChange={(e) => setNewCategoryDescription(e.target.value)}
-                  placeholder="Mô tả (tùy chọn)"
-                  className="rounded-lg"
-                />
-                <Select value={newParentId} onValueChange={setNewParentId}>
-                  <SelectTrigger className="rounded-lg">
-                    <SelectValue placeholder="Danh mục cha (tùy chọn)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={NO_PARENT_VALUE}>Không có</SelectItem>
-                    {categories.map((category) => (
-                      <SelectItem key={category.id} value={category.id}>
-                        {category.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <div className="flex gap-2">
-                  <Button
-                    onClick={handleCreateCategory}
-                    disabled={isCreating || !newCategoryName.trim()}
-                    className="flex-1 rounded-lg"
-                  >
-                    {isCreating ? (
-                      <Loader2 className="mr-2 size-4 animate-spin" />
-                    ) : (
-                      <Plus className="mr-2 size-4" />
-                    )}
-                    Tạo
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="rounded-lg"
-                    onClick={() => {
-                      setShowCreateForm(false);
-                      setNewCategoryName("");
-                      setNewCategoryDescription("");
-                      setNewParentId(NO_PARENT_VALUE);
-                    }}
-                  >
-                    Hủy
-                  </Button>
-                </div>
-              </div>
-            )}
+            <Button
+              variant="outline"
+              className="w-full rounded-xl"
+              onClick={() => setShowCreateModal(true)}
+            >
+              <Plus className="mr-2 size-4" />
+              Tạo danh mục mới
+            </Button>
 
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
@@ -405,55 +339,6 @@ export function CategoryManagementModal({
                 <div className="space-y-1.5">
                   {filteredCategories.map((category) => {
                     const isSelected = localSelectedIds.includes(category.id);
-                    const isEditing = editingCategory?.id === category.id;
-                    const parentName = getParentName(category.parentId);
-
-                    if (isEditing) {
-                      return (
-                        <div
-                          key={category.id}
-                          className="space-y-2 p-3 rounded-xl bg-muted border border-border"
-                        >
-                          <Input
-                            value={editName}
-                            onChange={(e) => setEditName(e.target.value)}
-                            className="h-9 rounded-lg"
-                            autoFocus
-                            placeholder="Tên danh mục"
-                          />
-                          <Input
-                            value={editDescription}
-                            onChange={(e) => setEditDescription(e.target.value)}
-                            className="h-9 rounded-lg"
-                            placeholder="Mô tả (tùy chọn)"
-                          />
-                          <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              onClick={handleUpdateCategory}
-                              disabled={isUpdating}
-                              className="flex-1 rounded-lg"
-                            >
-                              {isUpdating ? (
-                                <Loader2 className="mr-2 size-4 animate-spin" />
-                              ) : (
-                                <Check className="mr-2 size-4" />
-                              )}
-                              Lưu
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={cancelEdit}
-                              disabled={isUpdating}
-                              className="rounded-lg"
-                            >
-                              Hủy
-                            </Button>
-                          </div>
-                        </div>
-                      );
-                    }
 
                     return (
                       <div
@@ -478,21 +363,11 @@ export function CategoryManagementModal({
                           <FolderOpen className="size-4" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span
-                              className={`font-medium text-sm truncate ${isSelected ? "text-primary" : ""}`}
-                            >
-                              {category.name}
-                            </span>
-                            {parentName && (
-                              <Badge
-                                variant="outline"
-                                className="text-[10px] px-1.5 py-0 h-4 shrink-0"
-                              >
-                                {parentName}
-                              </Badge>
-                            )}
-                          </div>
+                          <span
+                            className={`font-medium text-sm truncate block ${isSelected ? "text-primary" : ""}`}
+                          >
+                            {category.name}
+                          </span>
                           {category.description && (
                             <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
                               {category.description}
@@ -513,8 +388,8 @@ export function CategoryManagementModal({
                           </Button>
                           <Button
                             size="icon"
-                            variant="ghost"
-                            className="size-7 rounded-lg text-destructive hover:text-destructive hover:bg-destructive/10"
+                            variant="destructive"
+                            className="size-7 rounded-lg"
                             onClick={(e) => {
                               e.stopPropagation();
                               setDeleteCategory(category);
@@ -579,6 +454,121 @@ export function CategoryManagementModal({
             </Button>
             <Button className="rounded-xl" onClick={handleSave}>
               Lưu
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Category Modal - Nested */}
+      <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Plus className="size-5" />
+              Tạo danh mục mới
+            </DialogTitle>
+            <DialogDescription>Nhập thông tin danh mục mới</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Input
+                value={newCategoryName}
+                onChange={(e) => setNewCategoryName(e.target.value)}
+                placeholder="Tên danh mục *"
+                className="rounded-lg"
+                autoFocus
+              />
+            </div>
+            <div className="space-y-2">
+              <Input
+                value={newCategoryDescription}
+                onChange={(e) => setNewCategoryDescription(e.target.value)}
+                placeholder="Mô tả (tùy chọn)"
+                className="rounded-lg"
+              />
+            </div>
+          </div>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              className="rounded-lg"
+              onClick={() => {
+                setShowCreateModal(false);
+                setNewCategoryName("");
+                setNewCategoryDescription("");
+              }}
+            >
+              Hủy
+            </Button>
+            <Button
+              onClick={handleCreateCategory}
+              disabled={isCreating || !newCategoryName.trim()}
+              className="rounded-lg"
+            >
+              {isCreating ? (
+                <Loader2 className="mr-2 size-4 animate-spin" />
+              ) : (
+                <Plus className="mr-2 size-4" />
+              )}
+              Tạo danh mục
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Category Modal - Nested */}
+      <Dialog
+        open={showEditModal}
+        onOpenChange={(open) => {
+          if (!open) cancelEdit();
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Edit2 className="size-5" />
+              Chỉnh sửa danh mục
+            </DialogTitle>
+            <DialogDescription>Cập nhật thông tin danh mục</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Input
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                placeholder="Tên danh mục *"
+                className="rounded-lg"
+                autoFocus
+              />
+            </div>
+            <div className="space-y-2">
+              <Input
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+                placeholder="Mô tả (tùy chọn)"
+                className="rounded-lg"
+              />
+            </div>
+          </div>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              className="rounded-lg"
+              onClick={cancelEdit}
+            >
+              Hủy
+            </Button>
+            <Button
+              onClick={handleUpdateCategory}
+              disabled={isUpdating || !editName.trim()}
+              className="rounded-lg"
+            >
+              {isUpdating ? (
+                <Loader2 className="mr-2 size-4 animate-spin" />
+              ) : (
+                <Check className="mr-2 size-4" />
+              )}
+              Lưu thay đổi
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -179,13 +179,10 @@ export default function EditPostPage() {
     };
   }, [hasLock, postId]);
 
-  const handleSave = useCallback(
-    (savedPostId: string) => {
-      releaseLock();
-      router.push(`/manage/posts/${savedPostId}?updated=true`);
-    },
-    [releaseLock, router],
-  );
+  const handleSave = useCallback((_savedPostId: string) => {
+    // Don't navigate on update, just stay on the edit page
+    // The toast is already shown in PostForm
+  }, []);
 
   const handleUnpublish = async () => {
     try {

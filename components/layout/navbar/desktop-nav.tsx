@@ -16,12 +16,8 @@ const leftItems = menuData.filter((item) => item.position === "left");
 const rightItems = menuData.filter((item) => item.position === "right");
 
 function NavItems({ items }: { items: MenuItem[] }) {
-  const {
-    activeMenu,
-    handleMouseEnter,
-    handleMouseLeave,
-    handleClick,
-  } = useNavbar();
+  const { activeMenu, handleMouseEnter, handleMouseLeave, handleClick } =
+    useNavbar();
 
   return (
     <>
@@ -42,18 +38,16 @@ function NavItems({ items }: { items: MenuItem[] }) {
           ) : (
             <Button
               onClick={() => handleClick(item.id)}
-             
-                className={
-                  cn(
-                    "uppercase tracking-wider",
-                    activeMenu === item.id ? " !bg-primary !text-primary-foreground" : "bg-transparent"
-                  )
-                }
-                variant="ghost"
+              className={cn(
+                "uppercase tracking-wider",
+                activeMenu === item.id
+                  ? " !bg-primary !text-primary-foreground"
+                  : "bg-transparent",
+              )}
+              variant="ghost"
             >
               {item.label}
               <motion.div
-              
                 animate={{ rotate: activeMenu === item.id ? 180 : 0 }}
                 transition={{ duration: 0.2, ease: "easeInOut" }}
               >
@@ -91,7 +85,7 @@ export function DesktopNav() {
     closeMenu,
     isOpen,
   } = useNavbar();
-  
+
   const contentRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -126,9 +120,15 @@ export function DesktopNav() {
                       >
                         <Container className="py-6 max-h-[calc(100vh-200px)] overflow-y-auto">
                           {item.type === "mega" ? (
-                            <MegaMenuContent item={item} closeMenu={closeMenu} />
+                            <MegaMenuContent
+                              item={item}
+                              closeMenu={closeMenu}
+                            />
                           ) : (
-                            <DropdownContent items={item.children} closeMenu={closeMenu} />
+                            <DropdownContent
+                              items={item.children}
+                              closeMenu={closeMenu}
+                            />
                           )}
                         </Container>
                       </motion.div>
@@ -145,7 +145,13 @@ export function DesktopNav() {
   );
 }
 
-function MegaMenuContent({ item, closeMenu }: { item: MenuItem; closeMenu: () => void }) {
+function MegaMenuContent({
+  item,
+  closeMenu,
+}: {
+  item: MenuItem;
+  closeMenu: () => void;
+}) {
   const isGroupLayout = item.layout === "group";
   const columns = item.columns || 3;
 
@@ -215,7 +221,11 @@ function MegaMenuContent({ item, closeMenu }: { item: MenuItem; closeMenu: () =>
                   duration: 0.15,
                 }}
               >
-                <MenuLink item={child} closeMenu={closeMenu} variant="compact" />
+                <MenuLink
+                  item={child}
+                  closeMenu={closeMenu}
+                  variant="compact"
+                />
               </motion.div>
             ))}
           </div>
@@ -225,7 +235,13 @@ function MegaMenuContent({ item, closeMenu }: { item: MenuItem; closeMenu: () =>
   );
 }
 
-function DropdownContent({ items, closeMenu }: { items: MenuItem[]; closeMenu: () => void }) {
+function DropdownContent({
+  items,
+  closeMenu,
+}: {
+  items: MenuItem[];
+  closeMenu: () => void;
+}) {
   return (
     <div className="flex flex-wrap gap-1.5">
       {items.map((item, index) => (
@@ -260,7 +276,7 @@ function MenuLink({
     <span
       className={cn(
         "group inline-flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200",
-        ""
+        "",
       )}
     >
       {Icon && (
@@ -281,7 +297,7 @@ function MenuLink({
     <span
       className={cn(
         "group flex items-center gap-2.5 px-2 py-1.5 rounded-md transition-all duration-200",
-        "hover:bg-accent"
+        "hover:bg-accent",
       )}
     >
       {Icon && (

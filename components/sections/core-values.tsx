@@ -2,7 +2,13 @@
 
 import { motion } from "motion/react";
 import { useState, useEffect } from "react";
-import { Users, Globe, Lightbulb, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Users,
+  Globe,
+  Lightbulb,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { AuroraText } from "@/components/ui/aurora-text";
 import {
   Carousel,
@@ -74,7 +80,10 @@ export default function CoreValues() {
   }, [isUserInteracting]);
 
   return (
-    <section id="values" className="py-12 lg:py-20 relative bg-white overflow-hidden">
+    <section
+      id="values"
+      className="py-12 lg:py-20 relative bg-white overflow-hidden"
+    >
       <div className="px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-0 items-start">
           <motion.div
@@ -84,7 +93,7 @@ export default function CoreValues() {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-4">
               TRIẾT LÝ
               <AuroraText
                 className="px-2"
@@ -128,7 +137,10 @@ export default function CoreValues() {
                   {coreValuesData.map((value, index) => {
                     const IconComponent = value.icon;
                     return (
-                      <CarouselItem key={index} className="pl-4 basis-full sm:basis-1/2">
+                      <CarouselItem
+                        key={index}
+                        className="pl-4 basis-full sm:basis-1/2"
+                      >
                         <div className="h-full">
                           <div className="bg-white rounded-xl p-6 lg:p-8 border transition-shadow duration-300 relative group min-h-[350px] lg:min-h-[400px] h-full flex flex-col justify-between hover:-translate-y-1 transition-transform">
                             <div className="absolute bottom-4 right-4 opacity-20 overflow-hidden">
@@ -138,7 +150,7 @@ export default function CoreValues() {
                             </div>
 
                             <div className="relative z-10">
-                              <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
+                              <h3 className="text-2xl lg:text-3xl font-bold text-foreground mb-2">
                                 {value.title}
                               </h3>
                               <h4 className="text-base lg:text-lg font-semibold text-blue-600 mb-4">

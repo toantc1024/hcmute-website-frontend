@@ -1,16 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
-import {
-  Upload,
-  Loader2,
-  Crop,
-  Type,
-  Camera,
-  X,
-  ImageIcon,
-  Check,
-} from "lucide-react";
+import { Upload, Loader2, Crop, Type, X, ImageIcon, Check } from "lucide-react";
 import Cropper, { Area, Point } from "react-easy-crop";
 
 import { cn } from "@/lib/utils";
@@ -122,7 +113,6 @@ export function ImageUploadDialog({
 
   // Caption state
   const [caption, setCaption] = useState("");
-  const [photoCredit, setPhotoCredit] = useState("");
 
   const resetState = useCallback(() => {
     setStep("select");
@@ -136,7 +126,6 @@ export function ImageUploadDialog({
     setIsCropping(false);
     setCroppedPreview(null);
     setCaption("");
-    setPhotoCredit("");
   }, []);
 
   const handleClose = useCallback(() => {
@@ -231,11 +220,7 @@ export function ImageUploadDialog({
       setUploadProgress(100);
 
       // Insert image with caption
-      onImageInsert(
-        uploadedUrl,
-        caption || undefined,
-        photoCredit || undefined,
-      );
+      onImageInsert(uploadedUrl, caption || undefined, undefined);
 
       handleClose();
     } catch (error) {
@@ -246,7 +231,6 @@ export function ImageUploadDialog({
     selectedFile,
     croppedPreview,
     caption,
-    photoCredit,
     onUpload,
     onImageInsert,
     handleClose,
@@ -305,7 +289,6 @@ export function ImageUploadDialog({
                 image={previewUrl}
                 crop={crop}
                 zoom={zoom}
-                aspect={16 / 9}
                 onCropChange={setCrop}
                 onZoomChange={setZoom}
                 onCropComplete={onCropComplete}
@@ -363,7 +346,7 @@ export function ImageUploadDialog({
               </div>
             )}
 
-            {/* Caption & Photo Credit */}
+            {/* Caption */}
             <div className="grid gap-4">
               <div className="space-y-2">
                 <Label className="flex items-center gap-1.5">
@@ -378,17 +361,6 @@ export function ImageUploadDialog({
                 <p className="text-xs text-muted-foreground">
                   Chú thích sẽ hiển thị dưới ảnh dạng in nghiêng
                 </p>
-              </div>
-              <div className="space-y-2">
-                <Label className="flex items-center gap-1.5">
-                  <Camera className="size-3.5" />
-                  Photo Credit (Tùy chọn)
-                </Label>
-                <Input
-                  value={photoCredit}
-                  onChange={(e) => setPhotoCredit(e.target.value)}
-                  placeholder="Tên người chụp ảnh..."
-                />
               </div>
             </div>
           </div>

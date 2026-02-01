@@ -160,30 +160,56 @@
 }
 
 /* Image Block with Caption */
-.tiptap .image-block {
+.tiptap .image-block,
+.prose .image-block {
   position: relative;
-  margin: 1.5em 0;
+  margin: 1.5em auto;
+  display: block;
 }
 
-.tiptap .image-block img {
+.tiptap .image-block.align-left,
+.prose .image-block.align-left {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.tiptap .image-block.align-center,
+.prose .image-block.align-center {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.tiptap .image-block.align-right,
+.prose .image-block.align-right {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+.tiptap .image-block img,
+.prose .image-block img {
   width: 100%;
   height: auto;
   border-radius: 0.75rem;
   margin: 0;
+  display: block;
 }
 
-.tiptap .image-block figcaption {
+.tiptap .image-block figcaption,
+.prose .image-block figcaption {
   margin-top: 0.5rem;
   text-align: center;
   font-size: 0.875rem;
   color: var(--muted-foreground);
 }
 
-.tiptap .image-block figcaption .caption {
+.tiptap .image-block figcaption .caption,
+.prose .image-block figcaption .caption {
   display: block;
+  font-style: italic;
 }
 
-.tiptap .image-block figcaption .photo-credit {
+.tiptap .image-block figcaption .photo-credit,
+.prose .image-block figcaption .photo-credit {
   display: block;
   font-size: 0.75rem;
   font-style: italic;

@@ -307,7 +307,7 @@ export default function FeatureShowcase() {
           </span>
 
           {/* Title */}
-          <h2 className="text-xl font-bold mb-2 text-gray-900">
+          <h2 className="text-xl font-bold mb-2 text-foreground">
             {feature.title}{" "}
             <AuroraText
               className="inline"
@@ -371,7 +371,7 @@ export default function FeatureShowcase() {
         >
           <h2
             className={`text-2xl lg:text-4xl font-bold mb-4 transition-colors duration-500 ${
-              isActive ? "text-gray-900" : "text-gray-500"
+              isActive ? "text-foreground" : "text-gray-500"
             }`}
           >
             {feature.title}{" "}

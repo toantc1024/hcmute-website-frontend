@@ -123,15 +123,17 @@ export function Toolbar({ editor, onImageUpload, onAIAssist }: ToolbarProps) {
   const setLink = useCallback(() => {
     if (!editor) return;
 
-    if (linkUrl === "") {
-      editor.chain().focus().extendMarkRange("link").unsetLink().run();
+    // Validate URL - add https:// if missing
+    let finalUrl = linkUrl.trim();
+    if (finalUrl && !finalUrl.match(/^https?:\/\//i)) {
+      finalUrl = `https://${finalUrl}`;
+    }
+
+    if (finalUrl === "") {
+      editor.chain().focus().unsetLink().run();
     } else {
-      editor
-        .chain()
-        .focus()
-        .extendMarkRange("link")
-        .setLink({ href: linkUrl })
-        .run();
+      // Only apply to selected text, don't extend mark range
+      editor.chain().focus().setLink({ href: finalUrl }).run();
     }
 
     setLinkUrl("");
@@ -329,7 +331,11 @@ export function Toolbar({ editor, onImageUpload, onAIAssist }: ToolbarProps) {
               <LinkIcon className="size-4" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-80" align="start">
+          <PopoverContent
+            className="w-80"
+            align="start"
+            onOpenAutoFocus={(e) => e.preventDefault()}
+          >
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium">URL liên kết</label>
               <div className="flex gap-2">
@@ -337,9 +343,17 @@ export function Toolbar({ editor, onImageUpload, onAIAssist }: ToolbarProps) {
                   placeholder="https://example.com"
                   value={linkUrl}
                   onChange={(e) => setLinkUrl(e.target.value)}
+                  autoFocus
                   onKeyDown={(e) => {
+                    // Stop propagation to prevent editor shortcuts
+                    e.stopPropagation();
                     if (e.key === "Enter") {
+                      e.preventDefault();
                       setLink();
+                    }
+                    if (e.key === "Escape") {
+                      e.preventDefault();
+                      setIsLinkPopoverOpen(false);
                     }
                   }}
                 />

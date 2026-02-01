@@ -138,13 +138,13 @@ export const tagsApi = {
     return response.data.data;
   },
 
-  createTag: async (name: string): Promise<TagAuditView> => {
+  createTag: async (name: string): Promise<string> => {
     const data: CreateTagRequest = {
       name,
       slug: generateSlug(name),
     };
 
-    const response = await apiClient.post<ApiResponse<TagAuditView>>(
+    const response = await apiClient.post<ApiResponse<string>>(
       "/api/v1/admin/tags",
       data,
     );
@@ -157,19 +157,11 @@ export const tagsApi = {
       throw handleApiError(response, "Không thể tạo thẻ");
     }
 
-    const tagData = response.data.data;
-    if (!tagData || !tagData.id) {
-      throw new Error("Dữ liệu thẻ không hợp lệ");
-    }
-
-    return tagData;
+    return response.data.data;
   },
 
-  updateTag: async (
-    tagId: string,
-    data: UpdateTagRequest,
-  ): Promise<TagAuditView> => {
-    const response = await apiClient.patch<ApiResponse<TagAuditView>>(
+  updateTag: async (tagId: string, data: UpdateTagRequest): Promise<void> => {
+    const response = await apiClient.patch<ApiResponse<void>>(
       `/api/v1/admin/tags/${tagId}`,
       data,
     );
@@ -181,8 +173,6 @@ export const tagsApi = {
     ) {
       throw handleApiError(response, "Không thể cập nhật thẻ");
     }
-
-    return response.data.data;
   },
 
   deleteTag: async (tagId: string): Promise<void> => {

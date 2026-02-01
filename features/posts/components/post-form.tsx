@@ -13,12 +13,11 @@ import {
   Tags,
   Image as ImageIcon,
   Send,
-  Eye,
+  Settings,
   ChevronDown,
   ChevronUp,
   Plus,
   Trash2,
-  Camera,
   User,
   FileText,
   Crop,
@@ -74,20 +73,12 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import {
-  Combobox,
-  ComboboxChip,
-  ComboboxChips,
-  ComboboxChipsInput,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxItem,
-  ComboboxList,
-} from "@/components/ui/combobox";
+import { SearchableTagSelect } from "@/components/ui/searchable-tag-select";
 
 import { TagManagementModal } from "./tag-management-modal";
 import { CategoryManagementModal } from "./category-management-modal";
 import { ImageUploadModal } from "./image-upload-modal";
+import { SimpleDescriptionEditor } from "./simple-description-editor";
 import {
   ImageCropper,
   COVER_IMAGE_SIZES,
@@ -156,7 +147,7 @@ function CollapsibleSection({
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
       <CollapsibleTrigger
         className={cn(
-          "flex w-full items-center justify-between py-3 px-4 rounded-xl",
+          "flex w-full  items-center justify-between py-3 px-4 rounded-xl",
           "bg-muted/30 hover:bg-muted/50 transition-colors",
           disabled && "opacity-60 pointer-events-none",
         )}
@@ -177,7 +168,7 @@ function CollapsibleSection({
           <ChevronDown className="size-4 text-muted-foreground" />
         )}
       </CollapsibleTrigger>
-      <CollapsibleContent className="pt-3 px-1 overflow-hidden min-w-0">
+      <CollapsibleContent className="pt-3  py-1 px-1 overflow-hidden min-w-0">
         {children}
       </CollapsibleContent>
     </Collapsible>
@@ -271,12 +262,19 @@ export function PostForm({
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
   const [isLoadingTags, setIsLoadingTags] = useState(true);
 
-  // Cover Image
-  const [coverImage, setCoverImage] = useState<FileDto | null>(null);
+  // Cover Image - Track selected image and cropped version
+  const [selectedCoverImage, setSelectedCoverImage] = useState<FileDto | null>(
+    null,
+  );
   const [coverImageCleared, setCoverImageCleared] = useState(false);
-  const [croppedImageUrl, setCroppedImageUrl] = useState<string | null>(null);
   const [croppedImageBlob, setCroppedImageBlob] = useState<Blob | null>(null);
+  const [croppedImageUrl, setCroppedImageUrl] = useState<string | null>(null);
   const [photoCredit, setPhotoCredit] = useState(post?.photoCredit || "");
+
+  // Track files to delete on save
+  const [filesToDelete, setFilesToDelete] = useState<string[]>([]);
+  // Track original cover image ID to delete if changed
+  const originalCoverImageId = useRef<string | undefined>(post?.coverImageId);
 
   // Extended Attributes
   const [extendedAttributes, setExtendedAttributes] =
@@ -330,13 +328,8 @@ export function PostForm({
   }, []);
 
   const handleImageUpload = useCallback(async (file: File): Promise<string> => {
-    try {
-      const results = await filesApi.uploadStreaming([file]);
-      return results[0].publicUrl;
-    } catch {
-      const result = await filesApi.uploadFile(file);
-      return result.publicUrl;
-    }
+    const result = await filesApi.uploadFile(file);
+    return result.publicUrl;
   }, []);
 
   const handleAIAssist = useCallback(
@@ -373,28 +366,76 @@ export function PostForm({
     setSelectedCategoryIds((prev) => prev.filter((id) => id !== categoryId));
   }, []);
 
-  const handleCoverImageSelect = useCallback((file: FileDto | null) => {
-    setCoverImage(file);
-    setCroppedImageUrl(null);
-    setCroppedImageBlob(null);
-
-    if (file === null) {
-      setCoverImageCleared(true);
-    } else {
-      setCoverImageCleared(false);
-      // Open cropper after selecting image
-      if (file?.publicUrl) {
-        setImageToCrop(file.publicUrl);
-        setShowImageCropper(true);
+  const handleCoverImageSelect = useCallback(
+    (file: FileDto | null) => {
+      if (file === null) {
+        // Clear cover image - mark for deletion on save
+        if (originalCoverImageId.current) {
+          setFilesToDelete((prev) =>
+            prev.includes(originalCoverImageId.current!)
+              ? prev
+              : [...prev, originalCoverImageId.current!],
+          );
+        }
+        // Also mark the selected image for deletion if it's different from original
+        if (
+          selectedCoverImage &&
+          selectedCoverImage.id !== originalCoverImageId.current
+        ) {
+          setFilesToDelete((prev) =>
+            prev.includes(selectedCoverImage.id)
+              ? prev
+              : [...prev, selectedCoverImage.id],
+          );
+        }
+        setSelectedCoverImage(null);
+        setCroppedImageUrl(null);
+        setCroppedImageBlob(null);
+        setCoverImageCleared(true);
+      } else {
+        // New cover image selected from modal (already uploaded)
+        // Mark previous selection for deletion if it's different from original
+        if (
+          selectedCoverImage &&
+          selectedCoverImage.id !== originalCoverImageId.current &&
+          selectedCoverImage.id !== file.id
+        ) {
+          setFilesToDelete((prev) =>
+            prev.includes(selectedCoverImage.id)
+              ? prev
+              : [...prev, selectedCoverImage.id],
+          );
+        }
+        setCoverImageCleared(false);
+        setSelectedCoverImage(file);
+        setCroppedImageUrl(null);
+        setCroppedImageBlob(null);
+        // Open cropper after selecting image
+        if (file.publicUrl) {
+          setImageToCrop(file.publicUrl);
+          setShowImageCropper(true);
+        }
       }
-    }
-  }, []);
+    },
+    [selectedCoverImage],
+  );
 
-  const handleCropComplete = useCallback((blob: Blob, url: string) => {
-    setCroppedImageBlob(blob);
-    setCroppedImageUrl(url);
-    toast.success("Đã cắt ảnh thành công");
-  }, []);
+  const handleCropComplete = useCallback(
+    (blob: Blob, url: string) => {
+      setCroppedImageBlob(blob);
+      setCroppedImageUrl(url);
+      // Mark original cover for deletion if we're replacing it
+      if (isEditMode && originalCoverImageId.current && !coverImageCleared) {
+        setFilesToDelete((prev) =>
+          prev.includes(originalCoverImageId.current!)
+            ? prev
+            : [...prev, originalCoverImageId.current!],
+        );
+      }
+      toast.success("Đã cắt ảnh thành công");
+    },
+    [isEditMode, coverImageCleared],
+  );
 
   const handleExtendedAttributeChange = useCallback(
     (key: string, value: string) => {
@@ -439,13 +480,15 @@ export function PostForm({
 
   // ========== Save Handlers ==========
   const handleSave = async () => {
+    // Prevent double-click
+    if (isSaving) return;
     if (!validateForm()) return;
 
     try {
       setIsSaving(true);
 
-      // If we have a cropped image, upload it first
-      let finalCoverImageId = coverImage?.id;
+      // Upload cropped cover image if we have one
+      let finalCoverImageId: string | undefined;
       if (croppedImageBlob) {
         const file = new File([croppedImageBlob], "cover-cropped.jpg", {
           type: "image/jpeg",
@@ -458,7 +501,9 @@ export function PostForm({
 
       if (isEditMode && post) {
         const getCoverImageId = () => {
+          // Priority: cropped image > newly selected image > keep existing
           if (finalCoverImageId) return finalCoverImageId;
+          if (selectedCoverImage) return selectedCoverImage.id;
           if (coverImageCleared) return undefined;
           return post.coverImageId || undefined;
         };
@@ -467,7 +512,7 @@ export function PostForm({
         await postsApi.updatePost(post.id, {
           title: title.trim(),
           content: content.trim(),
-          contentFormat: ContentFormat.TIPTAP_JSON,
+          contentFormat: ContentFormat.HTML,
           description: description.trim() || undefined,
           categoryIds:
             selectedCategoryIds.length > 0 ? selectedCategoryIds : undefined,
@@ -484,6 +529,27 @@ export function PostForm({
           version: post.version,
         });
         postId = post.id;
+
+        // Delete old files after successful save (don't wait, fire and forget)
+        if (filesToDelete.length > 0) {
+          Promise.all(
+            filesToDelete.map((fileId) =>
+              filesApi.deleteFile(fileId).catch((err) => {
+                console.error(`Failed to delete file ${fileId}:`, err);
+              }),
+            ),
+          ).then(() => {
+            // Clear the list after deletion
+            setFilesToDelete([]);
+          });
+        }
+
+        // Update the original cover image ID reference
+        if (finalCoverImageId) {
+          originalCoverImageId.current = finalCoverImageId;
+        } else if (coverImageCleared) {
+          originalCoverImageId.current = undefined;
+        }
       } else {
         const slug = generateSlug(title.trim());
         if (!slug) {
@@ -492,16 +558,19 @@ export function PostForm({
         }
 
         // createPost now returns the post ID
+        // For cover image: use cropped image if available, otherwise use selected image
+        const createCoverImageId = finalCoverImageId || selectedCoverImage?.id;
+
         postId = await postsApi.createPost({
           title: title.trim(),
           slug,
           content: content.trim(),
-          contentFormat: ContentFormat.TIPTAP_JSON,
+          contentFormat: ContentFormat.HTML,
           description: description.trim() || undefined,
           categoryIds:
             selectedCategoryIds.length > 0 ? selectedCategoryIds : undefined,
           tagIds: selectedTagIds.length > 0 ? selectedTagIds : undefined,
-          coverImageId: finalCoverImageId,
+          coverImageId: createCoverImageId,
           photoCredit: photoCredit.trim() || undefined,
           metaTitle: metaTitle.trim() || undefined,
           metaDescription: metaDescription.trim() || undefined,
@@ -519,9 +588,9 @@ export function PostForm({
 
       if (onSave) {
         onSave(postId);
-      } else {
-        // Navigate to manage posts list after success (both create and update)
-        router.push("/manage/posts");
+      } else if (!isEditMode) {
+        // Only navigate when creating a new post
+        router.push(`/manage/posts/${postId}`);
       }
     } catch (err) {
       const message =
@@ -539,18 +608,47 @@ export function PostForm({
     try {
       setIsSubmitting(true);
 
+      // Upload cropped cover image if we have one
+      let finalCoverImageId: string | undefined;
+      if (croppedImageBlob) {
+        const file = new File([croppedImageBlob], "cover-cropped.jpg", {
+          type: "image/jpeg",
+        });
+        const uploaded = await filesApi.uploadFile(file);
+        finalCoverImageId = uploaded.id;
+      }
+
+      const getCoverImageId = () => {
+        // Priority: cropped image > newly selected image > keep existing
+        if (finalCoverImageId) return finalCoverImageId;
+        if (selectedCoverImage) return selectedCoverImage.id;
+        if (coverImageCleared) return undefined;
+        return post.coverImageId || undefined;
+      };
+
       await postsApi.updatePost(post.id, {
         title: title.trim(),
         content: content.trim(),
-        contentFormat: ContentFormat.TIPTAP_JSON,
+        contentFormat: ContentFormat.HTML,
         description: description.trim() || undefined,
         categoryIds:
           selectedCategoryIds.length > 0 ? selectedCategoryIds : undefined,
         tagIds: selectedTagIds.length > 0 ? selectedTagIds : undefined,
-        coverImageId: coverImage?.id || post.coverImageId || undefined,
+        coverImageId: getCoverImageId(),
         photoCredit: photoCredit.trim() || undefined,
         version: post.version,
       });
+
+      // Delete old files after successful update
+      if (filesToDelete.length > 0) {
+        Promise.all(
+          filesToDelete.map((fileId) =>
+            filesApi.deleteFile(fileId).catch((err) => {
+              console.error(`Failed to delete file ${fileId}:`, err);
+            }),
+          ),
+        );
+      }
 
       await postsApi.submitPost(post.id, { version: post.version + 1 });
 
@@ -572,7 +670,7 @@ export function PostForm({
   );
   const currentCoverImageUrl =
     croppedImageUrl ||
-    coverImage?.publicUrl ||
+    selectedCoverImage?.publicUrl ||
     (!coverImageCleared ? post?.coverImageUrl : undefined);
 
   // ========== Render ==========
@@ -718,53 +816,28 @@ export function PostForm({
     overflow-hidden
   "
         >
-          <ScrollArea className="flex-1 h-full">
-            <div className="p-4 pb-8 space-y-4 max-w-full overflow-hidden">
+          <ScrollArea className="flex-1 h-full ">
+            <div className="p-4 pb-8 space-y-4  max-w-full overflow-hidden">
               {/* Description - First in Sidebar */}
               <CollapsibleSection
                 title="Mô tả"
                 icon={<AlignLeft className="size-4" />}
                 defaultOpen={true}
               >
-                <div className="space-y-2">
-                  <Textarea
-                    value={description}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      if (value.length <= 250) {
-                        setDescription(value);
-                      }
-                    }}
-                    placeholder="Mô tả ngắn gọn về bài viết..."
-                    disabled={isLocked}
-                    rows={4}
-                    maxLength={250}
-                    className="rounded-lg border-border resize-none text-sm w-full break-all overflow-wrap-anywhere [word-break:break-word] [overflow-wrap:break-word]"
-                  />
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs text-muted-foreground">
-                      Hiển thị trong danh sách và preview
-                    </p>
-                    <p
-                      className={cn(
-                        "text-xs",
-                        description.length >= 900
-                          ? "text-orange-500"
-                          : "text-muted-foreground",
-                        description.length >= 250 && "text-destructive",
-                      )}
-                    >
-                      {description.length}/250
-                    </p>
-                  </div>
-                </div>
+                <SimpleDescriptionEditor
+                  value={description}
+                  onChange={setDescription}
+                  placeholder="Mô tả ngắn gọn về bài viết..."
+                  maxLength={500}
+                  disabled={isLocked}
+                />
               </CollapsibleSection>
 
               <Separator />
 
               {/* Cover Image */}
               <CollapsibleSection
-                title="Ảnh đại diện"
+                title="Ảnh bìa bài viết"
                 icon={<ImageIcon className="size-4" />}
                 defaultOpen={true}
               >
@@ -777,12 +850,12 @@ export function PostForm({
                         className="w-full aspect-video object-cover rounded-lg border border-border"
                       />
                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
-                        {coverImage?.publicUrl && (
+                        {currentCoverImageUrl && (
                           <Button
                             variant="secondary"
                             size="sm"
                             onClick={() => {
-                              setImageToCrop(coverImage.publicUrl);
+                              setImageToCrop(currentCoverImageUrl);
                               setShowImageCropper(true);
                             }}
                           >
@@ -791,7 +864,7 @@ export function PostForm({
                           </Button>
                         )}
                         <Button
-                          // variant="destructive"
+                          variant="destructive"
                           size="sm"
                           onClick={() => handleCoverImageSelect(null)}
                           disabled={isLocked}
@@ -808,7 +881,7 @@ export function PostForm({
                     >
                       <ImageIcon className="mx-auto size-10 text-muted-foreground" />
                       <p className="mt-2 text-sm text-muted-foreground">
-                        Nhấn để chọn ảnh đại diện
+                        Nhấn để chọn ảnh bìa bài viết
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
                         Khuyến nghị: 1200×630px
@@ -824,21 +897,6 @@ export function PostForm({
                     <ImageIcon className="mr-2 size-4" />
                     {currentCoverImageUrl ? "Thay đổi ảnh" : "Chọn ảnh"}
                   </Button>
-                  {currentCoverImageUrl && (
-                    <div className="space-y-2">
-                      <Label className="text-xs text-muted-foreground flex items-center gap-1.5">
-                        <Camera className="size-3" />
-                        Photo Credit
-                      </Label>
-                      <Input
-                        value={photoCredit}
-                        onChange={(e) => setPhotoCredit(e.target.value)}
-                        placeholder="Tên người chụp ảnh..."
-                        disabled={isLocked}
-                        className="text-sm rounded-lg border-border"
-                      />
-                    </div>
-                  )}
                 </div>
               </CollapsibleSection>
 
@@ -850,71 +908,20 @@ export function PostForm({
                 icon={<FolderOpen className="size-4" />}
                 badge={selectedCategoryIds.length}
               >
-                <div className="space-y-3">
-                  {isLoadingCategories ? (
-                    <Skeleton className="h-9 w-full rounded-lg" />
-                  ) : (
-                    <>
-                      <Combobox
-                        items={categories}
-                        itemToStringValue={(category: CategorySimpleView) =>
-                          category.name
-                        }
-                        multiple
-                        value={categories.filter((c) =>
-                          selectedCategoryIds.includes(c.id),
-                        )}
-                        onValueChange={(values: CategorySimpleView[]) => {
-                          if (!isLocked) {
-                            setSelectedCategoryIds(values.map((v) => v.id));
-                          }
-                        }}
-                        disabled={isLocked}
-                      >
-                        <ComboboxChips className="min-h-10 rounded-lg">
-                          {categories
-                            .filter((c) => selectedCategoryIds.includes(c.id))
-                            .map((category) => (
-                              <ComboboxChip
-                                key={category.id}
-                                className="bg-primary/10 text-primary border-primary/20"
-                              >
-                                {category.name}
-                              </ComboboxChip>
-                            ))}
-                          <ComboboxChipsInput
-                            placeholder={
-                              selectedCategoryIds.length === 0
-                                ? "Tìm kiếm danh mục..."
-                                : "Thêm danh mục..."
-                            }
-                            disabled={isLocked}
-                          />
-                        </ComboboxChips>
-                        <ComboboxContent>
-                          <ComboboxEmpty>Không tìm thấy danh mục</ComboboxEmpty>
-                          <ComboboxList>
-                            {(category: CategorySimpleView) => (
-                              <ComboboxItem key={category.id} value={category}>
-                                <FolderOpen className="size-4 text-muted-foreground" />
-                                {category.name}
-                              </ComboboxItem>
-                            )}
-                          </ComboboxList>
-                        </ComboboxContent>
-                      </Combobox>
-                      <Button
-                        variant="outline"
-                        className="w-full rounded-lg"
-                        onClick={() => setShowCategoryModal(true)}
-                        disabled={isLocked}
-                      >
-                        <Plus className="mr-2 size-4" />
-                        Tạo danh mục mới
-                      </Button>
-                    </>
-                  )}
-                </div>
+                {isLoadingCategories ? (
+                  <Skeleton className="h-9 w-full rounded-lg" />
+                ) : (
+                  <SearchableTagSelect
+                    items={categories}
+                    selectedIds={selectedCategoryIds}
+                    onSelectionChange={setSelectedCategoryIds}
+                    onManage={() => setShowCategoryModal(true)}
+                    placeholder="Tìm kiếm danh mục..."
+                    manageLabel="Quản lý danh mục"
+                    itemIcon={<FolderOpen className="size-4" />}
+                    disabled={isLocked}
+                  />
+                )}
               </CollapsibleSection>
 
               <Separator />
@@ -925,69 +932,20 @@ export function PostForm({
                 icon={<Tags className="size-4" />}
                 badge={selectedTagIds.length}
               >
-                <div className="space-y-3">
-                  {isLoadingTags ? (
-                    <Skeleton className="h-9 w-full rounded-lg" />
-                  ) : (
-                    <>
-                      <Combobox
-                        items={tags}
-                        itemToStringValue={(tag: TagSimpleView) => tag.name}
-                        multiple
-                        value={tags.filter((t) =>
-                          selectedTagIds.includes(t.id),
-                        )}
-                        onValueChange={(values: TagSimpleView[]) => {
-                          if (!isLocked) {
-                            setSelectedTagIds(values.map((v) => v.id));
-                          }
-                        }}
-                        disabled={isLocked}
-                      >
-                        <ComboboxChips className="min-h-10 rounded-lg">
-                          {tags
-                            .filter((t) => selectedTagIds.includes(t.id))
-                            .map((tag) => (
-                              <ComboboxChip
-                                key={tag.id}
-                                className="bg-primary/10 text-primary border-primary/20"
-                              >
-                                {tag.name}
-                              </ComboboxChip>
-                            ))}
-                          <ComboboxChipsInput
-                            placeholder={
-                              selectedTagIds.length === 0
-                                ? "Tìm kiếm thẻ..."
-                                : "Thêm thẻ..."
-                            }
-                            disabled={isLocked}
-                          />
-                        </ComboboxChips>
-                        <ComboboxContent>
-                          <ComboboxEmpty>Không tìm thấy thẻ</ComboboxEmpty>
-                          <ComboboxList>
-                            {(tag: TagSimpleView) => (
-                              <ComboboxItem key={tag.id} value={tag}>
-                                <Tags className="size-4 text-muted-foreground" />
-                                {tag.name}
-                              </ComboboxItem>
-                            )}
-                          </ComboboxList>
-                        </ComboboxContent>
-                      </Combobox>
-                      <Button
-                        variant="outline"
-                        className="w-full rounded-lg"
-                        onClick={() => setShowTagModal(true)}
-                        disabled={isLocked}
-                      >
-                        <Plus className="mr-2 size-4" />
-                        Tạo thẻ mới
-                      </Button>
-                    </>
-                  )}
-                </div>
+                {isLoadingTags ? (
+                  <Skeleton className="h-9 w-full rounded-lg" />
+                ) : (
+                  <SearchableTagSelect
+                    items={tags}
+                    selectedIds={selectedTagIds}
+                    onSelectionChange={setSelectedTagIds}
+                    onManage={() => setShowTagModal(true)}
+                    placeholder="Tìm kiếm thẻ..."
+                    manageLabel="Quản lý thẻ"
+                    itemIcon={<Tags className="size-4" />}
+                    disabled={isLocked}
+                  />
+                )}
               </CollapsibleSection>
 
               <Separator />
@@ -1018,9 +976,7 @@ export function PostForm({
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs text-muted-foreground">
-                      Nhiếp ảnh gia
-                    </Label>
+                    <Label className="text-xs text-muted-foreground">Ảnh</Label>
                     <Input
                       value={extendedAttributes.Photographer || ""}
                       onChange={(e) =>
@@ -1057,7 +1013,7 @@ export function PostForm({
                             disabled={isLocked}
                           />
                           <Button
-                            variant="ghost"
+                            variant="destructive"
                             size="icon"
                             className="size-7 ml-1"
                             onClick={() => removeExtendedAttribute(key)}
@@ -1132,7 +1088,7 @@ export function PostForm({
               {/* Settings */}
               <CollapsibleSection
                 title="Cài đặt"
-                icon={<Eye className="size-4" />}
+                icon={<Settings className="size-4" />}
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
@@ -1197,13 +1153,13 @@ export function PostForm({
         open={showImageModal}
         onOpenChange={setShowImageModal}
         selectedImageId={
-          coverImage?.id ||
+          selectedCoverImage?.id ||
           (!coverImageCleared ? post?.coverImageId : undefined)
         }
         selectedImageUrl={currentCoverImageUrl}
         onSelect={handleCoverImageSelect}
-        title="Chọn ảnh đại diện"
-        description="Tải lên hoặc chọn ảnh đại diện cho bài viết"
+        title="Chọn ảnh bìa bài viết"
+        description="Tải lên hoặc chọn ảnh bìa cho bài viết"
       />
 
       {imageToCrop && (
@@ -1213,7 +1169,7 @@ export function PostForm({
           imageSrc={imageToCrop}
           onCropComplete={handleCropComplete}
           preset="desktop"
-          title="Cắt ảnh đại diện"
+          title="Cắt ảnh bìa bài viết"
         />
       )}
 

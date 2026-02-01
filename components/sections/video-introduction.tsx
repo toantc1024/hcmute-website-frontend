@@ -119,7 +119,10 @@ export default function VideoIntroduction() {
   }, [isDragging]);
 
   return (
-    <section id="history" className="bg-white h-auto relative py-12 lg:py-20 overflow-hidden">
+    <section
+      id="history"
+      className="bg-white h-auto relative py-12 lg:py-20 overflow-hidden"
+    >
       <div
         className="absolute w-full pointer-events-none z-0"
         style={{ top: "20px", height: "calc(100% + 400px)" }}
@@ -141,7 +144,7 @@ export default function VideoIntroduction() {
           ]}
           className={cn(
             "[mask-image:radial-gradient(800px_circle_at_center,white,transparent)]",
-            "inset-x-0 inset-y-[-30%] h-[100%] skew-y-12"
+            "inset-x-0 inset-y-[-30%] h-[100%] skew-y-12",
           )}
         />
       </div>
@@ -154,7 +157,7 @@ export default function VideoIntroduction() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-4">
             KHÁM PHÁ
             <AuroraText
               className="px-2"
@@ -179,20 +182,20 @@ export default function VideoIntroduction() {
           <div className="flex justify-center">
             <div
               ref={containerRef}
-              className="relative inline-flex items-center gap-0 bg-gray-100 rounded-3xl px-1 py-1 cursor-pointer select-none w-full max-w-5xl overflow-x-auto"
+              className="relative inline-flex items-center gap-0 bg-gray-100 rounded-md px-1 py-1 cursor-pointer select-none w-full max-w-5xl overflow-x-auto"
               onMouseDown={handleDragStart}
               onTouchStart={handleDragStart}
             >
               <motion.div
-                className="absolute bg-white rounded-3xl shadow-md hidden sm:block"
+                className="absolute bg-white rounded-md shadow-md hidden sm:block"
                 style={{
-                  height: "calc(100% - 8px)",
-                  top: "4px",
-                  width: "calc((100% - 8px) / 6)",
+                  height: "calc(100% - 12px)",
+                  top: "6px",
+                  width: "calc((100% - 36px) / 6)",
                 }}
                 initial={false}
                 animate={{
-                  left: `calc(${activeIndex} * ((100% - 8px) / 6) + 4px)`,
+                  left: `calc(${activeIndex} * ((100% - 36px) / 6) + 6px)`,
                 }}
                 transition={{
                   type: "spring",
@@ -207,8 +210,8 @@ export default function VideoIntroduction() {
                   onClick={() => setActiveIndex(index)}
                   className={`relative z-10 px-2 lg:px-4 py-2 text-xs lg:text-sm transition-all duration-200 flex items-center justify-center flex-1 whitespace-nowrap ${
                     activeIndex === index
-                      ? "text-gray-900 font-bold"
-                      : "text-gray-600 hover:text-gray-900 font-normal"
+                      ? "text-foreground font-bold"
+                      : "text-gray-600 hover:text-foreground font-normal"
                   }`}
                 >
                   {event.yearRange}
@@ -261,7 +264,7 @@ export default function VideoIntroduction() {
           </motion.div>
 
           <motion.div
-            className="text-gray-900 text-left"
+            className="text-foreground text-left"
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
@@ -273,7 +276,7 @@ export default function VideoIntroduction() {
                   <span className="text-2xl lg:text-4xl font-bold text-blue-600">
                     {activeEvent.yearRange}
                   </span>
-                  <h3 className="text-xl lg:text-3xl font-bold text-gray-900">
+                  <h3 className="text-xl lg:text-3xl font-bold text-foreground">
                     {activeEvent.title}
                   </h3>
                 </div>

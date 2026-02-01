@@ -73,9 +73,15 @@ export function TagManagementModal({
   const [tags, setTags] = useState<TagAuditView[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [localSelectedIds, setLocalSelectedIds] = useState<string[]>([]);
+
+  // Create modal state
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const [newTagName, setNewTagName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
-  const [localSelectedIds, setLocalSelectedIds] = useState<string[]>([]);
+
+  // Edit modal state
+  const [showEditModal, setShowEditModal] = useState(false);
 
   // Initialize local selection when modal opens
   useEffect(() => {
@@ -141,12 +147,16 @@ export function TagManagementModal({
 
     try {
       setIsCreating(true);
-      const createdTag = await tagsApi.createTag(trimmedName);
-      setTags((prev) => [...prev, createdTag]);
+      const createdTagId = await tagsApi.createTag(trimmedName);
       setNewTagName("");
-      toast.success(`Đã tạo thẻ "${createdTag.name}"`);
+      setShowCreateModal(false);
+      toast.success(`Đã tạo thẻ "${trimmedName}"`);
 
-      setLocalSelectedIds((prev) => [...prev, createdTag.id]);
+      // Add the new tag to selection
+      setLocalSelectedIds((prev) => [...prev, createdTagId]);
+
+      // Refetch to get the latest data
+      await fetchTags();
     } catch (err) {
       const message = err instanceof Error ? err.message : "Không thể tạo thẻ";
       toast.error(message);
@@ -181,16 +191,17 @@ export function TagManagementModal({
 
     try {
       setIsUpdating(true);
-      const updatedTag = await tagsApi.updateTag(editingTag.id, {
+      await tagsApi.updateTag(editingTag.id, {
         name: trimmedName,
         version: editingTag.version,
       });
 
-      setTags((prev) =>
-        prev.map((t) => (t.id === editingTag.id ? updatedTag : t)),
-      );
       setEditingTag(null);
-      toast.success(`Đã cập nhật thẻ "${updatedTag.name}"`);
+      setShowEditModal(false);
+      toast.success(`Đã cập nhật thẻ "${trimmedName}"`);
+
+      // Refetch to get the latest data
+      await fetchTags();
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Không thể cập nhật thẻ";
@@ -241,11 +252,13 @@ export function TagManagementModal({
   const startEdit = (tag: TagAuditView) => {
     setEditingTag(tag);
     setEditName(tag.name);
+    setShowEditModal(true);
   };
 
   const cancelEdit = () => {
     setEditingTag(null);
     setEditName("");
+    setShowEditModal(false);
   };
 
   return (
@@ -263,31 +276,14 @@ export function TagManagementModal({
           </DialogHeader>
 
           <div className="space-y-4">
-            <div className="flex gap-2">
-              <Input
-                value={newTagName}
-                onChange={(e) => setNewTagName(e.target.value)}
-                placeholder="Nhập tên thẻ mới..."
-                className="flex-1 rounded-xl"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleCreateTag();
-                  }
-                }}
-              />
-              <Button
-                onClick={handleCreateTag}
-                disabled={isCreating || !newTagName.trim()}
-                className="rounded-xl"
-              >
-                {isCreating ? (
-                  <Loader2 className="size-4 animate-spin" />
-                ) : (
-                  <Plus className="size-4" />
-                )}
-              </Button>
-            </div>
+            <Button
+              variant="outline"
+              className="w-full rounded-xl"
+              onClick={() => setShowCreateModal(true)}
+            >
+              <Plus className="mr-2 size-4" />
+              Tạo thẻ mới
+            </Button>
 
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
@@ -316,54 +312,6 @@ export function TagManagementModal({
                 <div className="space-y-1.5">
                   {filteredTags.map((tag) => {
                     const isSelected = localSelectedIds.includes(tag.id);
-                    const isEditing = editingTag?.id === tag.id;
-
-                    if (isEditing) {
-                      return (
-                        <div
-                          key={tag.id}
-                          className="flex items-center gap-2 p-3 rounded-xl bg-muted border border-border"
-                        >
-                          <Input
-                            value={editName}
-                            onChange={(e) => setEditName(e.target.value)}
-                            className="h-9 flex-1 rounded-lg"
-                            autoFocus
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") {
-                                e.preventDefault();
-                                handleUpdateTag();
-                              }
-                              if (e.key === "Escape") {
-                                cancelEdit();
-                              }
-                            }}
-                          />
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="size-8 rounded-lg"
-                            onClick={handleUpdateTag}
-                            disabled={isUpdating}
-                          >
-                            {isUpdating ? (
-                              <Loader2 className="size-4 animate-spin" />
-                            ) : (
-                              <Check className="size-4 text-green-600" />
-                            )}
-                          </Button>
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="size-8 rounded-lg"
-                            onClick={cancelEdit}
-                            disabled={isUpdating}
-                          >
-                            <X className="size-4" />
-                          </Button>
-                        </div>
-                      );
-                    }
 
                     return (
                       <div
@@ -406,8 +354,8 @@ export function TagManagementModal({
                           </Button>
                           <Button
                             size="icon"
-                            variant="ghost"
-                            className="size-7 rounded-lg text-destructive hover:text-destructive hover:bg-destructive/10"
+                            variant="destructive"
+                            className="size-7 rounded-lg"
                             onClick={(e) => {
                               e.stopPropagation();
                               setDeleteTag(tag);
@@ -470,6 +418,116 @@ export function TagManagementModal({
             </Button>
             <Button className="rounded-xl" onClick={handleSave}>
               Lưu
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Tag Modal - Nested */}
+      <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Plus className="size-5" />
+              Tạo thẻ mới
+            </DialogTitle>
+            <DialogDescription>Nhập tên thẻ mới</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Input
+                value={newTagName}
+                onChange={(e) => setNewTagName(e.target.value)}
+                placeholder="Tên thẻ *"
+                className="rounded-lg"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleCreateTag();
+                  }
+                }}
+              />
+            </div>
+          </div>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              className="rounded-lg"
+              onClick={() => {
+                setShowCreateModal(false);
+                setNewTagName("");
+              }}
+            >
+              Hủy
+            </Button>
+            <Button
+              onClick={handleCreateTag}
+              disabled={isCreating || !newTagName.trim()}
+              className="rounded-lg"
+            >
+              {isCreating ? (
+                <Loader2 className="mr-2 size-4 animate-spin" />
+              ) : (
+                <Plus className="mr-2 size-4" />
+              )}
+              Tạo thẻ
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Tag Modal - Nested */}
+      <Dialog
+        open={showEditModal}
+        onOpenChange={(open) => {
+          if (!open) cancelEdit();
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Edit2 className="size-5" />
+              Chỉnh sửa thẻ
+            </DialogTitle>
+            <DialogDescription>Cập nhật tên thẻ</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Input
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                placeholder="Tên thẻ *"
+                className="rounded-lg"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleUpdateTag();
+                  }
+                }}
+              />
+            </div>
+          </div>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              className="rounded-lg"
+              onClick={cancelEdit}
+            >
+              Hủy
+            </Button>
+            <Button
+              onClick={handleUpdateTag}
+              disabled={isUpdating || !editName.trim()}
+              className="rounded-lg"
+            >
+              {isUpdating ? (
+                <Loader2 className="mr-2 size-4 animate-spin" />
+              ) : (
+                <Check className="mr-2 size-4" />
+              )}
+              Lưu thay đổi
             </Button>
           </DialogFooter>
         </DialogContent>

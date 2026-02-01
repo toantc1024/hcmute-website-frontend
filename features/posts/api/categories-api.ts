@@ -128,10 +128,8 @@ export const categoriesApi = {
     return response.data.data;
   },
 
-  createCategory: async (
-    data: CreateCategoryRequest,
-  ): Promise<CategoryAuditView> => {
-    const response = await apiClient.post<ApiResponse<CategoryAuditView>>(
+  createCategory: async (data: CreateCategoryRequest): Promise<string> => {
+    const response = await apiClient.post<ApiResponse<string>>(
       "/api/v1/admin/categories",
       data,
     );
@@ -150,8 +148,8 @@ export const categoriesApi = {
   updateCategory: async (
     categoryId: string,
     data: UpdateCategoryRequest,
-  ): Promise<CategoryAuditView> => {
-    const response = await apiClient.patch<ApiResponse<CategoryAuditView>>(
+  ): Promise<void> => {
+    const response = await apiClient.patch<ApiResponse<void>>(
       `/api/v1/admin/categories/${categoryId}`,
       data,
     );
@@ -163,8 +161,6 @@ export const categoriesApi = {
     ) {
       throw handleApiError(response, "Không thể cập nhật danh mục");
     }
-
-    return response.data.data;
   },
 
   deleteCategory: async (categoryId: string): Promise<void> => {

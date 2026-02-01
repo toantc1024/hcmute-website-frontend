@@ -61,7 +61,10 @@ const itemVariants = {
 
 export default function UniversityStats() {
   return (
-    <section id="stats" className="py-12 px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40 bg-gradient-to-br from-gray-50 to-blue-50 overflow-hidden">
+    <section
+      id="stats"
+      className="py-12 px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40 bg-gradient-to-br from-gray-50 to-blue-50 overflow-hidden"
+    >
       <div className="w-full">
         <motion.div
           className="text-center mb-12"
@@ -70,7 +73,7 @@ export default function UniversityStats() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-2xl md:text-3xl lg:text-4xl text-start font-bold text-gray-900 mb-4">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl text-start font-bold text-foreground mb-4">
             TRƯỜNG TRỌNG ĐIỂM QUỐC GIA VỀ
             <AuroraText
               className="px-2"

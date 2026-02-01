@@ -1,7 +1,14 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
-import { Upload, Image as ImageIcon, Loader2, X, Trash2, Check } from "lucide-react";
+import {
+  Upload,
+  Image as ImageIcon,
+  Loader2,
+  X,
+  Trash2,
+  Check,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { filesApi, type FileDto } from "@/features/posts";
@@ -43,32 +50,36 @@ export function ImageUploadModal({
   const [uploadProgress, setUploadProgress] = useState(0);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  
+
   const [libraryImages, setLibraryImages] = useState<FileDto[]>([]);
   const [isLoadingLibrary, setIsLoadingLibrary] = useState(false);
   const [libraryLoaded, setLibraryLoaded] = useState(false);
   const [hoveredImageId, setHoveredImageId] = useState<string | null>(null);
-  
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const loadLibrary = useCallback(async (forceRefresh = false) => {
-    if (libraryLoaded && !forceRefresh) return;
-    
-    try {
-      setIsLoadingLibrary(true);
-      const files = await filesApi.getAdminFiles({ size: 50 });
-      const imageFiles = files.filter((f) => 
-        f.fileType.startsWith("image/") || 
-        /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(f.fileName)
-      );
-      setLibraryImages(imageFiles);
-      setLibraryLoaded(true);
-    } catch (err) {
-      toast.error("Không thể tải thư viện ảnh");
-    } finally {
-      setIsLoadingLibrary(false);
-    }
-  }, [libraryLoaded]);
+  const loadLibrary = useCallback(
+    async (forceRefresh = false) => {
+      if (libraryLoaded && !forceRefresh) return;
+
+      try {
+        setIsLoadingLibrary(true);
+        const files = await filesApi.getAdminFiles({ size: 50 });
+        const imageFiles = files.filter(
+          (f) =>
+            f.fileType.startsWith("image/") ||
+            /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(f.fileName),
+        );
+        setLibraryImages(imageFiles);
+        setLibraryLoaded(true);
+      } catch (err) {
+        toast.error("Không thể tải thư viện ảnh");
+      } finally {
+        setIsLoadingLibrary(false);
+      }
+    },
+    [libraryLoaded],
+  );
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
@@ -108,28 +119,23 @@ export function ImageUploadModal({
       }, 200);
 
       let uploadedFile: FileDto;
-      
-      try {
-        const uploadedFiles = await filesApi.uploadStreaming([selectedFile]);
-        uploadedFile = uploadedFiles[0];
-      } catch (streamingError) {
-        console.log("Streaming upload failed, trying presigned URL method...");
-        uploadedFile = await filesApi.uploadFile(selectedFile);
-      }
+
+      uploadedFile = await filesApi.uploadFile(selectedFile);
 
       clearInterval(progressInterval);
       setUploadProgress(100);
 
       toast.success("Tải lên thành công");
       onSelect(uploadedFile);
-      
+
       setSelectedFile(null);
       setPreviewUrl(null);
       setUploadProgress(0);
       setLibraryLoaded(false);
       onOpenChange(false);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Không thể tải lên tệp";
+      const message =
+        err instanceof Error ? err.message : "Không thể tải lên tệp";
       toast.error(message);
     } finally {
       setIsUploading(false);
@@ -184,8 +190,8 @@ export function ImageUploadModal({
   };
 
   return (
-    <Dialog 
-      open={open} 
+    <Dialog
+      open={open}
       onOpenChange={(isOpen) => {
         if (!isOpen) {
           clearPreview();
@@ -215,18 +221,18 @@ export function ImageUploadModal({
                 {selectedImageId}
               </p>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleClearSelection}
-            >
+            <Button variant="outline" size="sm" onClick={handleClearSelection}>
               <Trash2 className="mr-2 size-4" />
               Xóa
             </Button>
           </div>
         )}
 
-        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+        <Tabs
+          value={activeTab}
+          onValueChange={handleTabChange}
+          className="w-full"
+        >
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="upload">Tải lên</TabsTrigger>
             <TabsTrigger value="library">Thư viện</TabsTrigger>
@@ -273,7 +279,8 @@ export function ImageUploadModal({
                     <X className="size-4" />
                   </Button>
                   <p className="mt-2 text-sm text-center text-muted-foreground">
-                    {selectedFile?.name} ({Math.round((selectedFile?.size || 0) / 1024)}KB)
+                    {selectedFile?.name} (
+                    {Math.round((selectedFile?.size || 0) / 1024)}KB)
                   </p>
                 </div>
               )}
@@ -311,9 +318,9 @@ export function ImageUploadModal({
                         key={file.id}
                         className={cn(
                           "relative aspect-square rounded-lg overflow-hidden cursor-pointer group border-2 transition-all",
-                          isSelected 
-                            ? "border-primary ring-2 ring-primary/20" 
-                            : "border-transparent hover:border-primary/50"
+                          isSelected
+                            ? "border-primary ring-2 ring-primary/20"
+                            : "border-transparent hover:border-primary/50",
                         )}
                         onClick={() => handleSelectLibraryImage(file)}
                         onMouseEnter={() => setHoveredImageId(file.id)}

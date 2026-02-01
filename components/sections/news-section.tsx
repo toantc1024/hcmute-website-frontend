@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { NeonGradientCard } from "../ui/neon-gradient-card";
 import { AuroraText } from "../ui/aurora-text";
 import { postsApi, type PostAuditView } from "@/lib/api-client";
+import { COVER_IMAGE_SIZES } from "@/features/posts/components/image-cropper";
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -129,10 +130,10 @@ export default function NewsSection() {
                 Tin tức nổi bật của HCMUTE
               </div>
 
-              <h2 className="text-3xl sm:text-4xl lg:text-4xl xl:text-[46px] font-semibold leading-tight text-gray-900">
+              <h2 className="text-3xl sm:text-4xl lg:text-4xl xl:text-[46px] font-semibold leading-tight text-foreground">
                 <AuroraText
                   colors={["#0c4ebfff", "#1760dfff", "#ae0303ff"]}
-                  className="text-3xl md:text-4xl font-bold text-gray-900  whitespace-nowrap"
+                  className="text-3xl md:text-4xl font-bold text-foreground  whitespace-nowrap"
                 >
                   TIN TỨC &amp; SỰ KIỆN
                 </AuroraText>
@@ -232,7 +233,10 @@ export default function NewsSection() {
           {displayPosts.map((post, index) => (
             <Link key={post.id} href={`/tin-tuc/${post.slug}`}>
               <motion.article
-                className="group relative rounded-2xl overflow-hidden bg-white border border-gray-200 transition-all duration-500 hover:shadow-xl cursor-pointer aspect-[3/4]"
+                className="group relative rounded-2xl overflow-hidden bg-white border border-gray-200 transition-all duration-500 hover:shadow-xl cursor-pointer"
+                style={{
+                  aspectRatio: `${COVER_IMAGE_SIZES.mobile.width}/${COVER_IMAGE_SIZES.mobile.height}`,
+                }}
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -331,7 +335,7 @@ export default function NewsSection() {
           transition={{ duration: 0.6, delay: 0.3 }}
         >
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 className="text-lg font-semibold text-foreground">
               Khám phá toàn bộ tin tức, sự kiện và thông báo từ HCMUTE.
             </h3>
             <p className="text-sm text-gray-500 mt-1">
