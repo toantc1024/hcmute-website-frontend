@@ -435,7 +435,8 @@ export default function NewsDetailPage() {
                 {/* Meta */}
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground mb-8 pb-8 border-b">
                   {/* Authors */}
-                  <div className="flex items-center gap-2">
+                  {/* Authors */}
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                     {post.authors?.map((author, i) => (
                       <span key={author.id} className="flex items-center gap-1">
                         {i > 0 && <span>,</span>}
@@ -445,6 +446,28 @@ export default function NewsDetailPage() {
                     {post.extendedAttributes?.Author && (
                       <span className="font-medium text-foreground">
                         {post.extendedAttributes.Author}
+                      </span>
+                    )}
+
+                    {/* Extended Attributes: Photographer */}
+                    {((post.extendedAttributes as any)?.["Photographer"] || (post.extendedAttributes as any)?.["Người chụp ảnh"]) && (
+                       <span className="flex items-center gap-1">
+                        <Camera className="w-3.5 h-3.5" />
+                        <span className="text-muted-foreground mr-1">Ảnh:</span>
+                        <span className="font-medium text-foreground">
+                          {(post.extendedAttributes as any)?.["Photographer"] || (post.extendedAttributes as any)?.["Người chụp ảnh"]}
+                        </span>
+                      </span>
+                    )}
+
+                    {/* Extended Attributes: Editor */}
+                    {((post.extendedAttributes as any)?.["Editor"] || (post.extendedAttributes as any)?.["Biên tập viên"]) && (
+                       <span className="flex items-center gap-1">
+                         <User className="w-3.5 h-3.5" />
+                        <span className="text-muted-foreground mr-1">Biên tập:</span>
+                        <span className="font-medium text-foreground">
+                          {(post.extendedAttributes as any)?.["Editor"] || (post.extendedAttributes as any)?.["Biên tập viên"]}
+                        </span>
                       </span>
                     )}
                   </div>
