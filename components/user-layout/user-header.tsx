@@ -69,23 +69,25 @@ export function UserHeader() {
       <motion.header
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="sticky top-0 z-50 flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4"
+        className="sticky top-0 z-50 flex h-16 shrink-0 items-center gap-2 border-b bg-primary px-4 text-primary-foreground shadow-sm"
       >
-        <SidebarTrigger className="-ml-1" />
-        <Separator orientation="vertical" className="mr-2 h-4" />
+        <SidebarTrigger className="-ml-1 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground" />
+        <Separator orientation="vertical" className="mr-2 h-4 bg-primary-foreground/30" />
 
         <Breadcrumb className="flex-1">
-          <BreadcrumbList>
+          <BreadcrumbList className="text-primary-foreground/80 sm:gap-2">
             {breadcrumbs.map((item, index) => (
               <div key={item.label + index} className="flex items-center gap-2">
-                {index > 0 && <BreadcrumbSeparator />}
+                {index > 0 && <BreadcrumbSeparator className="text-primary-foreground/60" />}
                 <BreadcrumbItem>
                   {item.href ? (
-                    <BreadcrumbLink asChild>
+                    <BreadcrumbLink asChild className="text-primary-foreground/80 hover:text-primary-foreground">
                       <Link href={item.href}>{item.label}</Link>
                     </BreadcrumbLink>
                   ) : (
-                    <BreadcrumbPage>{item.label}</BreadcrumbPage>
+                    <BreadcrumbPage className="text-primary-foreground font-semibold">
+                      {item.label}
+                    </BreadcrumbPage>
                   )}
                 </BreadcrumbItem>
               </div>
@@ -97,11 +99,11 @@ export function UserHeader() {
           variant="outline"
           size="sm"
           onClick={() => setOpen(true)}
-          className="h-8 gap-2 px-3 text-muted-foreground hover:text-foreground"
+          className="h-8 gap-2 px-3 border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground placeholder:text-primary-foreground/60 hover:bg-primary-foreground/20 hover:text-primary-foreground shadow-none"
         >
           <Search className="size-4" />
           <span className="hidden sm:inline-block">Tìm kiếm</span>
-          <kbd className="pointer-events-none hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100 sm:inline-flex">
+          <kbd className="pointer-events-none hidden h-5 select-none items-center gap-1 rounded border border-primary-foreground/20 bg-primary-foreground/10 px-1.5 font-mono text-[10px] font-medium text-primary-foreground opacity-100 sm:inline-flex">
             <span className="text-xs">⌘</span>K
           </kbd>
         </Button>
