@@ -56,7 +56,7 @@ const TIMELINE_EVENTS: TimelineEvent[] = [
     title: "Khẳng định vị thế",
     description:
       "Là Cơ sở giáo dục đại học trọng điểm về kỹ thuật và công nghệ theo quy hoạch mạng lưới CSGD của Thủ tướng chính phủ; Được giao nhiệm vụ dẫn dắt mạng lưới Trung tâm đào tạo xuất sắc và tài năng về công nghệ 4.0, lĩnh vực Năng lượng tái tạo và Hydrogen.",
-    videoUrl: "https://www.youtube.com/embed/sQH0-tBvyY4",
+    videoUrl: "https://www.youtube.com/embed/2kM3ExnN1N0",
   },
 ];
 
@@ -448,7 +448,7 @@ export default function VideoIntroduction() {
             </AuroraText>
           </h2>
           <p className="text-base lg:text-lg text-gray-600 mx-auto">
-            Hành trình 63 năm xây dựng và phát triển của Trường Đại học Sư phạm
+            Hành trình 63 năm xây dựng và phát triển của Trường Đại học Công nghệ
             Kỹ thuật TP.HCM
           </p>
         </motion.div>

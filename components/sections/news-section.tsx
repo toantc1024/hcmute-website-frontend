@@ -52,9 +52,9 @@ export default function NewsSection() {
   }
 
   return (
-    <section className="relative overflow-hidden " id="news">
+    <section className="relative overflow-hidden py-12 lg:py-20" id="news">
       <div className=" relative w-full px-4 sm:px-8 lg:px-32">
-        <div className="bg-white  border-1 relative h-[200px] lg:h-[500px] rounded-3xl overflow-hidden mt-20 lg:mt-12">
+        <div className="bg-white  border-1 relative h-[200px] lg:h-[500px] rounded-3xl overflow-hidden">
           <div className="absolute inset-0 p-6 lg:p-8 flex flex-col lg:flex-row gap-6 lg:gap-8">
             {/* Left Side - Text Content */}
             <motion.div
@@ -80,7 +80,7 @@ export default function NewsSection() {
 
               <p className="text-base sm:text-lg text-gray-600 max-w-2xl leading-relaxed mx-auto lg:mx-0">
                 Hoạt động đào tạo, nghiên cứu và kết nối doanh nghiệp tại Trường
-                Đại học Sư phạm Kỹ thuật TP.HCM.
+                Đại học Công nghệ Kỹ Thuật TP.HCM.
               </p>
             </motion.div>
             <DotPattern

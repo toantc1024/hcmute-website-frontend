@@ -136,6 +136,12 @@
     } */
   }
 
+  /* Inter Black (900) - Bold for navigation items */
+  .font-inter-black {
+    font-family: Inter, sans-serif;
+    font-weight: 900;
+  }
+
   h1,
   h2,
   h3,

@@ -10,6 +10,7 @@ import {
   Plus,
   ArrowRight,
   BarChart3,
+  Sparkles,
 } from "lucide-react";
 import {
   Area,
@@ -69,39 +70,43 @@ interface StatCardProps {
     value: number;
     isPositive: boolean;
   };
+  gradient?: string;
 }
 
-function StatCard({ title, value, icon, description, trend }: StatCardProps) {
+function StatCard({ title, value, icon, description, trend, gradient }: StatCardProps) {
   return (
     <motion.div variants={itemVariants}>
-      <Card className="h-full">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">{title}</CardTitle>
-          <div className="text-muted-foreground">{icon}</div>
+      <Card className={`h-full relative overflow-hidden ${gradient ? 'text-white border-0' : ''}`}>
+        {gradient && (
+          <div className={`absolute inset-0 ${gradient}`} />
+        )}
+        <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className={`text-sm font-medium ${gradient ? 'text-white/90' : ''}`}>{title}</CardTitle>
+          <div className={gradient ? 'text-white/80' : 'text-muted-foreground'}>{icon}</div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="relative">
           <div className="text-2xl font-bold">{value}</div>
           {description && (
-            <p className="text-xs text-muted-foreground mt-1">{description}</p>
+            <p className={`text-xs mt-1 ${gradient ? 'text-white/70' : 'text-muted-foreground'}`}>{description}</p>
           )}
           {trend && (
             <div className="flex items-center gap-1 mt-2">
               <TrendingUp
                 className={`size-3 ${
                   trend.isPositive
-                    ? "text-green-500"
-                    : "text-red-500 rotate-180"
+                    ? "text-green-400"
+                    : "text-red-400 rotate-180"
                 }`}
               />
               <span
                 className={`text-xs ${
-                  trend.isPositive ? "text-green-500" : "text-red-500"
+                  trend.isPositive ? "text-green-400" : "text-red-400"
                 }`}
               >
                 {trend.isPositive ? "+" : "-"}
                 {Math.abs(trend.value)}%
               </span>
-              <span className="text-xs text-muted-foreground">
+              <span className={`text-xs ${gradient ? 'text-white/60' : 'text-muted-foreground'}`}>
                 so với tháng trước
               </span>
             </div>
@@ -123,9 +128,9 @@ function QuickAction({ title, description, href, icon }: QuickActionProps) {
   return (
     <motion.div variants={itemVariants}>
       <Link href={href}>
-        <Card className="group cursor-pointer transition-all hover:shadow-md hover:border-primary/50 h-full">
+        <Card className="group cursor-pointer transition-all hover:shadow-lg hover:border-primary/50 h-full bg-gradient-to-br from-white to-blue-50/50 dark:from-background dark:to-blue-950/20">
           <CardContent className="flex items-center gap-4 p-4">
-            <div className="flex size-12 items-center justify-center rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+            <div className="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-blue-600 text-primary-foreground shadow-lg shadow-primary/25">
               {icon}
             </div>
             <div className="flex-1 min-w-0">
@@ -154,19 +159,20 @@ const viewsChartData = [
 const viewsChartConfig = {
   views: {
     label: "Lượt xem",
-    color: "hsl(var(--primary))",
+    color: "#1760df",
   },
 } satisfies ChartConfig;
 
 const postsChartData = [
-  { status: "Đã xuất bản", count: 18, fill: "hsl(var(--primary))" },
-  { status: "Nháp", count: 4, fill: "hsl(var(--muted-foreground))" },
-  { status: "Chờ duyệt", count: 2, fill: "hsl(var(--chart-3))" },
+  { status: "Đã xuất bản", count: 18, fill: "#1760df" },
+  { status: "Nháp", count: 4, fill: "#5a94e8" },
+  { status: "Chờ duyệt", count: 2, fill: "#a3c4f3" },
 ];
 
 const postsChartConfig = {
   count: {
     label: "Số bài",
+    color: "#1760df",
   },
 } satisfies ChartConfig;
 
@@ -181,12 +187,14 @@ export default function DashboardPage() {
       icon: <FileText className="size-4" />,
       description: "Tổng số bài viết của bạn",
       trend: { value: 12, isPositive: true },
+      gradient: "bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700",
     },
     {
       title: t.dashboard.publishedPosts,
       value: 18,
       icon: <Eye className="size-4" />,
       description: "Bài đã xuất bản",
+      gradient: "bg-gradient-to-br from-emerald-500 to-teal-600",
     },
     {
       title: t.dashboard.draftPosts,
@@ -222,30 +230,49 @@ export default function DashboardPage() {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="space-y-8"
+      className="space-y-8 relative"
     >
-      <motion.div variants={itemVariants}>
-        <h1 className="text-3xl font-bold tracking-tight">
-          {t.dashboard.welcome}, {user?.name || user?.preferred_username}!
-        </h1>
-        <p className="text-muted-foreground mt-2">
-          Đây là bảng điều khiển của bạn. Quản lý bài viết và theo dõi hiệu
-          suất.
-        </p>
+      {/* Background Orb Effects */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/20 rounded-full blur-[100px] animate-pulse" />
+        <div className="absolute top-60 -left-40 w-96 h-96 bg-blue-400/15 rounded-full blur-[120px]" />
+        <div className="absolute bottom-20 right-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: "1s" }} />
+      </div>
+
+      {/* Welcome Header with Glass Effect */}
+      <motion.div variants={itemVariants} className="relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-blue-500/5 to-transparent rounded-3xl blur-xl" />
+        <div className="relative bg-white/50 dark:bg-background/50 backdrop-blur-xl rounded-3xl border border-white/20 dark:border-white/10 p-6 shadow-xl shadow-primary/5">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 rounded-xl bg-gradient-to-br from-primary to-blue-600 text-white">
+              <Sparkles className="size-5" />
+            </div>
+            <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-foreground via-primary to-blue-600 bg-clip-text text-transparent">
+              {t.dashboard.welcome}, {user?.name || user?.preferred_username}!
+            </h1>
+          </div>
+          <p className="text-muted-foreground">
+            Đây là bảng điều khiển của bạn. Quản lý bài viết và theo dõi hiệu suất.
+          </p>
+        </div>
       </motion.div>
 
+      {/* Stats Grid */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
           <StatCard key={stat.title} {...stat} />
         ))}
       </div>
 
+      {/* Charts Section */}
       <div className="grid gap-6 lg:grid-cols-2">
         <motion.div variants={itemVariants}>
-          <Card className="h-full">
+          <Card className="h-full bg-gradient-to-br from-white to-blue-50/30 dark:from-background dark:to-blue-950/10 border-blue-100/50 dark:border-blue-900/20">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="size-5" />
+                <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary to-blue-600 text-white">
+                  <BarChart3 className="size-4" />
+                </div>
                 Lượt xem theo tháng
               </CardTitle>
               <CardDescription>
@@ -262,7 +289,13 @@ export default function DashboardPage() {
                   data={viewsChartData}
                   margin={{ left: 12, right: 12, top: 12 }}
                 >
-                  <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                  <defs>
+                    <linearGradient id="viewsGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#1760df" stopOpacity={0.4} />
+                      <stop offset="100%" stopColor="#1760df" stopOpacity={0.05} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" />
                   <XAxis
                     dataKey="month"
                     tickLine={false}
@@ -277,10 +310,9 @@ export default function DashboardPage() {
                   <Area
                     dataKey="views"
                     type="monotone"
-                    fill="hsl(var(--primary))"
-                    fillOpacity={0.2}
-                    stroke="hsl(var(--primary))"
-                    strokeWidth={2}
+                    fill="url(#viewsGradient)"
+                    stroke="#1760df"
+                    strokeWidth={2.5}
                   />
                 </AreaChart>
               </ChartContainer>
@@ -289,10 +321,12 @@ export default function DashboardPage() {
         </motion.div>
 
         <motion.div variants={itemVariants}>
-          <Card className="h-full">
+          <Card className="h-full bg-gradient-to-br from-white to-blue-50/30 dark:from-background dark:to-blue-950/10 border-blue-100/50 dark:border-blue-900/20">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <FileText className="size-5" />
+                <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary to-blue-600 text-white">
+                  <FileText className="size-4" />
+                </div>
                 Phân bố bài viết
               </CardTitle>
               <CardDescription>
@@ -310,7 +344,7 @@ export default function DashboardPage() {
                   layout="vertical"
                   margin={{ left: 0, right: 12 }}
                 >
-                  <CartesianGrid horizontal={false} strokeDasharray="3 3" />
+                  <CartesianGrid horizontal={false} strokeDasharray="3 3" stroke="hsl(var(--border))" />
                   <YAxis
                     dataKey="status"
                     type="category"
@@ -324,7 +358,7 @@ export default function DashboardPage() {
                     cursor={false}
                     content={<ChartTooltipContent hideLabel />}
                   />
-                  <Bar dataKey="count" radius={4} />
+                  <Bar dataKey="count" radius={6} />
                 </BarChart>
               </ChartContainer>
             </CardContent>
@@ -332,8 +366,10 @@ export default function DashboardPage() {
         </motion.div>
       </div>
 
+      {/* Quick Actions */}
       <motion.div variants={itemVariants}>
-        <h2 className="text-xl font-semibold mb-4">
+        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          <div className="w-1 h-6 bg-gradient-to-b from-primary to-blue-600 rounded-full" />
           {t.dashboard.quickActions}
         </h2>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -343,10 +379,14 @@ export default function DashboardPage() {
         </div>
       </motion.div>
 
+      {/* Recent Posts */}
       <motion.div variants={itemVariants}>
-        <Card>
+        <Card className="bg-gradient-to-br from-white to-blue-50/30 dark:from-background dark:to-blue-950/10 border-blue-100/50 dark:border-blue-900/20">
           <CardHeader>
-            <CardTitle>{t.dashboard.recentPosts}</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <div className="w-1 h-5 bg-gradient-to-b from-primary to-blue-600 rounded-full" />
+              {t.dashboard.recentPosts}
+            </CardTitle>
             <CardDescription>Các bài viết gần đây nhất của bạn</CardDescription>
           </CardHeader>
           <CardContent>
@@ -354,11 +394,11 @@ export default function DashboardPage() {
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+                  className="flex items-center justify-between p-3 rounded-xl border bg-white/50 dark:bg-background/50 hover:bg-accent/50 hover:shadow-md transition-all"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="size-10 rounded bg-muted flex items-center justify-center">
-                      <FileText className="size-5 text-muted-foreground" />
+                    <div className="size-10 rounded-xl bg-gradient-to-br from-primary/10 to-blue-500/10 flex items-center justify-center">
+                      <FileText className="size-5 text-primary" />
                     </div>
                     <div>
                       <p className="font-medium">Bài viết mẫu {i}</p>
@@ -374,7 +414,7 @@ export default function DashboardPage() {
               ))}
             </div>
             <div className="mt-4 text-center">
-              <Button variant="outline" asChild>
+              <Button variant="outline" asChild className="bg-white/50 hover:bg-primary hover:text-white transition-all">
                 <Link href="/manage/posts">
                   {t.posts.allPosts}
                   <ArrowRight className="ml-2 size-4" />

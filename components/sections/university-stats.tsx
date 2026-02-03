@@ -63,7 +63,7 @@ export default function UniversityStats() {
   return (
     <section
       id="stats"
-      className="py-12 px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40 bg-gradient-to-br from-gray-50 to-blue-50 overflow-hidden"
+      className="py-12 lg:py-20 px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40 bg-gradient-to-br from-gray-50 to-blue-50 overflow-hidden"
     >
       <div className="w-full">
         <motion.div
@@ -102,12 +102,12 @@ export default function UniversityStats() {
             >
               <div className="flex flex-col items-center text-center">
                 <div
-                  className={`text-3xl md:text-4xl lg:text-5xl font-bold mb-2 ${stat.color}`}
+                  className={`text-3xl md:text-4xl lg:text-7xl font-bold mb-2 ${stat.color}`}
                 >
                   {stat.number && (
                     <NumberTicker
                       value={stat.number}
-                      className={`inline-block ${stat.color}`}
+                      className={`font-bold text-[72px] leading-none bg-gradient-to-br from-[#0c4ebf] via-[#1760df] to-[#ae0303]   bg-clip-text text-transparent mb-2 ${stat.color}`}
                     />
                   )}
                   {stat.suffix && <span>{stat.suffix}</span>}

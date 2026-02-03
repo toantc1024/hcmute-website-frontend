@@ -19,6 +19,7 @@ import {
   LayoutGrid,
   Landmark,
   ScrollText,
+  Newspaper,
   type LucideIcon,
 } from "lucide-react";
 
@@ -431,6 +432,14 @@ export const menuData: MenuItem[] = [
         ],
       },
     ],
+  },
+  {
+    id: "tin-tuc",
+    label: "Tin tức",
+    type: "link",
+    href: "/tin-tuc",
+    position: "left",
+    icon: Newspaper,
   },
   {
     id: "nghien-cuu",

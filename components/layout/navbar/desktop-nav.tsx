@@ -11,13 +11,15 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/container";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-
+import { useRouter } from "next/navigation";
 const leftItems = menuData.filter((item) => item.position === "left");
 const rightItems = menuData.filter((item) => item.position === "right");
 
 function NavItems({ items }: { items: MenuItem[] }) {
   const { activeMenu, handleMouseEnter, handleMouseLeave, handleClick } =
     useNavbar();
+  
+  const router = useRouter();
 
   return (
     <>
@@ -29,18 +31,24 @@ function NavItems({ items }: { items: MenuItem[] }) {
           onMouseLeave={handleMouseLeave}
         >
           {item.type === "link" ? (
-            <Link
-              href={item.href || "#"}
-              className=" px-3  py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-md"
+            <Button
+              variant="ute"
+               className={cn(
+                "uppercase font-extrabold hover:text-primary-foreground",
+                activeMenu === item.id
+                  ? " !bg-primary !text-primary-foreground"
+                  : "bg-transparent",
+              )}
+              onClick={() => router.push(item.href || "#")}
             >
-              {item.label}
-            </Link>
+              <span className="font-inter-black">{item.label}</span>
+            </Button>
           ) : (
             <Button
               variant="ute"
               onClick={() => handleClick(item.id)}
               className={cn(
-                "uppercase tracking-wider",
+                "uppercase font-extrabold",
                 activeMenu === item.id
                   ? " !bg-primary !text-primary-foreground"
                   : "bg-transparent",

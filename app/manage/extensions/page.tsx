@@ -95,6 +95,15 @@ export default function ExtensionsPage() {
 
   const installedExtensions: ExtensionCardProps[] = [
     {
+      name: "Short Link",
+      description:
+        "Tạo và quản lý link rút gọn với domain link.hcmute.edu.vn cho các bài viết và tài liệu",
+      version: "1.0.0",
+      author: "HCM-UTE Team",
+      isInstalled: true,
+      isEnabled: true,
+    },
+    {
       name: "SEO Optimizer",
       description:
         "Tối ưu hóa SEO cho bài viết với phân tích từ khóa và gợi ý cải thiện",

@@ -52,13 +52,31 @@ function getStatusBadgeVariant(
 ): "default" | "secondary" | "destructive" | "outline" {
   switch (status) {
     case PostStatus.PUBLISHED:
-      return "default";
+      return "default"; // Primary blue - success
+    case PostStatus.PENDING:
+      return "outline"; // Yellow/warning
     case PostStatus.DRAFT:
-      return "secondary";
+      return "secondary"; // Gray - neutral
     case PostStatus.REJECTED:
-      return "destructive";
+      return "destructive"; // Red - danger
     default:
       return "outline";
+  }
+}
+
+// Status color classes for visual distinction
+function getStatusColorClass(status: PostStatus): string {
+  switch (status) {
+    case PostStatus.PUBLISHED:
+      return "bg-green-100 text-green-800 border-green-200";
+    case PostStatus.PENDING:
+      return "bg-yellow-100 text-yellow-800 border-yellow-200";
+    case PostStatus.DRAFT:
+      return "bg-gray-100 text-gray-600 border-gray-200";
+    case PostStatus.REJECTED:
+      return "bg-red-100 text-red-800 border-red-200";
+    default:
+      return "";
   }
 }
 
@@ -199,7 +217,7 @@ function PostsContent() {
         filterType: "select",
         filterOptions: statusFilterOptions,
         cell: ({ row }) => (
-          <Badge variant={getStatusBadgeVariant(row.status)}>
+          <Badge className={getStatusColorClass(row.status)}>
             {getPostStatusLabel(row.status)}
           </Badge>
         ),
@@ -302,43 +320,49 @@ function PostsContent() {
           Tất cả
         </Button>
         <Button
-          variant={
-            statusFilter === String(PostStatus.DRAFT) ? "secondary" : "ghost"
-          }
+          variant="ghost"
           size="sm"
-          className="h-7 px-3 text-xs"
+          className={`h-7 px-3 text-xs ${
+            statusFilter === String(PostStatus.DRAFT)
+              ? "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              : ""
+          }`}
           onClick={() => handleStatusFilter(String(PostStatus.DRAFT))}
         >
           Nháp
         </Button>
         <Button
-          variant={
-            statusFilter === String(PostStatus.PENDING) ? "secondary" : "ghost"
-          }
+          variant="ghost"
           size="sm"
-          className="h-7 px-3 text-xs"
+          className={`h-7 px-3 text-xs ${
+            statusFilter === String(PostStatus.PENDING)
+              ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+              : ""
+          }`}
           onClick={() => handleStatusFilter(String(PostStatus.PENDING))}
         >
           Chờ duyệt
         </Button>
         <Button
-          variant={
-            statusFilter === String(PostStatus.PUBLISHED)
-              ? "secondary"
-              : "ghost"
-          }
+          variant="ghost"
           size="sm"
-          className="h-7 px-3 text-xs"
+          className={`h-7 px-3 text-xs ${
+            statusFilter === String(PostStatus.PUBLISHED)
+              ? "bg-green-100 text-green-800 hover:bg-green-200"
+              : ""
+          }`}
           onClick={() => handleStatusFilter(String(PostStatus.PUBLISHED))}
         >
           Đã xuất bản
         </Button>
         <Button
-          variant={
-            statusFilter === String(PostStatus.REJECTED) ? "secondary" : "ghost"
-          }
+          variant="ghost"
           size="sm"
-          className="h-7 px-3 text-xs"
+          className={`h-7 px-3 text-xs ${
+            statusFilter === String(PostStatus.REJECTED)
+              ? "bg-red-100 text-red-800 hover:bg-red-200"
+              : ""
+          }`}
           onClick={() => handleStatusFilter(String(PostStatus.REJECTED))}
         >
           Từ chối

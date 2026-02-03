@@ -87,7 +87,7 @@ export default function UniversityLeadership() {
 
         {/* Blue background section */}
         <div className="relative w-full bg-blue-600">
-          <div className="absolute inset-0 w-full h-full">
+          <div className="absolute  scale-[1.45] inset-0 w-full h-full">
             <Image
               src={AGENT_BACKGROUND}
               alt="Background"

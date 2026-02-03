@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import ArrowButton from "@/components/blocks/arrow-button";
 import Image from "next/image";
 
@@ -24,7 +22,7 @@ const slides: CarouselSlide[] = [
     subtitle: "Tiên phong trong giáo dục kỹ thuật",
     description:
       "Đào tạo nguồn nhân lực chất lượng cao trong lĩnh vực kỹ thuật và công nghệ, đáp ứng nhu cầu phát triển của đất nước.",
-    image: "/carousel/1.jpg",
+    image: "/carousel/image.png",
     cta: "Tìm hiểu thêm",
     ctaLink: "/gioi-thieu",
   },
@@ -34,7 +32,7 @@ const slides: CarouselSlide[] = [
     subtitle: "Đổi mới sáng tạo",
     description:
       "Phát triển các dự án nghiên cứu ứng dụng, chuyển giao công nghệ và hợp tác với doanh nghiệp để tạo ra giá trị thực tiễn.",
-    image: "/carousel/2.jpg",
+    image: "/carousel/image copy.png",
     cta: "Khám phá nghiên cứu",
     ctaLink: "/nghien-cuu",
   },
@@ -44,7 +42,7 @@ const slides: CarouselSlide[] = [
     subtitle: "Kết nối toàn cầu",
     description:
       "Liên kết với các trường đại học hàng đầu thế giới, tạo cơ hội học tập và nghiên cứu quốc tế cho sinh viên và giảng viên.",
-    image: "/carousel/3.jpg",
+    image: "/carousel/image copy 2.png",
     cta: "Xem chương trình",
     ctaLink: "/hop-tac",
   },
@@ -79,7 +77,8 @@ export default function HeroCarousel() {
   return (
     <section
       id="hero"
-      className="relative w-full overflow-x-hidden bg-gray-900 h-[50vh] sm:h-[60vh] md:h-[70vh] lg:h-[80vh] xl:h-screen"
+      className="group/carousel relative w-full overflow-x-hidden bg-gray-900"
+      style={{ aspectRatio: "2560/854" }}
     >
       <AnimatePresence initial={false} mode="wait">
         <motion.div
@@ -103,73 +102,23 @@ export default function HeroCarousel() {
               className="object-cover object-center"
               priority
               quality={90}
-              sizes="(max-width: 768px) 1600px, 1920px"
+              sizes="100vw"
             />
           </motion.div>
-          <div className="absolute inset-0 bg-black/40" />
-
-          <div className="relative z-10 h-full flex items-center">
-            <div className="w-full px-4 sm:px-8 md:px-12 lg:px-24 xl:px-32 2xl:px-40">
-              <div className="max-w-3xl">
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.3, duration: 0.4 }}
-                >
-                  <span className="inline-block px-3 py-1.5 sm:px-4 sm:py-2 bg-blue-600/90 text-white rounded-full text-xs sm:text-sm font-medium mb-3 sm:mb-6">
-                    {slides[currentSlide].subtitle}
-                  </span>
-                </motion.div>
-
-                <motion.h1
-                  className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-3 sm:mb-4 md:mb-6 leading-tight"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.3, duration: 0.5 }}
-                >
-                  {slides[currentSlide].title}
-                </motion.h1>
-
-                <motion.p
-                  className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-200 mb-4 sm:mb-6 md:mb-8 leading-relaxed max-w-2xl line-clamp-2 sm:line-clamp-3 md:line-clamp-none"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.4, duration: 0.5 }}
-                >
-                  {slides[currentSlide].description}
-                </motion.p>
-
-                <motion.div
-                  className="flex flex-col sm:flex-row gap-3 sm:gap-4"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.5, duration: 0.5 }}
-                >
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="!text-white rounded-3xl backdrop-blur-md bg-white/20 text-white px-5 py-2.5 sm:px-6 sm:py-3 md:px-8 md:py-4 text-sm sm:text-base hover:bg-white/30 border-white/30 hover:border-white/50 transition-all duration-300"
-                  >
-                    {slides[currentSlide].cta}
-                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
-                  </Button>
-                </motion.div>
-              </div>
-            </div>
-          </div>
         </motion.div>
       </AnimatePresence>
 
+      {/* Arrow buttons - only visible on hover, positioned at edges */}
       <ArrowButton
         direction="left"
-        className="absolute left-2 sm:left-4 md:left-6 lg:left-12 xl:left-16 top-1/2 -translate-y-1/2 z-20"
+        className="absolute left-2 sm:left-3 md:left-4 lg:left-6 xl:left-8 top-1/2 -translate-y-1/2 z-20 opacity-0 group-hover/carousel:opacity-100 transition-opacity duration-300"
         onClick={prevSlide}
         onMouseEnter={() => setIsAutoPlay(false)}
         onMouseLeave={() => setIsAutoPlay(true)}
       />
 
       <ArrowButton
-        className="absolute right-2 sm:right-4 md:right-6 lg:right-12 xl:right-16 top-1/2 -translate-y-1/2 z-20"
+        className="absolute right-2 sm:right-3 md:right-4 lg:right-6 xl:right-8 top-1/2 -translate-y-1/2 z-20 opacity-0 group-hover/carousel:opacity-100 transition-opacity duration-300"
         direction="right"
         onClick={nextSlide}
         onMouseEnter={() => setIsAutoPlay(false)}

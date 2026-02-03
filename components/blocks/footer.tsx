@@ -123,7 +123,7 @@ export default function Footer() {
                 <div className="flex items-start gap-3 text-blue-100">
                   <MapPin className="w-4 h-4 mt-1 text-white shrink-0" />
                   <span>
-                    01 Võ Văn Ngân, Phường Linh Chiểu, TP. Thủ Đức, TP. Hồ Chí
+                    01 Võ Văn Ngân, Phường Thủ Đức, TP. Thủ Đức, TP. Hồ Chí
                     Minh
                   </span>
                 </div>
