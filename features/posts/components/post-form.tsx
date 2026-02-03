@@ -561,7 +561,7 @@ export function PostForm({
         // For cover image: use cropped image if available, otherwise use selected image
         const createCoverImageId = finalCoverImageId || selectedCoverImage?.id;
 
-        postId = await postsApi.createPost({
+        const createPayload = {
           title: title.trim(),
           slug,
           content: content.trim(),
@@ -579,7 +579,14 @@ export function PostForm({
               ? extendedAttributes
               : undefined,
           allowCloning,
-        });
+        };
+
+        // Debug: Log the payload to check for non-string UUIDs
+        console.log('[PostForm] Create payload:', JSON.stringify(createPayload, null, 2));
+        console.log('[PostForm] categoryIds type:', typeof selectedCategoryIds, selectedCategoryIds);
+        console.log('[PostForm] coverImageId type:', typeof createCoverImageId, createCoverImageId);
+
+        postId = await postsApi.createPost(createPayload);
       }
 
       toast.success(

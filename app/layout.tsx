@@ -25,7 +25,7 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <AuthProvider>{children}</AuthProvider>
-        <Toaster position="bottom-right" richColors closeButton />
+        <Toaster position="top-right" richColors closeButton />
       </body>
     </html>
   );

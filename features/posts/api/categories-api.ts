@@ -128,8 +128,9 @@ export const categoriesApi = {
     return response.data.data;
   },
 
+
   createCategory: async (data: CreateCategoryRequest): Promise<string> => {
-    const response = await apiClient.post<ApiResponse<string>>(
+    const response = await apiClient.post<ApiResponse<CategoryAuditView | string>>(
       "/api/v1/admin/categories",
       data,
     );
@@ -142,7 +143,15 @@ export const categoriesApi = {
       throw handleApiError(response, "Không thể tạo danh mục");
     }
 
-    return response.data.data;
+    // Handle both cases: API returns either the created category object or just the ID
+    const result = response.data.data;
+    if (typeof result === "string") {
+      return result;
+    }
+    if (result && typeof result === "object" && "id" in result) {
+      return result.id;
+    }
+    throw new Error("Phản hồi không hợp lệ từ server");
   },
 
   updateCategory: async (

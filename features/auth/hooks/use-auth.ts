@@ -73,7 +73,7 @@ export const useAuth = create<AuthStore>()(
 
           return user;
         } catch (error) {
-          alert(JSON.stringify(error));
+          console.error('Login callback error:', error);
           const message = error instanceof Error ? error.message : 'Failed to complete login';
           set({ error: message, isLoading: false });
           clearCodeVerifier();

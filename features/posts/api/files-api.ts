@@ -78,12 +78,11 @@ export const filesApi = {
   },
 
   uploadFile: async (file: File): Promise<FileDto> => {
-    alert("STEP 1. PRESIGNED");
     const presigned = await filesApi.getPresignedUploadUrl({
       fileName: file.name,
       fileSize: file.size,
     });
-    alert("STEP 2. UPLOADING " + presigned);
+
     await axios.put(presigned.url, file, {
       headers: {
         "Content-Type": file.type || "application/octet-stream",
