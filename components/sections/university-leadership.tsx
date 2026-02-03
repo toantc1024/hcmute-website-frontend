@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { useState } from "react";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import Image from "next/image";
@@ -47,11 +47,11 @@ export default function UniversityLeadership() {
     >
       <div className="w-full px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40 relative">
         <motion.div
-          className="text-center  mb-12"
+          className="text-center mb-8 lg:mb-12"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.6 }}
         >
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-4">
             LÃNH ĐẠO CỦA
@@ -66,79 +66,137 @@ export default function UniversityLeadership() {
         </motion.div>
       </div>
 
-      <div className="relative pt-8 lg:pt-16">
-        <div className="absolute top-0 left-6 sm:left-12 lg:left-24 xl:left-32 2xl:left-40 z-30 flex space-x-2">
-          <button
-            onClick={prevSlide}
-            className="bg-white hover:bg-gray-100 rounded-full p-2 sm:p-3 border border-gray-200 shadow-md transition-all duration-200 flex items-center justify-center"
-          >
-            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
-          </button>
-          <button
-            onClick={nextSlide}
-            className="bg-white hover:bg-gray-100 rounded-full p-2 sm:p-3 border border-gray-200 shadow-md transition-all duration-200 flex items-center justify-center"
-          >
-            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
-          </button>
+      <div className="relative">
+        {/* Navigation buttons - on top */}
+        <div className="w-full px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40 pb-4">
+          <div className="flex justify-center lg:justify-start gap-3">
+            <button
+              onClick={prevSlide}
+              className="bg-white hover:bg-gray-50 rounded-full p-2.5 sm:p-3 border border-gray-200 transition-all duration-200 flex items-center justify-center"
+            >
+              <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
+            </button>
+            <button
+              onClick={nextSlide}
+              className="bg-white hover:bg-gray-50 rounded-full p-2.5 sm:p-3 border border-gray-200 transition-all duration-200 flex items-center justify-center"
+            >
+              <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
+            </button>
+          </div>
         </div>
 
-        <div className="relative w-full bg-blue-600 min-h-[280px] md:min-h-[360px]">
-          <motion.div
-            key={`bg-${currentSlide}`}
-            className="absolute inset-0 w-full h-full"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          >
+        {/* Blue background section */}
+        <div className="relative w-full bg-blue-600">
+          <div className="absolute inset-0 w-full h-full">
             <Image
               src={AGENT_BACKGROUND}
               alt="Background"
               fill
               className="object-cover"
             />
-          </motion.div>
+          </div>
 
-          <div className="relative z-10 h-full min-h-[280px] md:min-h-[360px] flex items-center">
+          <div className="relative z-10">
             <div className="px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40 w-full">
-              <div className="flex items-center justify-center lg:justify-start">
-                <motion.div
-                  key={currentSlide}
-                  className="text-white text-center lg:text-left max-w-xl lg:max-w-lg"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-2">
-                    {currentLeader.name}
-                  </h3>
-                  <p className="text-blue-100 text-sm sm:text-base lg:text-lg font-medium mb-3">
-                    {currentLeader.position}
-                  </p>
+              {/* Mobile layout: vertical stack - text on top, image below */}
+              <div className="flex flex-col lg:hidden">
+                {/* Text content - Top on mobile */}
+                <div className="pt-8 pb-4">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={currentSlide}
+                      className="text-white text-center"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.4 }}
+                    >
+                      <h3 className="text-xl sm:text-2xl font-bold mb-2">
+                        {currentLeader.name}
+                      </h3>
+                      <p className="text-blue-100 text-sm sm:text-base font-medium mb-4">
+                        {currentLeader.position}
+                      </p>
+                      <p className="text-blue-100 leading-relaxed text-sm sm:text-base max-w-md mx-auto">
+                        <Quote className="inline w-4 h-4 mr-2 mb-1 text-blue-200" />
+                        {currentLeader.description}
+                      </p>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
 
-                  <p className="text-blue-100 font-bold leading-relaxed text-xs sm:text-sm lg:text-base">
-                    <Quote className="inline w-4 h-4 sm:w-5 sm:h-5 mr-2 mb-1 text-blue-200" />
-                    {currentLeader.description}
-                  </p>
-                </motion.div>
+                {/* Leader image - Bottom on mobile, centered */}
+                <div className="flex justify-center">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={`image-mobile-${currentSlide}`}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.4 }}
+                    >
+                      <Image
+                        src={currentLeader.image}
+                        alt={currentLeader.name}
+                        width={400}
+                        height={500}
+                        className="h-[200px] sm:h-[240px] md:h-[280px] w-auto object-contain object-bottom"
+                      />
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+              </div>
+
+              {/* Desktop layout: side by side - text left, image right */}
+              <div className="hidden lg:flex lg:items-end lg:gap-8 xl:gap-12">
+                {/* Text content - Left side, vertically centered */}
+                <div className="flex-1 py-12 flex items-center">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={`desktop-${currentSlide}`}
+                      className="text-white text-left w-full"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.4 }}
+                    >
+                      <h3 className="text-3xl xl:text-4xl font-bold mb-2">
+                        {currentLeader.name}
+                      </h3>
+                      <p className="text-blue-100 text-lg font-medium mb-4">
+                        {currentLeader.position}
+                      </p>
+                      <p className="text-blue-100 leading-relaxed text-base lg:text-lg max-w-xl">
+                        <Quote className="inline w-5 h-5 mr-2 mb-1 text-blue-200" />
+                        {currentLeader.description}
+                      </p>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+
+                {/* Leader image - Right side, anchored to bottom */}
+                <div className="flex-shrink-0">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={`image-desktop-${currentSlide}`}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.4 }}
+                    >
+                      <Image
+                        src={currentLeader.image}
+                        alt={currentLeader.name}
+                        width={400}
+                        height={500}
+                        className="h-[360px] xl:h-[400px] 2xl:h-[440px] w-auto object-contain object-bottom"
+                      />
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
               </div>
             </div>
           </div>
-
-          <motion.div
-            key={`image-${currentSlide}`}
-            className="hidden lg:block absolute right-24 xl:right-32 2xl:right-40 bottom-0"
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            <Image
-              src={currentLeader.image}
-              alt={currentLeader.name}
-              width={400}
-              height={500}
-              className="h-[380px] xl:h-[450px] 2xl:h-[500px] w-auto object-contain object-bottom"
-            />
-          </motion.div>
         </div>
       </div>
     </section>

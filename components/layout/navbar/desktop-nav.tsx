@@ -37,6 +37,7 @@ function NavItems({ items }: { items: MenuItem[] }) {
             </Link>
           ) : (
             <Button
+              variant="ute"
               onClick={() => handleClick(item.id)}
               className={cn(
                 "uppercase tracking-wider",
@@ -44,7 +45,6 @@ function NavItems({ items }: { items: MenuItem[] }) {
                   ? " !bg-primary !text-primary-foreground"
                   : "bg-transparent",
               )}
-              variant="ghost"
             >
               {item.label}
               <motion.div

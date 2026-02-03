@@ -184,13 +184,8 @@ export function PostForm({
   }, []);
 
   const handleImageUpload = useCallback(async (file: File): Promise<string> => {
-    try {
-      const results = await filesApi.uploadStreaming([file]);
-      return results[0].publicUrl;
-    } catch {
-      const result = await filesApi.uploadFile(file);
-      return result.publicUrl;
-    }
+    const result = await filesApi.uploadFile(file);
+    return result.publicUrl;
   }, []);
 
   const handleTagToggle = useCallback((tagId: string) => {
@@ -243,7 +238,7 @@ export function PostForm({
           return post.coverImageId || undefined;
         };
 
-        savedPost = await postsApi.updatePost(post.id, {
+        await postsApi.updatePost(post.id, {
           title: title.trim(),
           content: content.trim(),
           contentFormat: ContentFormat.TIPTAP_JSON,
@@ -258,6 +253,8 @@ export function PostForm({
           allowCloning,
           version: post.version,
         });
+
+        savedPost = await postsApi.getPostById(post.id);
       } else {
         const slug = generateSlug(title.trim());
         if (!slug) {
@@ -265,7 +262,7 @@ export function PostForm({
           return;
         }
 
-        savedPost = await postsApi.createPost({
+        const createdPostId = await postsApi.createPost({
           title: title.trim(),
           slug,
           content: content.trim(),
@@ -280,6 +277,8 @@ export function PostForm({
           metaDescription: metaDescription.trim() || undefined,
           allowCloning,
         });
+
+        savedPost = await postsApi.getPostById(createdPostId);
       }
 
       if (!savedPost || !savedPost.id) {

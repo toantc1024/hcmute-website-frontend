@@ -120,6 +120,22 @@ export function Toolbar({ editor, onImageUpload, onAIAssist }: ToolbarProps) {
   const [showAIPrompt, setShowAIPrompt] = useState(false);
   const [aiPrompt, setAIPrompt] = useState("");
 
+  // Pre-fill link URL when popover opens and link is active
+  const handleLinkPopoverOpenChange = useCallback(
+    (open: boolean) => {
+      if (open && editor) {
+        const linkMark = editor.getAttributes("link");
+        if (linkMark.href) {
+          setLinkUrl(linkMark.href);
+        }
+      } else if (!open) {
+        setLinkUrl("");
+      }
+      setIsLinkPopoverOpen(open);
+    },
+    [editor],
+  );
+
   const setLink = useCallback(() => {
     if (!editor) return;
 
@@ -317,7 +333,7 @@ export function Toolbar({ editor, onImageUpload, onAIAssist }: ToolbarProps) {
         <Separator orientation="vertical" className="mx-1 h-6" />
 
         {/* Link */}
-        <Popover open={isLinkPopoverOpen} onOpenChange={setIsLinkPopoverOpen}>
+        <Popover open={isLinkPopoverOpen} onOpenChange={handleLinkPopoverOpenChange}>
           <PopoverTrigger asChild>
             <Button
               type="button"
@@ -353,12 +369,12 @@ export function Toolbar({ editor, onImageUpload, onAIAssist }: ToolbarProps) {
                     }
                     if (e.key === "Escape") {
                       e.preventDefault();
-                      setIsLinkPopoverOpen(false);
+                      handleLinkPopoverOpenChange(false);
                     }
                   }}
                 />
                 <Button type="button" onClick={setLink} size="sm">
-                  Thêm
+                  {editor.isActive("link") ? "Cập nhật" : "Thêm"}
                 </Button>
               </div>
             </div>

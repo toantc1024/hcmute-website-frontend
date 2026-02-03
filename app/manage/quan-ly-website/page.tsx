@@ -437,7 +437,7 @@ export default function WebsiteManagementPage() {
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input id="email" defaultValue="info@hcmute.edu.vn" />
+                    <Input id="email" defaultValue="bmc@hcmute.edu.vn" />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="workingHours">Giờ làm việc</Label>

@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-const BANNER_LOGO = "/logo/banner.png";
+const BANNER_LOGO = "/logo/rectangle-logo.png";
 
 interface LogoProps {
   className?: string;

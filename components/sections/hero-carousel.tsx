@@ -20,7 +20,7 @@ interface CarouselSlide {
 const slides: CarouselSlide[] = [
   {
     id: 1,
-    title: "Trường Đại học Sư phạm Kỹ Thuật TP. Hồ Chí Minh",
+    title: "Trường Đại học Công nghệ Kỹ thuật TP. Hồ Chí Minh",
     subtitle: "Tiên phong trong giáo dục kỹ thuật",
     description:
       "Đào tạo nguồn nhân lực chất lượng cao trong lĩnh vực kỹ thuật và công nghệ, đáp ứng nhu cầu phát triển của đất nước.",
@@ -77,7 +77,10 @@ export default function HeroCarousel() {
   };
 
   return (
-    <section id="hero" className="relative w-full overflow-x-hidden bg-gray-900 h-[50vh] sm:h-[60vh] md:h-[70vh] lg:h-[80vh] xl:h-screen">
+    <section
+      id="hero"
+      className="relative w-full overflow-x-hidden bg-gray-900 h-[50vh] sm:h-[60vh] md:h-[70vh] lg:h-[80vh] xl:h-screen"
+    >
       <AnimatePresence initial={false} mode="wait">
         <motion.div
           key={currentSlide}

@@ -111,7 +111,7 @@ export function TiptapViewer({
   className?: string;
 }) {
   const editor = useEditor({
-    extensions: getExtensions(),
+    extensions: getExtensions({ openLinksOnClick: true }),
     content: contentJson || content,
     editable: false,
     immediatelyRender: false,

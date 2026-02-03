@@ -11,7 +11,18 @@ import { ImageBlock } from "./image-block-extension";
 
 const lowlight = createLowlight(common);
 
-export function getExtensions(placeholder?: string) {
+export interface ExtensionOptions {
+  placeholder?: string;
+  openLinksOnClick?: boolean;
+}
+
+export function getExtensions(options?: ExtensionOptions | string) {
+  // Support legacy string parameter for placeholder
+  const opts: ExtensionOptions =
+    typeof options === "string" ? { placeholder: options } : options || {};
+
+  const { placeholder, openLinksOnClick = false } = opts;
+
   return [
     StarterKit.configure({
       codeBlock: false,
@@ -24,9 +35,13 @@ export function getExtensions(placeholder?: string) {
       emptyEditorClass: "is-editor-empty",
     }),
     Link.configure({
-      openOnClick: false,
+      openOnClick: openLinksOnClick,
       HTMLAttributes: {
         class: "text-primary underline",
+        ...(openLinksOnClick && {
+          target: "_blank",
+          rel: "noopener noreferrer",
+        }),
       },
     }),
     Image.configure({

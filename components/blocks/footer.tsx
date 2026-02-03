@@ -64,6 +64,7 @@ const socialLinks = [
 ];
 
 const AGENT_BACKGROUND = "/assets/agent-cta-background.webp";
+const FLOWER_WHITE = "/assets/FLOWER_UTE_WHITE.png";
 
 export default function Footer() {
   return (
@@ -78,7 +79,17 @@ export default function Footer() {
         />
       </div>
       <div className="absolute inset-0 bg-blue-600/70" />
-      
+
+      {/* Decorative flower in top-right corner - overflows outside but clipped */}
+      <motion.div
+        className="absolute -top-50 -right-72 rotate-0 w-144 h-144 opacity-45 pointer-events-none"
+        initial={{ opacity: 0, scale: 0.8, rotate: 0 }}
+        whileInView={{ opacity: 0.45, scale: 1, rotate: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
+      >
+        <Image src={FLOWER_WHITE} alt="" fill className="object-contain" />
+      </motion.div>
       {/* Top border */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-white/20" />
 
@@ -94,7 +105,7 @@ export default function Footer() {
             >
               <div className="flex items-center gap-3 mb-6">
                 <Image
-                  src="/logo/banner.png"
+                  src="/logo/rectangle-logo.png"
                   alt="HCM-UTE Logo"
                   width={180}
                   height={50}
@@ -122,7 +133,7 @@ export default function Footer() {
                 </div>
                 <div className="flex items-center gap-3 text-blue-100">
                   <Mail className="w-4 h-4 text-white shrink-0" />
-                  <span>info@hcmute.edu.vn</span>
+                  <span>bmc@hcmute.edu.vn</span>
                 </div>
               </div>
 
@@ -247,8 +258,8 @@ export default function Footer() {
           <div className="w-full mx-auto px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40 py-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <p className="text-blue-100 text-sm text-center md:text-left">
-                © {new Date().getFullYear()} Trường Đại học Công nghệ Kỹ Thuật TP.
-                Hồ Chí Minh. All rights reserved.
+                © {new Date().getFullYear()} Trường Đại học Công nghệ Kỹ Thuật
+                TP. Hồ Chí Minh. All rights reserved.
               </p>
               <p className="text-blue-200 text-xs">
                 Thực hiện bởi Phòng Quản trị Thương hiệu & Truyền thông

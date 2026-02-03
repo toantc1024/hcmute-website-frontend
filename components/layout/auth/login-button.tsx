@@ -13,7 +13,13 @@ import {
 import { useRouter } from "next/navigation";
 
 interface LoginButtonProps {
-  variant?: "default" | "ghost" | "outline" | "secondary" | "destructive" | "link";
+  variant?:
+    | "default"
+    | "ghost"
+    | "outline"
+    | "secondary"
+    | "destructive"
+    | "link";
 }
 
 export function LoginButton({ variant = "default" }: LoginButtonProps) {
@@ -47,14 +53,16 @@ export function LoginButton({ variant = "default" }: LoginButtonProps) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
           <div className="px-2 py-1.5">
-            <p className="text-sm font-medium">{user.name || user.preferred_username}</p>
+            <p className="text-sm font-medium">
+              {user.name || user.preferred_username}
+            </p>
             {user.email && (
               <p className="text-xs text-muted-foreground">{user.email}</p>
             )}
           </div>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleShowProfile}>
-        Bảng điều khiển
+            Bảng điều khiển
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={logout} className="text-destructive">
@@ -67,14 +75,7 @@ export function LoginButton({ variant = "default" }: LoginButtonProps) {
   }
 
   return (
-    <Button
-      variant={variant}
-      onClick={handleLogin}
-      disabled={isLoading}
-      icon={ArrowRight}
-      iconPlacement="right"
-      effect={isLoading ? undefined : "expandIcon"}
-    >
+    <Button variant={variant} onClick={handleLogin} disabled={isLoading}>
       {isLoading ? "Đang xử lý..." : "Đăng nhập"}
     </Button>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import Link from "next/link";
@@ -11,6 +11,7 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { AuroraText } from "@/components/ui/aurora-text";
+import { AnimatedTabs } from "@/components/ui/animated-tabs";
 import { MagicCard } from "@/components/ui/magic-card";
 
 interface Unit {
@@ -154,61 +155,11 @@ export default function UnitsSection() {
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
 
-  const handleDragStart = () => {
-    setIsDragging(true);
-  };
-
-  const handleDragMove = (clientX: number) => {
-    if (!isDragging || !containerRef.current) return;
-
-    const container = containerRef.current;
-    const rect = container.getBoundingClientRect();
-    const x = clientX - rect.left;
-    const percentage = Math.max(0, Math.min(1, x / rect.width));
-    const index = Math.round(percentage * (UNIT_GROUPS.length - 1));
-    setActiveTab(index);
-  };
-
-  const handleDragEnd = () => {
-    setIsDragging(false);
-  };
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (isDragging) {
-        handleDragMove(e.clientX);
-      }
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (isDragging && e.touches[0]) {
-        handleDragMove(e.touches[0].clientX);
-      }
-    };
-
-    const handleUp = () => {
-      if (isDragging) {
-        handleDragEnd();
-      }
-    };
-
-    if (isDragging) {
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleUp);
-      document.addEventListener("touchmove", handleTouchMove);
-      document.addEventListener("touchend", handleUp);
-    }
-
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleUp);
-      document.removeEventListener("touchmove", handleTouchMove);
-      document.removeEventListener("touchend", handleUp);
-    };
-  }, [isDragging]);
+  const tabItems = UNIT_GROUPS.map((group, index) => ({
+    label: group.title,
+    value: index,
+  }));
 
   useEffect(() => {
     if (!carouselApi) {
@@ -251,46 +202,13 @@ export default function UnitsSection() {
             </h2>
 
             <div className="flex justify-center mt-8">
-              <div
-                ref={containerRef}
-                className="relative inline-flex items-center gap-0 bg-gray-100 rounded-3xl px-1 py-1 cursor-pointer select-none w-full max-w-3xl"
-                onMouseDown={handleDragStart}
-                onTouchStart={handleDragStart}
-              >
-                <motion.div
-                  className="absolute bg-white rounded-3xl shadow-md hidden sm:block"
-                  style={{
-                    height: "calc(100% - 8px)",
-                    top: "4px",
-                    width: `calc((100% - 8px) / ${UNIT_GROUPS.length})`,
-                  }}
-                  initial={false}
-                  animate={{
-                    left: `calc(${activeTab} * ((100% - 8px) / ${UNIT_GROUPS.length}) + 4px)`,
-                  }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 300,
-                    damping: 30,
-                  }}
-                />
-
-                {UNIT_GROUPS.map((group, index) => (
-                  <button
-                    key={group.title}
-                    onClick={() => {
-                      setActiveTab(index);
-                    }}
-                    className={`relative z-10 px-2 lg:px-4 py-2 text-xs lg:text-sm transition-all duration-200 flex items-center justify-center flex-1 whitespace-nowrap ${
-                      activeTab === index
-                        ? "text-foreground font-bold"
-                        : "text-gray-600 hover:text-foreground font-normal"
-                    }`}
-                  >
-                    {group.title}
-                  </button>
-                ))}
-              </div>
+              <AnimatedTabs
+                items={tabItems}
+                activeIndex={activeTab}
+                onTabChange={setActiveTab}
+                className="w-full max-w-3xl rounded-rounded"
+                layoutId="units-tab-indicator"
+              />
             </div>
           </motion.div>
 

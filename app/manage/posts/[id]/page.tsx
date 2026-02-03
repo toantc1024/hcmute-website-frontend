@@ -12,18 +12,19 @@ import {
   Eye,
   Tag,
   Clock,
-  FileJson,
   Send,
   MessageSquare,
   History,
   CheckCircle2,
   XCircle,
   Loader2,
-  ChevronDown,
-  ChevronUp,
   RefreshCw,
   Rocket,
   AlertCircle,
+  ImageIcon,
+  FolderOpen,
+  Hash,
+  FileText,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -43,16 +44,10 @@ import {
 } from "@/features/posts";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -486,32 +481,47 @@ export default function PostDetailPage() {
   const owner = post.authors?.find((a) => a.authorType === AuthorType.OWNER);
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" asChild>
+    <div className="-m-4 md:-m-6 min-h-[calc(100%+2rem)] md:min-h-[calc(100%+3rem)] flex flex-col">
+      {/* Header */}
+      <header className="shrink-0 bg-background border-b">
+        <div className="flex items-center gap-2 px-4 py-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-8 shrink-0"
+            asChild
+          >
             <Link href="/manage/posts">
               <ArrowLeft className="size-4" />
             </Link>
           </Button>
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight line-clamp-1">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-base font-semibold tracking-tight line-clamp-1">
               {post.title}
             </h1>
-            <div className="flex items-center gap-2 mt-1">
-              <Badge variant={getStatusBadgeVariant(post.status)}>
-                {getPostStatusLabel(post.status)}
+          </div>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <Badge
+              variant={getStatusBadgeVariant(post.status)}
+              className="text-xs"
+            >
+              {getPostStatusLabel(post.status)}
+            </Badge>
+            {post.allowCloning && (
+              <Badge variant="secondary" className="text-xs">
+                Cho phép sao chép
               </Badge>
-              {post.allowCloning && (
-                <Badge variant="secondary">Cho phép sao chép</Badge>
-              )}
-            </div>
+            )}
           </div>
         </div>
-        <div className="flex items-center gap-2">
+      </header>
+
+      {/* Actions Bar */}
+      <div className="shrink-0 border-b bg-muted/30">
+        <div className="flex items-center gap-2 px-4 py-2 overflow-x-auto">
           <Button
             variant="ghost"
-            size="icon"
+            size="sm"
             onClick={handleRefresh}
             disabled={isRefreshing}
           >
@@ -519,10 +529,11 @@ export default function PostDetailPage() {
               className={`size-4 ${isRefreshing ? "animate-spin" : ""}`}
             />
           </Button>
+          <Separator orientation="vertical" className="h-6" />
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="outline" onClick={fetchReviewSessions}>
-                <MessageSquare className="mr-2 size-4" />
+              <Button variant="ghost" size="sm" onClick={fetchReviewSessions}>
+                <MessageSquare className="mr-1.5 size-4" />
                 Đánh giá
               </Button>
             </SheetTrigger>
@@ -579,222 +590,250 @@ export default function PostDetailPage() {
             </SheetContent>
           </Sheet>
           {post.status === PostStatus.DRAFT && (
-            <Button variant="outline" onClick={() => setShowSubmitDialog(true)}>
-              <Send className="mr-2 size-4" />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowSubmitDialog(true)}
+            >
+              <Send className="mr-1.5 size-4" />
               Gửi duyệt
             </Button>
           )}
-          {/* TEMPORARY_POST: Force Publish / Unpublish Button */}
           {post.status === PostStatus.PUBLISHED ? (
             <Button
-              variant="outline"
-              className="border-orange-500 text-orange-600 hover:bg-orange-50 hover:text-orange-700"
+              variant="ghost"
+              size="sm"
+              className="text-orange-600 hover:text-orange-700 hover:bg-orange-50"
               onClick={() => setShowPublishDialog(true)}
             >
-              <XCircle className="mr-2 size-4" />
-              Hủy đăng bài
+              <XCircle className="mr-1.5 size-4" />
+              Hủy đăng
             </Button>
           ) : (
             <Button
-              variant="default"
-              className="bg-green-600 hover:bg-green-700"
+              variant="ghost"
+              size="sm"
+              className="text-green-600 hover:text-green-700 hover:bg-green-50"
               onClick={() => setShowPublishDialog(true)}
             >
-              <Rocket className="mr-2 size-4" />
+              <Rocket className="mr-1.5 size-4" />
               Đăng bài
             </Button>
           )}
-          <Button variant="outline" asChild>
+          <div className="flex-1" />
+          <Button variant="outline" size="sm" asChild>
             <Link href={`/manage/posts/${postId}/edit`}>
-              <Edit className="mr-2 size-4" />
+              <Edit className="mr-1.5 size-4" />
               {t.common.edit}
             </Link>
           </Button>
           <Button
             variant="destructive"
+            size="sm"
             onClick={() => setShowDeleteDialog(true)}
           >
-            <Trash2 className="mr-2 size-4" />
+            <Trash2 className="mr-1.5 size-4" />
             {t.common.delete}
           </Button>
         </div>
       </div>
 
-      <Card>
-        <CardContent>
-          <WorkflowProgress status={post.status} reviewers={post.reviewers} />
-        </CardContent>
-      </Card>
-
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t.posts.postContent}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Tabs defaultValue="content" className="w-full">
-                <TabsList>
-                  <TabsTrigger value="content">Nội dung</TabsTrigger>
-                  <TabsTrigger value="json">
-                    <FileJson className="mr-2 size-4" />
-                    JSON
-                  </TabsTrigger>
-                </TabsList>
-                <TabsContent value="content" className="mt-4">
-                  {post.description && (
-                    <div className="mb-4 p-4 bg-muted rounded-lg">
-                      <p className="text-sm font-medium text-muted-foreground mb-1">
-                        Mô tả
-                      </p>
-                      <p>{post.description}</p>
-                    </div>
-                  )}
-                  <div
-                    className="prose prose-sm max-w-none dark:prose-invert"
-                    dangerouslySetInnerHTML={{ __html: post.content || "" }}
-                  />
-                </TabsContent>
-                <TabsContent value="json" className="mt-4">
-                  <pre className="p-4 bg-muted rounded-lg overflow-auto text-xs max-h-[500px]">
-                    {JSON.stringify(post, null, 2)}
-                  </pre>
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
-        </div>
-
+      {/* Content */}
+      <div className="flex-1 overflow-auto p-4 md:p-6">
         <div className="space-y-6">
           <Card>
-            <CardHeader>
-              <CardTitle>{t.common.details}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-3">
-                <User className="size-4 text-muted-foreground" />
-                <div>
-                  <p className="text-sm text-muted-foreground">
-                    {t.posts.postAuthor}
-                  </p>
-                  <p className="font-medium">{owner?.fullName || "N/A"}</p>
-                </div>
-              </div>
-              <Separator />
-              <div className="flex items-center gap-3">
-                <Calendar className="size-4 text-muted-foreground" />
-                <div>
-                  <p className="text-sm text-muted-foreground">
-                    {t.posts.postDate}
-                  </p>
-                  <p className="font-medium">{formatDate(post.createdDate)}</p>
-                </div>
-              </div>
-              {post.publishedAt && (
-                <>
+            <CardContent>
+              <WorkflowProgress
+                status={post.status}
+                reviewers={post.reviewers}
+              />
+            </CardContent>
+          </Card>
+
+          <div className="grid gap-6 lg:grid-cols-3">
+            <div className="lg:col-span-2 space-y-6">
+              {/* Description */}
+              {post.description && (
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <FileText className="size-4" />
+                      Mô tả
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div
+                      className="text-muted-foreground leading-relaxed prose prose-sm dark:prose-invert max-w-none prose-a:text-primary prose-a:underline prose-a:underline-offset-2"
+                      dangerouslySetInnerHTML={{ __html: post.description }}
+                    />
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Main Content */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>{t.posts.postContent}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <article
+                    className="prose prose-sm sm:prose lg:prose-lg max-w-none dark:prose-invert prose-headings:font-semibold prose-a:text-primary prose-img:rounded-lg"
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        post.content ||
+                        "<p class='text-muted-foreground italic'>Chưa có nội dung</p>",
+                    }}
+                  />
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="space-y-6">
+              {/* Cover Image */}
+              {post.coverImageUrl && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <ImageIcon className="size-4" />
+                      Ảnh bìa
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0 px-6 pb-6">
+                    <div className="relative aspect-video w-full overflow-hidden rounded-lg">
+                      <img
+                        src={post.coverImageUrl}
+                        alt={post.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    {post.photoCredit && (
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Photo: {post.photoCredit}
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>{t.common.details}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <User className="size-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm text-muted-foreground">
+                        {t.posts.postAuthor}
+                      </p>
+                      <p className="font-medium">{owner?.fullName || "N/A"}</p>
+                    </div>
+                  </div>
+                  <Separator />
+                  <div className="flex items-center gap-3">
+                    <Calendar className="size-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm text-muted-foreground">
+                        {t.posts.postDate}
+                      </p>
+                      <p className="font-medium">
+                        {formatDate(post.createdDate)}
+                      </p>
+                    </div>
+                  </div>
+                  {post.publishedAt && (
+                    <>
+                      <Separator />
+                      <div className="flex items-center gap-3">
+                        <Eye className="size-4 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm text-muted-foreground">
+                            {t.posts.publishedAt}
+                          </p>
+                          <p className="font-medium">
+                            {formatDate(post.publishedAt)}
+                          </p>
+                        </div>
+                      </div>
+                    </>
+                  )}
                   <Separator />
                   <div className="flex items-center gap-3">
                     <Eye className="size-4 text-muted-foreground" />
                     <div>
-                      <p className="text-sm text-muted-foreground">
-                        {t.posts.publishedAt}
-                      </p>
+                      <p className="text-sm text-muted-foreground">Lượt xem</p>
                       <p className="font-medium">
-                        {formatDate(post.publishedAt)}
+                        {post.viewCount.toLocaleString()}
                       </p>
                     </div>
                   </div>
-                </>
+                  <Separator />
+                  <div className="flex items-center gap-3">
+                    <Clock className="size-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm text-muted-foreground">Phiên bản</p>
+                      <p className="font-medium">{post.version}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {post.reviewers && post.reviewers.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Người đánh giá</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <WorkflowProgressVertical
+                      status={post.status}
+                      reviewers={post.reviewers}
+                    />
+                  </CardContent>
+                </Card>
               )}
-              <Separator />
-              <div className="flex items-center gap-3">
-                <Eye className="size-4 text-muted-foreground" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Lượt xem</p>
-                  <p className="font-medium">
-                    {post.viewCount.toLocaleString()}
-                  </p>
-                </div>
-              </div>
-              <Separator />
-              <div className="flex items-center gap-3">
-                <Clock className="size-4 text-muted-foreground" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Phiên bản</p>
-                  <p className="font-medium">{post.version}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
 
-          {post.reviewers && post.reviewers.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Người đánh giá</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <WorkflowProgressVertical
-                  status={post.status}
-                  reviewers={post.reviewers}
-                />
-              </CardContent>
-            </Card>
-          )}
+              {post.categories && post.categories.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <FolderOpen className="size-4" />
+                      {t.posts.postCategory}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-2">
+                      {post.categories.map((category) => (
+                        <Badge key={category.id} variant="outline">
+                          {category.name}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
-          {post.categories && post.categories.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>{t.posts.postCategory}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-2">
-                  {post.categories.map((category) => (
-                    <Badge key={category.id} variant="outline">
-                      {category.name}
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {post.tags && post.tags.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>{t.posts.postTags}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-2">
-                  {post.tags.map((tag) => (
-                    <Badge key={tag.id} variant="secondary">
-                      <Tag className="mr-1 size-3" />
-                      {tag.name}
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {post.coverImageUrl && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Ảnh đại diện</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <img
-                  src={post.coverImageUrl}
-                  alt={post.title}
-                  className="w-full rounded-lg object-cover"
-                />
-                {post.photoCredit && (
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Photo: {post.photoCredit}
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-          )}
+              {post.tags && post.tags.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Hash className="size-4" />
+                      {t.posts.postTags}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-2">
+                      {post.tags.map((tag) => (
+                        <Badge key={tag.id} variant="secondary">
+                          <Tag className="mr-1 size-3" />
+                          {tag.name}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 

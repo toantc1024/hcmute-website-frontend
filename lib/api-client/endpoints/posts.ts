@@ -51,6 +51,7 @@ export interface PostDetailView {
   categories: PostCategory[];
   tags: PostTag[];
   media: PostMedia[];
+  extendedAttributes?: Record<string, any>;
 }
 
 export interface PostAuditView {

@@ -148,7 +148,24 @@ export function SimpleDescriptionEditor({
   const handleRemoveLink = useCallback(() => {
     if (!editor) return;
     editor.chain().focus().unsetLink().run();
+    setLinkUrl("");
   }, [editor]);
+
+  // Pre-fill link URL when popover opens and link is active
+  const handlePopoverOpenChange = useCallback(
+    (open: boolean) => {
+      if (open && editor) {
+        const linkMark = editor.getAttributes("link");
+        if (linkMark.href) {
+          setLinkUrl(linkMark.href);
+        }
+      } else if (!open) {
+        setLinkUrl("");
+      }
+      setLinkPopoverOpen(open);
+    },
+    [editor],
+  );
 
   const isLinkActive = editor?.isActive("link") ?? false;
 
@@ -166,7 +183,7 @@ export function SimpleDescriptionEditor({
       {/* Mini Toolbar */}
       <div className="flex items-center gap-1 px-2 py-1.5 border-b border-border/50 bg-muted/30 rounded-t-xl">
         <TooltipProvider delayDuration={300}>
-          <Popover open={linkPopoverOpen} onOpenChange={setLinkPopoverOpen}>
+          <Popover open={linkPopoverOpen} onOpenChange={handlePopoverOpenChange}>
             <Tooltip>
               <TooltipTrigger asChild>
                 <PopoverTrigger asChild>
@@ -177,11 +194,11 @@ export function SimpleDescriptionEditor({
                     disabled={disabled}
                   >
                     <Link2 className="size-3.5 mr-1" />
-                    Thêm link
+                    {isLinkActive ? "Sửa link" : "Thêm link"}
                   </Button>
                 </PopoverTrigger>
               </TooltipTrigger>
-              <TooltipContent>Thêm liên kết</TooltipContent>
+              <TooltipContent>{isLinkActive ? "Sửa liên kết" : "Thêm liên kết"}</TooltipContent>
             </Tooltip>
             <PopoverContent
               className="w-80"
@@ -215,13 +232,13 @@ export function SimpleDescriptionEditor({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setLinkPopoverOpen(false)}
+                    onClick={() => handlePopoverOpenChange(false)}
                   >
                     Hủy
                   </Button>
                   <Button size="sm" onClick={handleAddLink} disabled={!linkUrl}>
                     <ExternalLink className="size-3 mr-1" />
-                    Thêm
+                    {isLinkActive ? "Cập nhật" : "Thêm"}
                   </Button>
                 </div>
               </div>

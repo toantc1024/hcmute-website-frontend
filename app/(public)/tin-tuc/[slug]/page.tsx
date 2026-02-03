@@ -1,29 +1,50 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { useParams } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
 import { motion } from "motion/react";
 import {
-  ArrowLeft,
   Calendar,
-  Eye,
-  User,
-  Tag,
-  Share2,
   Clock,
+  Eye,
+  Share2,
+  User,
+  ChevronRight,
+  ArrowLeft,
+  Hash,
+  Camera,
+  ZoomIn,
+  ZoomOut,
+  List,
   Facebook,
   Twitter,
-  Link as LinkIcon,
-  Check,
+  Linkedin,
+  Link2,
+  GraduationCap,
+  Search,
+  BookOpen,
+  Building2,
+  Award,
+  FileText,
+  ExternalLink,
 } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { useParams } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { postsApi, type PostDetailView, type PostAuditView } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import {
-  postsApi,
-  type PostDetailView,
-  type PostAuditView,
-} from "@/lib/api-client";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -34,34 +55,64 @@ const formatDate = (dateString: string) => {
   });
 };
 
-const formatReadTime = (content: string) => {
-  const wordsPerMinute = 200;
-  const words = content.replace(/<[^>]*>/g, "").split(/\s+/).length;
-  const minutes = Math.ceil(words / wordsPerMinute);
+const calculateReadTime = (content: string) => {
+  const words = content.split(/\s+/).length;
+  const minutes = Math.ceil(words / 200);
   return `${minutes} phút đọc`;
 };
 
-interface TableOfContentsItem {
-  id: string;
-  text: string;
-  level: number;
-}
+// Extract headings from HTML content for outline
+const extractHeadings = (html: string) => {
+  if (typeof window === "undefined") return [];
+  
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+  const headings: Array<{ level: number; text: string; id: string }> = [];
 
-const extractHeadings = (content: string): TableOfContentsItem[] => {
-  const headingRegex = /<h([2-4])[^>]*id="([^"]*)"[^>]*>([^<]*)<\/h[2-4]>/gi;
-  const headings: TableOfContentsItem[] = [];
-  let match;
-
-  while ((match = headingRegex.exec(content)) !== null) {
-    headings.push({
-      level: parseInt(match[1]),
-      id: match[2],
-      text: match[3].trim(),
-    });
-  }
+  doc.querySelectorAll("h1, h2, h3").forEach((heading) => {
+    const level = parseInt(heading.tagName.substring(1));
+    const text = heading.textContent || "";
+    const id = text
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+    headings.push({ level, text, id });
+  });
 
   return headings;
 };
+
+// Quick action links
+const quickActions = [
+  {
+    title: "Khoa & Đơn vị",
+    icon: Building2,
+    items: [
+      { name: "Khoa Công nghệ Thông tin", href: "/khoa/cntt" },
+      { name: "Khoa Điện - Điện tử", href: "/khoa/dien" },
+      { name: "Khoa Cơ khí", href: "/khoa/co-khi" },
+      { name: "Khoa Kinh tế", href: "/khoa/kinh-te" },
+    ],
+  },
+  {
+    title: "Học bổng",
+    icon: Award,
+    items: [
+      { name: "Học bổng khuyến khích", href: "/hoc-bong/khuyen-khich" },
+      { name: "Học bổng tài trợ", href: "/hoc-bong/tai-tro" },
+      { name: "Học bổng du học", href: "/hoc-bong/du-hoc" },
+    ],
+  },
+  {
+    title: "Tra cứu thông tin",
+    icon: Search,
+    items: [
+      { name: "Tra cứu điểm thi", href: "/tra-cuu/diem-thi" },
+      { name: "Tra cứu học phí", href: "/tra-cuu/hoc-phi" },
+      { name: "Tra cứu lịch học", href: "/tra-cuu/lich-hoc" },
+    ],
+  },
+];
 
 export default function NewsDetailPage() {
   const params = useParams();
@@ -71,11 +122,10 @@ export default function NewsDetailPage() {
   const [relatedPosts, setRelatedPosts] = useState<PostAuditView[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeHeading, setActiveHeading] = useState<string>("");
-  const [copied, setCopied] = useState(false);
-  const [tableOfContents, setTableOfContents] = useState<TableOfContentsItem[]>(
-    [],
-  );
+  const [fontSize, setFontSize] = useState(18);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [outlineOpen, setOutlineOpen] = useState(false);
+  const [processedContent, setProcessedContent] = useState("");
 
   const fetchPost = useCallback(async () => {
     try {
@@ -83,16 +133,34 @@ export default function NewsDetailPage() {
       setError(null);
       const data = await postsApi.getPostBySlug(slug);
       setPost(data);
-      setTableOfContents(extractHeadings(data.content));
 
-      if (data.categories.length > 0) {
+      // Process content - add IDs to headings for navigation
+      if (typeof window !== "undefined") {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(data.content, "text/html");
+        
+        doc.querySelectorAll("h1, h2, h3").forEach((heading) => {
+          if (!heading.id) {
+            const id = (heading.textContent || "")
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, "-")
+              .replace(/(^-|-$)/g, "");
+            heading.id = id;
+          }
+        });
+
+        setProcessedContent(doc.body.innerHTML);
+      } else {
+        setProcessedContent(data.content);
+      }
+
+      // Fetch related posts
+      if (data.categories?.[0]) {
         const related = await postsApi.getPublishedPosts({
           categoryId: data.categories[0].id,
-          limit: 4,
+          limit: 5,
         });
-        setRelatedPosts(
-          related.content.filter((p) => p.id !== data.id).slice(0, 3),
-        );
+        setRelatedPosts(related.content.filter((p) => p.id !== data.id).slice(0, 4));
       }
     } catch (err) {
       setError("Không tìm thấy bài viết");
@@ -108,64 +176,49 @@ export default function NewsDetailPage() {
     }
   }, [slug, fetchPost]);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const headings = document.querySelectorAll("h2[id], h3[id], h4[id]");
-      let currentHeading = "";
+  const headings = useMemo(() => {
+    if (!processedContent) return [];
+    return extractHeadings(processedContent);
+  }, [processedContent]);
 
-      headings.forEach((heading) => {
-        const rect = heading.getBoundingClientRect();
-        if (rect.top <= 150) {
-          currentHeading = heading.id;
-        }
-      });
+  const shareUrl = typeof window !== "undefined" ? window.location.href : "";
 
-      setActiveHeading(currentHeading);
+  const handleShare = (platform: string) => {
+    if (!post) return;
+    const title = encodeURIComponent(post.title);
+    const url = encodeURIComponent(shareUrl);
+
+    const shareUrls: Record<string, string> = {
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+      twitter: `https://twitter.com/intent/tweet?url=${url}&text=${title}`,
+      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    if (platform === "copy") {
+      navigator.clipboard.writeText(shareUrl);
+      setShareOpen(false);
+      return;
+    }
 
-  const copyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error("Failed to copy:", err);
+    if (shareUrls[platform]) {
+      window.open(shareUrls[platform], "_blank", "width=600,height=400");
     }
   };
 
-  const shareOnFacebook = () => {
-    window.open(
-      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`,
-      "_blank",
-    );
-  };
-
-  const shareOnTwitter = () => {
-    window.open(
-      `https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(post?.title || "")}`,
-      "_blank",
-    );
+  const scrollToHeading = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+      setOutlineOpen(false);
+    }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
-        <div className="px-4 sm:px-8 lg:px-16 xl:px-24">
-          <div className="max-w-4xl mx-auto animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/4 mb-6" />
-            <div className="h-12 bg-gray-200 rounded w-3/4 mb-4" />
-            <div className="h-6 bg-gray-200 rounded w-1/2 mb-8" />
-            <div className="aspect-video bg-gray-200 rounded-2xl mb-8" />
-            <div className="space-y-4">
-              {[...Array(8)].map((_, i) => (
-                <div key={i} className="h-4 bg-gray-200 rounded w-full" />
-              ))}
-            </div>
-          </div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <div className="w-10 h-10 border-2 border-muted border-t-primary rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-sm text-muted-foreground">Đang tải...</p>
         </div>
       </div>
     );
@@ -173,15 +226,18 @@ export default function NewsDetailPage() {
 
   if (error || !post) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-foreground mb-4">
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center max-w-md mx-auto px-4">
+          <h2 className="text-xl font-medium text-foreground mb-2">
             {error || "Không tìm thấy bài viết"}
-          </h1>
+          </h2>
+          <p className="text-sm text-muted-foreground mb-6">
+            Bài viết không tồn tại hoặc đã bị xóa
+          </p>
           <Link href="/tin-tuc">
-            <Button>
+            <Button variant="outline" size="sm">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Quay lại danh sách
+              Quay lại
             </Button>
           </Link>
         </div>
@@ -190,288 +246,411 @@ export default function NewsDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b">
-        <div className="px-4 sm:px-8 lg:px-16 xl:px-24 py-4">
-          <Link
-            href="/tin-tuc"
-            className="inline-flex items-center text-sm text-gray-600 hover:text-blue-600 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Quay lại danh sách tin tức
-          </Link>
-        </div>
-      </div>
-
-      <article className="px-4 sm:px-8 lg:px-16 xl:px-24 py-8 lg:py-12">
-        <div className="flex gap-8">
-          <aside className="hidden xl:block w-56 shrink-0">
-            <div className="sticky top-24">
-              <div className="flex items-center gap-2 mb-4">
-                <Share2 className="w-4 h-4 text-gray-400" />
-                <span className="text-sm font-medium text-gray-700">
-                  Chia sẻ
-                </span>
-              </div>
-              <div className="flex flex-col gap-2">
-                <button
-                  onClick={shareOnFacebook}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#1877F2] text-white text-sm hover:opacity-90 transition-opacity"
-                >
-                  <Facebook className="w-4 h-4" />
-                  Facebook
-                </button>
-                <button
-                  onClick={shareOnTwitter}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#1DA1F2] text-white text-sm hover:opacity-90 transition-opacity"
-                >
-                  <Twitter className="w-4 h-4" />
-                  Twitter
-                </button>
-                <button
-                  onClick={copyLink}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm hover:bg-gray-200 transition-colors"
-                >
-                  {copied ? (
-                    <>
-                      <Check className="w-4 h-4 text-green-600" />
-                      Đã sao chép!
-                    </>
-                  ) : (
-                    <>
-                      <LinkIcon className="w-4 h-4" />
-                      Sao chép link
-                    </>
-                  )}
-                </button>
-              </div>
-
-              {post.tags.length > 0 && (
-                <div className="mt-8">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Tag className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm font-medium text-gray-700">
-                      Thẻ
+    <TooltipProvider>
+      <div className="min-h-screen bg-background">
+        {/* Breadcrumb with Back Button */}
+        <div className="border-b">
+          <div className="px-4 sm:px-8 lg:px-32 py-3">
+            <div className="flex items-center gap-4">
+              {/* Back Button */}
+              <Link href="/tin-tuc">
+                <Button variant="ghost" size="sm" className="gap-2 -ml-2">
+                  <ArrowLeft className="w-4 h-4" />
+                  Quay lại
+                </Button>
+              </Link>
+              
+              {/* Breadcrumb */}
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Link href="/" className="hover:text-foreground transition-colors">
+                  Trang chủ
+                </Link>
+                <ChevronRight className="w-4 h-4" />
+                <Link href="/tin-tuc" className="hover:text-foreground transition-colors">
+                  Tin tức
+                </Link>
+                {post.categories?.[0] && (
+                  <>
+                    <ChevronRight className="w-4 h-4" />
+                    <span className="text-foreground">
+                      {post.categories[0].name}
                     </span>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {post.tags.map((tag) => (
-                      <Link
-                        key={tag.id}
-                        href={`/tin-tuc?tag=${tag.id}`}
-                        className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs hover:bg-gray-200 transition-colors"
-                      >
-                        #{tag.name}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
+                  </>
+                )}
+              </div>
             </div>
-          </aside>
+          </div>
+        </div>
 
-          <main className="flex-1 min-w-0 max-w-4xl">
-            <motion.header
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="mb-8"
-            >
-              {post.categories.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {post.categories.map((category) => (
-                    <Link
-                      key={category.id}
-                      href={`/tin-tuc?category=${category.id}`}
-                      className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors"
-                    >
-                      {category.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
-
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground leading-tight mb-4">
-                {post.title}
-              </h1>
-
-              {post.excerpt && (
-                <p className="text-lg text-gray-600 leading-relaxed mb-6">
-                  {post.excerpt}
-                </p>
-              )}
-
-              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
-                {post.authors.length > 0 && (
-                  <div className="flex items-center gap-2">
-                    {post.authors[0].avatarUrl ? (
-                      <Image
-                        src={post.authors[0].avatarUrl}
-                        alt={post.authors[0].displayName}
-                        width={32}
-                        height={32}
-                        className="rounded-full"
-                      />
-                    ) : (
-                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                        <User className="w-4 h-4 text-blue-600" />
+        {/* Main Layout - Same padding as landing page */}
+        <div className="px-4 sm:px-8 lg:px-32 py-8">
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Left Sidebar - Tools */}
+            <aside className="hidden lg:block w-12 flex-shrink-0">
+              <div className="sticky top-24 flex flex-col gap-2">
+                {/* Outline */}
+                {headings.length > 0 && (
+                  <Popover open={outlineOpen} onOpenChange={setOutlineOpen}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" size="icon" className="rounded-full w-10 h-10">
+                            <List className="w-4 h-4" />
+                          </Button>
+                        </PopoverTrigger>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">Mục lục</TooltipContent>
+                    </Tooltip>
+                    <PopoverContent side="right" align="start" className="w-72 max-h-96 overflow-y-auto">
+                      <p className="text-xs font-semibold text-muted-foreground mb-3">MỤC LỤC</p>
+                      <div className="space-y-1">
+                        {headings.map((h, i) => (
+                          <button
+                            key={i}
+                            onClick={() => scrollToHeading(h.id)}
+                            className={cn(
+                              "block w-full text-left py-1.5 text-sm hover:text-primary transition-colors truncate",
+                              h.level === 1 && "font-medium",
+                              h.level === 2 && "pl-3 text-muted-foreground",
+                              h.level === 3 && "pl-6 text-muted-foreground text-xs"
+                            )}
+                          >
+                            {h.text}
+                          </button>
+                        ))}
                       </div>
-                    )}
-                    <span className="font-medium text-gray-700">
-                      {post.authors[0].displayName}
-                    </span>
-                  </div>
+                    </PopoverContent>
+                  </Popover>
                 )}
-                <div className="flex items-center gap-1">
-                  <Calendar className="w-4 h-4" />
-                  {formatDate(post.publishedAt || post.createdAt)}
-                </div>
-                <div className="flex items-center gap-1">
-                  <Clock className="w-4 h-4" />
-                  {formatReadTime(post.content)}
-                </div>
-                {post.viewCount > 0 && (
-                  <div className="flex items-center gap-1">
-                    <Eye className="w-4 h-4" />
-                    {post.viewCount} lượt xem
-                  </div>
-                )}
-              </div>
-            </motion.header>
 
-            {post.coverImageUrl && (
+                {/* Zoom Out */}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="icon"
+                      className="rounded-full w-10 h-10"
+                      onClick={() => setFontSize(prev => Math.max(14, prev - 2))}
+                    >
+                      <ZoomOut className="w-4 h-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">Thu nhỏ chữ</TooltipContent>
+                </Tooltip>
+
+                {/* Zoom In */}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="icon"
+                      className="rounded-full w-10 h-10"
+                      onClick={() => setFontSize(prev => Math.min(24, prev + 2))}
+                    >
+                      <ZoomIn className="w-4 h-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">Phóng to chữ</TooltipContent>
+                </Tooltip>
+
+                {/* Share */}
+                <Popover open={shareOpen} onOpenChange={setShareOpen}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" size="icon" className="rounded-full w-10 h-10">
+                          <Share2 className="w-4 h-4" />
+                        </Button>
+                      </PopoverTrigger>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">Chia sẻ</TooltipContent>
+                  </Tooltip>
+                  <PopoverContent side="right" align="start" className="w-48">
+                    <p className="text-xs font-semibold text-muted-foreground mb-3">CHIA SẺ</p>
+                    <div className="space-y-1">
+                      <button
+                        onClick={() => handleShare("facebook")}
+                        className="flex items-center gap-3 w-full py-2 px-2 text-sm hover:bg-accent rounded-md transition-colors"
+                      >
+                        <Facebook className="w-4 h-4" />
+                        Facebook
+                      </button>
+                      <button
+                        onClick={() => handleShare("twitter")}
+                        className="flex items-center gap-3 w-full py-2 px-2 text-sm hover:bg-accent rounded-md transition-colors"
+                      >
+                        <Twitter className="w-4 h-4" />
+                        Twitter
+                      </button>
+                      <button
+                        onClick={() => handleShare("linkedin")}
+                        className="flex items-center gap-3 w-full py-2 px-2 text-sm hover:bg-accent rounded-md transition-colors"
+                      >
+                        <Linkedin className="w-4 h-4" />
+                        LinkedIn
+                      </button>
+                      <button
+                        onClick={() => handleShare("copy")}
+                        className="flex items-center gap-3 w-full py-2 px-2 text-sm hover:bg-accent rounded-md transition-colors"
+                      >
+                        <Link2 className="w-4 h-4" />
+                        Sao chép link
+                      </button>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </aside>
+
+            {/* Main Content */}
+            <article className="flex-1 min-w-0">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className="relative aspect-video rounded-2xl overflow-hidden mb-8"
+                transition={{ duration: 0.4 }}
               >
-                <Image
-                  src={post.coverImageUrl}
-                  alt={post.title}
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              </motion.div>
-            )}
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="prose prose-lg max-w-none prose-headings:scroll-mt-24 prose-a:text-blue-600 prose-img:rounded-xl"
-              dangerouslySetInnerHTML={{ __html: post.content }}
-            />
-
-            <div className="xl:hidden mt-8 pt-8 border-t">
-              <div className="flex flex-wrap gap-2">
-                {post.tags.map((tag) => (
-                  <Link
-                    key={tag.id}
-                    href={`/tin-tuc?tag=${tag.id}`}
-                    className="px-3 py-1.5 bg-gray-100 text-gray-600 rounded-full text-sm hover:bg-gray-200 transition-colors"
+                {/* Category */}
+                {post.categories?.[0] && (
+                  <Link 
+                    href={`/tin-tuc?category=${post.categories[0].id}`}
+                    className="inline-block text-sm font-medium text-primary hover:underline mb-4"
                   >
-                    #{tag.name}
+                    {post.categories[0].name}
+                  </Link>
+                )}
+
+                {/* Title */}
+                <h1 className="text-3xl sm:text-4xl lg:text-[42px] font-bold text-foreground leading-tight mb-4">
+                  {post.title}
+                </h1>
+
+                {/* Excerpt */}
+                {post.excerpt && (
+                  <div 
+                    className="text-lg sm:text-xl text-muted-foreground leading-relaxed mb-6 tiptap"
+                    dangerouslySetInnerHTML={{ __html: post.excerpt }}
+                  />
+                )}
+
+                {/* Meta */}
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground mb-8 pb-8 border-b">
+                  {/* Authors */}
+                  <div className="flex items-center gap-2">
+                    {post.authors?.map((author, i) => (
+                      <span key={author.id} className="flex items-center gap-1">
+                        {i > 0 && <span>,</span>}
+                        <span className="font-medium text-foreground">{author.displayName}</span>
+                      </span>
+                    ))}
+                    {post.extendedAttributes?.Author && (
+                      <span className="font-medium text-foreground">
+                        {post.extendedAttributes.Author}
+                      </span>
+                    )}
+                  </div>
+                  
+                  <span className="text-muted-foreground/50">·</span>
+                  
+                  <time>{formatDate(post.publishedAt || post.createdAt)}</time>
+                  
+                  <span className="text-muted-foreground/50">·</span>
+                  
+                  <span>{calculateReadTime(post.content)}</span>
+                  
+                  <span className="text-muted-foreground/50">·</span>
+                  
+                  <span className="flex items-center gap-1">
+                    <Eye className="w-3.5 h-3.5" />
+                    {post.viewCount}
+                  </span>
+                </div>
+
+                {/* Cover Image */}
+                {post.coverImageUrl && (
+                  <figure className="mb-8">
+                    <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-muted">
+                      <Image
+                        src={post.coverImageUrl}
+                        alt={post.title}
+                        fill
+                        unoptimized
+                        className="object-cover"
+                        priority
+                      />
+                    </div>
+                  </figure>
+                )}
+
+                {/* Content - TipTap HTML Render */}
+                <div
+                  className="tiptap-content"
+                  style={{ fontSize: `${fontSize}px` }}
+                  dangerouslySetInnerHTML={{ __html: processedContent }}
+                />
+
+                {/* Tags */}
+                {post.tags && post.tags.length > 0 && (
+                  <div className="mt-12 pt-8 border-t">
+                    <div className="flex flex-wrap gap-2">
+                      {post.tags.map((tag) => (
+                        <Link 
+                          key={tag.id} 
+                          href={`/tin-tuc?tag=${tag.slug}`}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-secondary text-secondary-foreground text-sm hover:bg-secondary/80 transition-colors"
+                        >
+                          <Hash className="w-3 h-3" />
+                          {tag.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Mobile Actions */}
+                <div className="flex lg:hidden items-center justify-center gap-2 mt-8 pt-8 border-t">
+                  <Button variant="outline" size="sm" onClick={() => setFontSize(prev => Math.max(14, prev - 2))}>
+                    <ZoomOut className="w-4 h-4" />
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setFontSize(prev => Math.min(24, prev + 2))}>
+                    <ZoomIn className="w-4 h-4" />
+                  </Button>
+                  <Popover open={shareOpen} onOpenChange={setShareOpen}>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <Share2 className="w-4 h-4 mr-2" />
+                        Chia sẻ
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-48">
+                      <div className="space-y-1">
+                        <button onClick={() => handleShare("facebook")} className="flex items-center gap-3 w-full py-2 px-2 text-sm hover:bg-accent rounded-md">
+                          <Facebook className="w-4 h-4" /> Facebook
+                        </button>
+                        <button onClick={() => handleShare("twitter")} className="flex items-center gap-3 w-full py-2 px-2 text-sm hover:bg-accent rounded-md">
+                          <Twitter className="w-4 h-4" /> Twitter
+                        </button>
+                        <button onClick={() => handleShare("linkedin")} className="flex items-center gap-3 w-full py-2 px-2 text-sm hover:bg-accent rounded-md">
+                          <Linkedin className="w-4 h-4" /> LinkedIn
+                        </button>
+                        <button onClick={() => handleShare("copy")} className="flex items-center gap-3 w-full py-2 px-2 text-sm hover:bg-accent rounded-md">
+                          <Link2 className="w-4 h-4" /> Sao chép link
+                        </button>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </motion.div>
+            </article>
+
+            {/* Right Sidebar - Quick Actions */}
+            <aside className="w-full lg:w-80 flex-shrink-0">
+              <div className="lg:sticky lg:top-24 space-y-6">
+                {/* Quick Actions Accordion */}
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base">Truy cập nhanh</CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    {/* Always expanded quick actions */}
+                    <div className="space-y-4">
+                      {quickActions.map((section, idx) => (
+                        <div key={idx} className="space-y-2">
+                          <div className="flex items-center gap-2 text-sm font-medium">
+                            <section.icon className="w-4 h-4 text-primary" />
+                            {section.title}
+                          </div>
+                          <div className="space-y-1 pl-6">
+                            {section.items.map((item, i) => (
+                              <Link
+                                key={i}
+                                href={item.href}
+                                className="flex items-center justify-between py-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
+                              >
+                                {item.name}
+                                <ExternalLink className="w-3 h-3" />
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Category Card */}
+                {post.categories?.[0] && (
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-primary" />
+                        Danh mục
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <Link 
+                        href={`/tin-tuc?category=${post.categories[0].id}`}
+                        className="text-sm font-medium hover:text-primary transition-colors"
+                      >
+                        {post.categories[0].name}
+                      </Link>
+                      {post.categories[0].description && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {post.categories[0].description}
+                        </p>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </aside>
+          </div>
+
+          {/* Related Posts - Bottom */}
+          <section className="mt-16 pt-8 border-t">
+            <h2 className="text-xl font-semibold mb-6">Bài viết liên quan</h2>
+            {relatedPosts.length > 0 ? (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {relatedPosts.map((related) => (
+                  <Link
+                    key={related.id}
+                    href={`/tin-tuc/${related.slug}`}
+                    className="group"
+                  >
+                    <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+                      {related.coverImageUrl && (
+                        <div className="relative aspect-video bg-muted">
+                          <Image
+                            src={related.coverImageUrl}
+                            alt={related.title}
+                            fill
+                            unoptimized
+                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
+                      )}
+                      <CardContent className="p-4">
+                        <h3 className="font-medium text-sm text-foreground line-clamp-2 group-hover:text-primary transition-colors mb-2">
+                          {related.title}
+                        </h3>
+                        <time className="text-xs text-muted-foreground">
+                          {formatDate(related.publishedAt || related.createdAt)}
+                        </time>
+                      </CardContent>
+                    </Card>
                   </Link>
                 ))}
               </div>
-              <div className="flex gap-2 mt-4">
-                <button
-                  onClick={shareOnFacebook}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-[#1877F2] text-white text-sm"
-                >
-                  <Facebook className="w-4 h-4" />
-                  Chia sẻ
-                </button>
-                <button
-                  onClick={copyLink}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm"
-                >
-                  {copied ? (
-                    <Check className="w-4 h-4 text-green-600" />
-                  ) : (
-                    <LinkIcon className="w-4 h-4" />
-                  )}
-                  {copied ? "Đã sao chép" : "Sao chép"}
-                </button>
-              </div>
-            </div>
-          </main>
-
-          <aside className="hidden lg:block w-64 shrink-0">
-            <div className="sticky top-24">
-              {tableOfContents.length > 0 && (
-                <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-                  <h3 className="font-semibold text-foreground mb-4">
-                    Mục lục
-                  </h3>
-                  <nav className="space-y-2">
-                    {tableOfContents.map((item) => (
-                      <a
-                        key={item.id}
-                        href={`#${item.id}`}
-                        className={`block text-sm transition-colors ${
-                          item.level === 3 ? "pl-4" : ""
-                        } ${item.level === 4 ? "pl-8" : ""} ${
-                          activeHeading === item.id
-                            ? "text-blue-600 font-medium"
-                            : "text-gray-600 hover:text-foreground"
-                        }`}
-                      >
-                        {item.text}
-                      </a>
-                    ))}
-                  </nav>
-                </div>
-              )}
-            </div>
-          </aside>
+            ) : (
+              <Card className="border-dashed">
+                <CardContent className="flex flex-col items-center justify-center py-12">
+                  <FileText className="w-12 h-12 text-muted-foreground/50 mb-4" />
+                  <p className="text-sm text-muted-foreground">Chưa có bài viết liên quan</p>
+                </CardContent>
+              </Card>
+            )}
+          </section>
         </div>
-      </article>
-
-      {relatedPosts.length > 0 && (
-        <section className="bg-white border-t py-12">
-          <div className="px-4 sm:px-8 lg:px-16 xl:px-24">
-            <h2 className="text-2xl font-bold text-foreground mb-8">
-              Bài viết liên quan
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {relatedPosts.map((relatedPost) => (
-                <Link
-                  key={relatedPost.id}
-                  href={`/tin-tuc/${relatedPost.slug}`}
-                >
-                  <article className="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg transition-all duration-300">
-                    <div className="relative aspect-video overflow-hidden">
-                      {relatedPost.coverImageUrl ? (
-                        <Image
-                          src={relatedPost.coverImageUrl}
-                          alt={relatedPost.title}
-                          fill
-                          className="object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600" />
-                      )}
-                    </div>
-                    <div className="p-5">
-                      <div className="text-xs text-gray-500 mb-2">
-                        {formatDate(
-                          relatedPost.publishedAt || relatedPost.createdAt,
-                        )}
-                      </div>
-                      <h3 className="font-semibold text-foreground line-clamp-2 group-hover:text-blue-600 transition-colors">
-                        {relatedPost.title}
-                      </h3>
-                    </div>
-                  </article>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-    </div>
+      </div>
+    </TooltipProvider>
   );
 }
