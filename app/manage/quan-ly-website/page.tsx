@@ -93,29 +93,44 @@ export default function WebsiteManagementPage() {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="space-y-8"
+      className="space-y-8 relative"
     >
-      <motion.div
-        variants={itemVariants}
-        className="flex items-center justify-between"
-      >
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            {t.websiteManagement.title}
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            {t.websiteManagement.description}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline">
-            <RefreshCw className="size-4 mr-2" />
-            Đặt lại
-          </Button>
-          <Button>
-            <Save className="size-4 mr-2" />
-            Lưu thay đổi
-          </Button>
+      {/* Background Orb Effects */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/20 rounded-full blur-[100px] animate-pulse" />
+        <div className="absolute top-60 -left-40 w-96 h-96 bg-blue-400/15 rounded-full blur-[120px]" />
+        <div className="absolute bottom-20 right-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: "1s" }} />
+      </div>
+
+      {/* Header with Glass Effect */}
+      <motion.div variants={itemVariants} className="relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-blue-500/5 to-transparent rounded-3xl blur-xl" />
+        <div className="relative bg-white/50 dark:bg-background/50 backdrop-blur-xl rounded-3xl border border-white/20 dark:border-white/10 p-6 shadow-xl shadow-primary/5">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 rounded-xl bg-gradient-to-br from-primary to-blue-600 text-white">
+                  <Settings className="size-5" />
+                </div>
+                <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-foreground via-primary to-blue-600 bg-clip-text text-transparent">
+                  {t.websiteManagement.title}
+                </h1>
+              </div>
+              <p className="text-muted-foreground">
+                {t.websiteManagement.description}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" className="bg-white/50 hover:bg-white">
+                <RefreshCw className="size-4 mr-2" />
+                Đặt lại
+              </Button>
+              <Button className="bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90">
+                <Save className="size-4 mr-2" />
+                Lưu thay đổi
+              </Button>
+            </div>
+          </div>
         </div>
       </motion.div>
 
@@ -426,7 +441,7 @@ export default function WebsiteManagementPage() {
                     <Label htmlFor="address">Địa chỉ</Label>
                     <Input
                       id="address"
-                      defaultValue="01 Võ Văn Ngân, P. Thủ Đức, TP. Thủ Đức, TP.HCM"
+                      defaultValue="01 Võ Văn Ngân, P. Thủ Đức, TP.HCM"
                     />
                   </div>
                   <div className="space-y-2">

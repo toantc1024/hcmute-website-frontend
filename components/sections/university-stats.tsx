@@ -98,22 +98,22 @@ export default function UniversityStats() {
             <motion.div
               key={index}
               variants={itemVariants}
-              className="rounded-xl p-6 transition-shadow duration-300 border border-gray-100"
+              className="rounded-xl p-6 transition-shadow duration-300 h-full min-h-[180px] flex items-center justify-center"
             >
               <div className="flex flex-col items-center text-center">
                 <div
-                  className={`text-3xl md:text-4xl lg:text-7xl font-bold mb-2 ${stat.color}`}
+                  className={`text-5xl md:text-6xl lg:text-7xl font-bold mb-2 leading-none ${stat.color}`}
                 >
                   {stat.number && (
                     <NumberTicker
                       value={stat.number}
-                      className={`font-bold text-[72px] leading-none bg-gradient-to-br from-[#0c4ebf] via-[#1760df] to-[#ae0303]   bg-clip-text text-transparent mb-2 ${stat.color}`}
+                      className={`font-bold leading-none bg-gradient-to-br from-[#0c4ebf] via-[#1760df] to-[#ae0303] bg-clip-text text-transparent`}
                     />
                   )}
                   {stat.suffix && <span>{stat.suffix}</span>}
                 </div>
 
-                <p className="text-sm text-gray-600 leading-relaxed">
+                <p className="text-sm text-gray-600 leading-relaxed mt-2">
                   {stat.description}
                 </p>
               </div>

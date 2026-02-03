@@ -68,17 +68,17 @@ export default function UniversityLeadership() {
 
       <div className="relative">
         {/* Navigation buttons - on top */}
-        <div className="w-full px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40 pb-4">
+        <div className="w-full px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40 pb-4 relative z-20">
           <div className="flex justify-center lg:justify-start gap-3">
             <button
               onClick={prevSlide}
-              className="bg-white hover:bg-gray-50 rounded-full p-2.5 sm:p-3 border border-gray-200 transition-all duration-200 flex items-center justify-center"
+              className="bg-white hover:bg-gray-50 rounded-full p-2.5 sm:p-3 border border-gray-200 transition-all duration-200 flex items-center justify-center shadow-md hover:shadow-lg cursor-pointer"
             >
               <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
             </button>
             <button
               onClick={nextSlide}
-              className="bg-white hover:bg-gray-50 rounded-full p-2.5 sm:p-3 border border-gray-200 transition-all duration-200 flex items-center justify-center"
+              className="bg-white hover:bg-gray-50 rounded-full p-2.5 sm:p-3 border border-gray-200 transition-all duration-200 flex items-center justify-center shadow-md hover:shadow-lg cursor-pointer"
             >
               <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
             </button>

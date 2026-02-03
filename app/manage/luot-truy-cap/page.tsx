@@ -10,6 +10,8 @@ import {
   Smartphone,
   Tablet,
   Globe,
+  BarChart3,
+  Sparkles,
 } from "lucide-react";
 import {
   Area,
@@ -50,7 +52,11 @@ const containerVariants = {
 
 const itemVariants = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4 },
+  },
 };
 
 interface StatCardProps {
@@ -62,39 +68,43 @@ interface StatCardProps {
     value: number;
     isPositive: boolean;
   };
+  gradient?: string;
 }
 
-function StatCard({ title, value, icon, description, trend }: StatCardProps) {
+function StatCard({ title, value, icon, description, trend, gradient }: StatCardProps) {
   return (
     <motion.div variants={itemVariants}>
-      <Card className="h-full">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">{title}</CardTitle>
-          <div className="text-muted-foreground">{icon}</div>
+      <Card className={`h-full relative overflow-hidden ${gradient ? 'text-white border-0' : ''}`}>
+        {gradient && (
+          <div className={`absolute inset-0 ${gradient}`} />
+        )}
+        <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className={`text-sm font-medium ${gradient ? 'text-white/90' : ''}`}>{title}</CardTitle>
+          <div className={gradient ? 'text-white/80' : 'text-muted-foreground'}>{icon}</div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="relative">
           <div className="text-2xl font-bold">{value}</div>
           {description && (
-            <p className="text-xs text-muted-foreground mt-1">{description}</p>
+            <p className={`text-xs mt-1 ${gradient ? 'text-white/70' : 'text-muted-foreground'}`}>{description}</p>
           )}
           {trend && (
             <div className="flex items-center gap-1 mt-2">
               <TrendingUp
                 className={`size-3 ${
                   trend.isPositive
-                    ? "text-green-500"
-                    : "text-red-500 rotate-180"
+                    ? "text-green-400"
+                    : "text-red-400 rotate-180"
                 }`}
               />
               <span
                 className={`text-xs ${
-                  trend.isPositive ? "text-green-500" : "text-red-500"
+                  trend.isPositive ? "text-green-400" : "text-red-400"
                 }`}
               >
                 {trend.isPositive ? "+" : "-"}
                 {Math.abs(trend.value)}%
               </span>
-              <span className="text-xs text-muted-foreground">
+              <span className={`text-xs ${gradient ? 'text-white/60' : 'text-muted-foreground'}`}>
                 so với hôm qua
               </span>
             </div>
@@ -118,7 +128,7 @@ const visitsChartData = [
 const visitsChartConfig = {
   visits: {
     label: "Lượt truy cập",
-    color: "hsl(var(--primary))",
+    color: "#1760df",
   },
 } satisfies ChartConfig;
 
@@ -133,20 +143,20 @@ const topPagesData = [
 const topPagesConfig = {
   views: {
     label: "Lượt xem",
-    color: "hsl(var(--primary))",
+    color: "#1760df",
   },
 } satisfies ChartConfig;
 
 const deviceData = [
-  { name: "Desktop", value: 55, fill: "hsl(var(--primary))" },
-  { name: "Mobile", value: 35, fill: "hsl(var(--chart-2))" },
-  { name: "Tablet", value: 10, fill: "hsl(var(--chart-3))" },
+  { name: "Desktop", value: 55, fill: "#1760df" },
+  { name: "Mobile", value: 35, fill: "#5a94e8" },
+  { name: "Tablet", value: 10, fill: "#a3c4f3" },
 ];
 
 const deviceConfig = {
-  Desktop: { label: "Desktop", color: "hsl(var(--primary))" },
-  Mobile: { label: "Mobile", color: "hsl(var(--chart-2))" },
-  Tablet: { label: "Tablet", color: "hsl(var(--chart-3))" },
+  Desktop: { label: "Desktop", color: "#1760df" },
+  Mobile: { label: "Mobile", color: "#5a94e8" },
+  Tablet: { label: "Tablet", color: "#a3c4f3" },
 } satisfies ChartConfig;
 
 export default function TrafficPage() {
@@ -159,6 +169,7 @@ export default function TrafficPage() {
       icon: <Eye className="size-4" />,
       description: t.traffic.todayVisits,
       trend: { value: 12, isPositive: true },
+      gradient: "bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700",
     },
     {
       title: t.traffic.uniqueVisitors,
@@ -166,6 +177,7 @@ export default function TrafficPage() {
       icon: <Users className="size-4" />,
       description: t.traffic.todayVisits,
       trend: { value: 8, isPositive: true },
+      gradient: "bg-gradient-to-br from-emerald-500 to-teal-600",
     },
     {
       title: t.traffic.pageViews,
@@ -188,25 +200,47 @@ export default function TrafficPage() {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="space-y-8"
+      className="space-y-8 relative"
     >
-      <motion.div variants={itemVariants}>
-        <h1 className="text-3xl font-bold tracking-tight">{t.traffic.title}</h1>
-        <p className="text-muted-foreground mt-1">{t.traffic.description}</p>
+      {/* Background Orb Effects */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/20 rounded-full blur-[100px] animate-pulse" />
+        <div className="absolute top-60 -left-40 w-96 h-96 bg-blue-400/15 rounded-full blur-[120px]" />
+        <div className="absolute bottom-20 right-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: "1s" }} />
+      </div>
+
+      {/* Header with Glass Effect */}
+      <motion.div variants={itemVariants} className="relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-blue-500/5 to-transparent rounded-3xl blur-xl" />
+        <div className="relative bg-white/50 dark:bg-background/50 backdrop-blur-xl rounded-3xl border border-white/20 dark:border-white/10 p-6 shadow-xl shadow-primary/5">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 rounded-xl bg-gradient-to-br from-primary to-blue-600 text-white">
+              <BarChart3 className="size-5" />
+            </div>
+            <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-foreground via-primary to-blue-600 bg-clip-text text-transparent">
+              {t.traffic.title}
+            </h1>
+          </div>
+          <p className="text-muted-foreground">{t.traffic.description}</p>
+        </div>
       </motion.div>
 
+      {/* Stats Grid */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
           <StatCard key={stat.title} {...stat} />
         ))}
       </div>
 
+      {/* Charts Section */}
       <div className="grid gap-6 lg:grid-cols-2">
         <motion.div variants={itemVariants}>
-          <Card className="h-full">
+          <Card className="h-full bg-gradient-to-br from-white to-blue-50/30 dark:from-background dark:to-blue-950/10 border-blue-100/50 dark:border-blue-900/20">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="size-5" />
+                <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary to-blue-600 text-white">
+                  <TrendingUp className="size-4" />
+                </div>
                 Lượt truy cập theo ngày
               </CardTitle>
               <CardDescription>Thống kê 7 ngày gần nhất</CardDescription>
@@ -221,7 +255,13 @@ export default function TrafficPage() {
                   data={visitsChartData}
                   margin={{ left: 12, right: 12, top: 12 }}
                 >
-                  <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                  <defs>
+                    <linearGradient id="visitsGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#1760df" stopOpacity={0.4} />
+                      <stop offset="100%" stopColor="#1760df" stopOpacity={0.05} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" />
                   <XAxis
                     dataKey="date"
                     tickLine={false}
@@ -236,10 +276,9 @@ export default function TrafficPage() {
                   <Area
                     dataKey="visits"
                     type="monotone"
-                    fill="hsl(var(--primary))"
-                    fillOpacity={0.2}
-                    stroke="hsl(var(--primary))"
-                    strokeWidth={2}
+                    fill="url(#visitsGradient)"
+                    stroke="#1760df"
+                    strokeWidth={2.5}
                   />
                 </AreaChart>
               </ChartContainer>
@@ -248,10 +287,12 @@ export default function TrafficPage() {
         </motion.div>
 
         <motion.div variants={itemVariants}>
-          <Card className="h-full">
+          <Card className="h-full bg-gradient-to-br from-white to-blue-50/30 dark:from-background dark:to-blue-950/10 border-blue-100/50 dark:border-blue-900/20">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Eye className="size-5" />
+                <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary to-blue-600 text-white">
+                  <Eye className="size-4" />
+                </div>
                 {t.traffic.topPages}
               </CardTitle>
               <CardDescription>Trang được xem nhiều nhất</CardDescription>
@@ -267,7 +308,7 @@ export default function TrafficPage() {
                   layout="vertical"
                   margin={{ left: 0, right: 12 }}
                 >
-                  <CartesianGrid horizontal={false} strokeDasharray="3 3" />
+                  <CartesianGrid horizontal={false} strokeDasharray="3 3" stroke="hsl(var(--border))" />
                   <YAxis
                     dataKey="page"
                     type="category"
@@ -281,7 +322,7 @@ export default function TrafficPage() {
                     cursor={false}
                     content={<ChartTooltipContent hideLabel />}
                   />
-                  <Bar dataKey="views" fill="hsl(var(--primary))" radius={4} />
+                  <Bar dataKey="views" fill="#1760df" radius={6} />
                 </BarChart>
               </ChartContainer>
             </CardContent>
@@ -289,11 +330,14 @@ export default function TrafficPage() {
         </motion.div>
       </div>
 
+      {/* Device Distribution */}
       <motion.div variants={itemVariants}>
-        <Card>
+        <Card className="bg-gradient-to-br from-white to-blue-50/30 dark:from-background dark:to-blue-950/10 border-blue-100/50 dark:border-blue-900/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Monitor className="size-5" />
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary to-blue-600 text-white">
+                <Monitor className="size-4" />
+              </div>
               {t.traffic.visitorsByDevice}
             </CardTitle>
             <CardDescription>Phân bố thiết bị truy cập</CardDescription>
@@ -323,8 +367,8 @@ export default function TrafficPage() {
               </ChartContainer>
               <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-primary/10">
-                    <Monitor className="size-5 text-primary" />
+                  <div className="p-2 rounded-lg bg-[#1760df]/10">
+                    <Monitor className="size-5 text-[#1760df]" />
                   </div>
                   <div>
                     <p className="font-medium">Desktop</p>
@@ -334,8 +378,8 @@ export default function TrafficPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-chart-2/10">
-                    <Smartphone className="size-5 text-chart-2" />
+                  <div className="p-2 rounded-lg bg-[#5a94e8]/10">
+                    <Smartphone className="size-5 text-[#5a94e8]" />
                   </div>
                   <div>
                     <p className="font-medium">Mobile</p>
@@ -345,8 +389,8 @@ export default function TrafficPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-chart-3/10">
-                    <Tablet className="size-5 text-chart-3" />
+                  <div className="p-2 rounded-lg bg-[#a3c4f3]/10">
+                    <Tablet className="size-5 text-[#a3c4f3]" />
                   </div>
                   <div>
                     <p className="font-medium">Tablet</p>
