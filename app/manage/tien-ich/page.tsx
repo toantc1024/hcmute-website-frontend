@@ -10,16 +10,16 @@ import {
   FileText,
   UserCircle,
   ExternalLink,
+  Link as LinkIcon,
+  Sparkles,
 } from "lucide-react";
+import type { ElementType } from "react";
 
 import { useI18n } from "@/lib/i18n";
 
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -39,7 +39,7 @@ const itemVariants = {
 interface UtilityCardProps {
   name: string;
   description: string;
-  icon: React.ElementType;
+  icon: ElementType;
   href: string;
   iconColor?: string;
   bgColor?: string;
@@ -54,18 +54,18 @@ function UtilityCard({
   bgColor = "bg-primary/10",
 }: UtilityCardProps) {
   return (
-    <motion.div variants={itemVariants}>
+    <motion.div variants={itemVariants} className="h-full">
       <a
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="block"
+        className="block h-full"
       >
-        <Card className="overflow-hidden h-full transition-all hover:shadow-lg hover:border-primary/50 group cursor-pointer">
-          <CardContent className="p-6">
-            <div className="flex items-start gap-4">
+        <Card className="overflow-hidden h-full transition-all duration-300 hover:shadow-lg hover:border-primary/50 group cursor-pointer bg-white/60 backdrop-blur-sm border-muted/50 hover:bg-white/80">
+          <CardContent className="p-6 h-full">
+            <div className="flex items-start gap-4 h-full">
               <div
-                className={`size-14 rounded-xl ${bgColor} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}
+                className={`size-14 rounded-xl ${bgColor} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-sm`}
               >
                 <Icon className={`size-7 ${iconColor}`} />
               </div>
@@ -73,7 +73,7 @@ function UtilityCard({
                 <div className="flex items-center gap-2 mb-2">
                   <Badge
                     variant="outline"
-                    className="text-xs text-muted-foreground"
+                    className="text-xs text-muted-foreground/80 bg-white/50"
                   >
                     <ExternalLink className="size-3 mr-1" />
                     External
@@ -157,6 +157,14 @@ export default function UtilitiesPage() {
       iconColor: "text-pink-600",
       bgColor: "bg-pink-100",
     },
+    {
+      name: "Short Link",
+      description: "Tạo và quản lý link rút gọn với domain link.hcmute.edu.vn",
+      icon: LinkIcon,
+      href: "https://link.hcmute.edu.vn",
+      iconColor: "text-indigo-600",
+      bgColor: "bg-indigo-100",
+    },
   ];
 
   return (
@@ -164,17 +172,32 @@ export default function UtilitiesPage() {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="space-y-8"
+      className="space-y-8 relative"
     >
-      <motion.div variants={itemVariants}>
-        <h1 className="text-3xl font-bold tracking-tight">
-          {t.utilities.title}
-        </h1>
-        <p className="text-muted-foreground mt-1">{t.utilities.description}</p>
+      {/* Background Orbs */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 left-0 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-400/5 rounded-full blur-3xl" />
+      </div>
+
+      <motion.div variants={itemVariants} className="relative z-10">
+        <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-blue-100/50 rounded-lg backdrop-blur-sm shadow-sm ring-1 ring-blue-100">
+                <Sparkles className="size-6 text-blue-600" />
+            </div>
+             <h1 className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
+              {t.utilities.title}
+             </h1>
+        </div>
+         <p className="text-muted-foreground mt-1 max-w-2xl">{t.utilities.description}</p>
       </motion.div>
 
       <motion.div variants={itemVariants}>
-        <h2 className="text-xl font-semibold mb-4">{t.utilities.ecosystem}</h2>
+        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <GraduationCap className="size-5 text-blue-500" />
+            {t.utilities.ecosystem}
+        </h2>
         <div className="grid gap-4 md:grid-cols-2">
           {ecosystemApps.map((app) => (
             <UtilityCard key={app.name} {...app} />
@@ -183,7 +206,10 @@ export default function UtilitiesPage() {
       </motion.div>
 
       <motion.div variants={itemVariants}>
-        <h2 className="text-xl font-semibold mb-4">{t.utilities.aiAndTools}</h2>
+        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <Bot className="size-5 text-violet-500" />
+            {t.utilities.aiAndTools}
+        </h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {aiAndTools.map((app) => (
             <UtilityCard key={app.name} {...app} />
