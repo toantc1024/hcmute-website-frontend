@@ -68,7 +68,7 @@ export default function UniversityLeadership() {
 
       <div className="relative">
         {/* Navigation buttons - on top */}
-        <div className="w-full px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40 pb-4 relative z-20">
+        <div className="w-full px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40   pb-4 relative z-20">
           <div className="flex justify-center lg:justify-start gap-3">
             <button
               onClick={prevSlide}
@@ -87,7 +87,7 @@ export default function UniversityLeadership() {
 
         {/* Blue background section */}
         <div className="relative w-full bg-blue-600">
-          <div className="absolute  scale-[1.45] inset-0 w-full h-full">
+          <div className="absolute  scale-[1.2] inset-0 w-full h-full">
             <Image
               src={AGENT_BACKGROUND}
               alt="Background"
@@ -96,8 +96,8 @@ export default function UniversityLeadership() {
             />
           </div>
 
-          <div className="relative z-10">
-            <div className="px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40 w-full">
+          <div className="relative z-10 ">
+            <div className="px-6 sm:px-12  lg:px-24 xl:px-32 2xl:px-40 w-full">
               {/* Mobile layout: vertical stack - text on top, image below */}
               <div className="flex flex-col lg:hidden">
                 {/* Text content - Top on mobile */}
@@ -148,7 +148,7 @@ export default function UniversityLeadership() {
               </div>
 
               {/* Desktop layout: side by side - text left, image right */}
-              <div className="hidden lg:flex lg:items-end lg:gap-8 xl:gap-12">
+              <div className="hidden lg:flex lg:items-end lg:gap-24 xl:gap-48 2xl:gap-64">
                 {/* Text content - Left side, vertically centered */}
                 <div className="flex-1 py-12 flex items-center">
                   <AnimatePresence mode="wait">

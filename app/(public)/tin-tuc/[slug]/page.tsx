@@ -39,7 +39,11 @@ import {
   Headphones,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { postsApi, type PostDetailView, type PostAuditView } from "@/lib/api-client";
+import {
+  postsApi,
+  type PostDetailView,
+  type PostAuditView,
+} from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -75,7 +79,7 @@ const calculateReadTime = (content: string) => {
 // Extract headings from HTML content for outline
 const extractHeadings = (html: string) => {
   if (typeof window === "undefined") return [];
-  
+
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, "text/html");
   const headings: Array<{ level: number; text: string; id: string }> = [];
@@ -150,7 +154,7 @@ export default function NewsDetailPage() {
       if (typeof window !== "undefined") {
         const parser = new DOMParser();
         const doc = parser.parseFromString(data.content, "text/html");
-        
+
         doc.querySelectorAll("h1, h2, h3").forEach((heading) => {
           if (!heading.id) {
             const id = (heading.textContent || "")
@@ -172,7 +176,9 @@ export default function NewsDetailPage() {
           categoryId: data.categories[0].id,
           limit: 5,
         });
-        setRelatedPosts(related.content.filter((p) => p.id !== data.id).slice(0, 4));
+        setRelatedPosts(
+          related.content.filter((p) => p.id !== data.id).slice(0, 4),
+        );
       }
     } catch (err) {
       setError("Không tìm thấy bài viết");
@@ -273,9 +279,9 @@ export default function NewsDetailPage() {
                 className="object-cover"
                 priority
               />
-              {/* Black Gradient Overlay from Bottom */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
-              
+              {/* Blue Gradient Overlay from Bottom */}
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-700/95 via-slate-800/70 to-slate-900/20" />
+
               {/* White UTE Flower - Decorative (overflow hidden like footer) */}
               <motion.div
                 className="absolute -top-32 -left-32 w-96 h-96 opacity-10 pointer-events-none"
@@ -283,31 +289,46 @@ export default function NewsDetailPage() {
                 animate={{ opacity: 0.1, scale: 1, rotate: 0 }}
                 transition={{ duration: 1, ease: "easeOut" }}
               >
-                <Image src={FLOWER_WHITE} alt="" fill className="object-contain" />
+                <Image
+                  src={FLOWER_WHITE}
+                  alt=""
+                  fill
+                  className="object-contain"
+                />
               </motion.div>
-              
+
               {/* Content Overlay */}
               <div className="absolute inset-0 flex flex-col justify-end">
                 <div className="px-4 sm:px-8 lg:px-32 pb-8 sm:pb-12 lg:pb-16">
                   {/* Back Button & Breadcrumb */}
-                  <motion.div 
+                  <motion.div
                     className="flex items-center gap-4 mb-6"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: 0.1 }}
                   >
                     <Link href="/tin-tuc">
-                      <Button variant="secondary" size="sm" className="gap-2 bg-white/10 hover:bg-white/20 text-white border-white/20 backdrop-blur-sm">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        className="gap-2 bg-white/10 hover:bg-white/20 text-white border-white/20 backdrop-blur-sm"
+                      >
                         <ArrowLeft className="w-4 h-4" />
                         Quay lại
                       </Button>
                     </Link>
                     <div className="hidden sm:flex items-center gap-2 text-sm text-white/70">
-                      <Link href="/" className="hover:text-white transition-colors">
+                      <Link
+                        href="/"
+                        className="hover:text-white transition-colors"
+                      >
                         Trang chủ
                       </Link>
                       <ChevronRight className="w-4 h-4" />
-                      <Link href="/tin-tuc" className="hover:text-white transition-colors">
+                      <Link
+                        href="/tin-tuc"
+                        className="hover:text-white transition-colors"
+                      >
                         Tin tức
                       </Link>
                       {post.categories?.[0] && (
@@ -321,24 +342,9 @@ export default function NewsDetailPage() {
                     </div>
                   </motion.div>
 
-                  {/* Category Badge */}
-                  {post.categories?.[0] && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4, delay: 0.2 }}
-                    >
-                      <Link href={`/tin-tuc?category=${post.categories[0].id}`}>
-                        <Badge className="bg-primary hover:bg-primary/90 text-white mb-4">
-                          {post.categories[0].name}
-                        </Badge>
-                      </Link>
-                    </motion.div>
-                  )}
-
                   {/* Title */}
-                  <motion.h1 
-                    className="text-2xl sm:text-3xl lg:text-5xl font-bold text-white leading-tight mb-4 max-w-4xl"
+                  <motion.h1
+                    className="text-2xl sm:text-3xl lg:text-5xl font-bold text-white leading-tight mb-4"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: 0.3 }}
@@ -347,7 +353,7 @@ export default function NewsDetailPage() {
                   </motion.h1>
 
                   {/* Meta Info */}
-                  <motion.div 
+                  <motion.div
                     className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-white/80"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -356,9 +362,14 @@ export default function NewsDetailPage() {
                     {/* Authors */}
                     <div className="flex flex-wrap items-center gap-x-2">
                       {post.authors?.map((author, i) => (
-                        <span key={author.id} className="flex items-center gap-1">
+                        <span
+                          key={author.id}
+                          className="flex items-center gap-1"
+                        >
                           {i > 0 && <span>,</span>}
-                          <span className="font-medium text-white">{author.displayName}</span>
+                          <span className="font-medium text-white">
+                            {author.displayName}
+                          </span>
                         </span>
                       ))}
                       {post.extendedAttributes?.Author && (
@@ -367,7 +378,7 @@ export default function NewsDetailPage() {
                         </span>
                       )}
                     </div>
-                    
+
                     <span className="text-white/50">·</span>
                     <time className="flex items-center gap-1">
                       <Calendar className="w-3.5 h-3.5" />
@@ -397,29 +408,44 @@ export default function NewsDetailPage() {
                 animate={{ opacity: 0.15, scale: 1, rotate: 0 }}
                 transition={{ duration: 1, ease: "easeOut" }}
               >
-                <Image src={FLOWER_WHITE} alt="" fill className="object-contain" />
+                <Image
+                  src={FLOWER_WHITE}
+                  alt=""
+                  fill
+                  className="object-contain"
+                />
               </motion.div>
-              
+
               <div className="px-4 sm:px-8 lg:px-32">
                 {/* Back Button & Breadcrumb */}
-                <motion.div 
+                <motion.div
                   className="flex items-center gap-4 mb-6"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: 0.1 }}
                 >
                   <Link href="/tin-tuc">
-                    <Button variant="secondary" size="sm" className="gap-2 bg-white/10 hover:bg-white/20 text-white border-white/20">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="gap-2 bg-white/10 hover:bg-white/20 text-white border-white/20"
+                    >
                       <ArrowLeft className="w-4 h-4" />
                       Quay lại
                     </Button>
                   </Link>
                   <div className="hidden sm:flex items-center gap-2 text-sm text-white/70">
-                    <Link href="/" className="hover:text-white transition-colors">
+                    <Link
+                      href="/"
+                      className="hover:text-white transition-colors"
+                    >
                       Trang chủ
                     </Link>
                     <ChevronRight className="w-4 h-4" />
-                    <Link href="/tin-tuc" className="hover:text-white transition-colors">
+                    <Link
+                      href="/tin-tuc"
+                      className="hover:text-white transition-colors"
+                    >
                       Tin tức
                     </Link>
                     {post.categories?.[0] && (
@@ -449,8 +475,8 @@ export default function NewsDetailPage() {
                 )}
 
                 {/* Title */}
-                <motion.h1 
-                  className="text-2xl sm:text-3xl lg:text-5xl font-bold text-white leading-tight mb-4 max-w-4xl"
+                <motion.h1
+                  className="text-2xl sm:text-3xl lg:text-5xl font-bold text-white leading-tight mb-4"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: 0.3 }}
@@ -459,7 +485,7 @@ export default function NewsDetailPage() {
                 </motion.h1>
 
                 {/* Meta Info */}
-                <motion.div 
+                <motion.div
                   className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-white/80"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -468,7 +494,9 @@ export default function NewsDetailPage() {
                   {post.authors?.map((author, i) => (
                     <span key={author.id} className="flex items-center gap-1">
                       {i > 0 && <span>,</span>}
-                      <span className="font-medium text-white">{author.displayName}</span>
+                      <span className="font-medium text-white">
+                        {author.displayName}
+                      </span>
                     </span>
                   ))}
                   <span className="text-white/50">·</span>
@@ -503,8 +531,8 @@ export default function NewsDetailPage() {
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <PopoverTrigger asChild>
-                        <Button 
-                          size="icon" 
+                        <Button
+                          size="icon"
                           className="rounded-full w-14 h-14 bg-gradient-to-br from-blue-500 via-blue-400 to-blue-700 hover:from-blue-600 hover:via-blue-500 hover:to-blue-800 text-white shadow-xl shadow-blue-500/30 border-0 ring-4 ring-blue-300/30"
                         >
                           <Sparkles className="w-7 h-7" />
@@ -514,7 +542,9 @@ export default function NewsDetailPage() {
                     <TooltipContent side="right">Trợ lý AI</TooltipContent>
                   </Tooltip>
                   <PopoverContent side="right" align="start" className="w-64">
-                    <p className="text-xs font-semibold text-muted-foreground mb-3">TRỢ LÝ AI</p>
+                    <p className="text-xs font-semibold text-muted-foreground mb-3">
+                      TRỢ LÝ AI
+                    </p>
                     <div className="space-y-1">
                       <button
                         onClick={() => {
@@ -526,7 +556,9 @@ export default function NewsDetailPage() {
                         <Volume2 className="w-5 h-5" />
                         <div className="text-left">
                           <div className="font-medium">Nghe tóm tắt</div>
-                          <div className="text-xs text-muted-foreground">AI đọc tóm tắt bài viết</div>
+                          <div className="text-xs text-muted-foreground">
+                            AI đọc tóm tắt bài viết
+                          </div>
                         </div>
                       </button>
                       <button
@@ -539,7 +571,9 @@ export default function NewsDetailPage() {
                         <Headphones className="w-5 h-5" />
                         <div className="text-left">
                           <div className="font-medium">Nghe toàn bài</div>
-                          <div className="text-xs text-muted-foreground">AI đọc toàn bộ nội dung</div>
+                          <div className="text-xs text-muted-foreground">
+                            AI đọc toàn bộ nội dung
+                          </div>
                         </div>
                       </button>
                       <button
@@ -552,7 +586,9 @@ export default function NewsDetailPage() {
                         <FileDigit className="w-5 h-5" />
                         <div className="text-left">
                           <div className="font-medium">Tóm tắt nội dung</div>
-                          <div className="text-xs text-muted-foreground">AI tóm tắt điểm chính</div>
+                          <div className="text-xs text-muted-foreground">
+                            AI tóm tắt điểm chính
+                          </div>
                         </div>
                       </button>
                       <button
@@ -565,7 +601,9 @@ export default function NewsDetailPage() {
                         <Languages className="w-5 h-5" />
                         <div className="text-left">
                           <div className="font-medium">Dịch bài viết</div>
-                          <div className="text-xs text-muted-foreground">Dịch sang ngôn ngữ khác</div>
+                          <div className="text-xs text-muted-foreground">
+                            Dịch sang ngôn ngữ khác
+                          </div>
                         </div>
                       </button>
                     </div>
@@ -578,8 +616,8 @@ export default function NewsDetailPage() {
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <PopoverTrigger asChild>
-                          <Button 
-                            size="icon" 
+                          <Button
+                            size="icon"
                             className="rounded-full w-14 h-14 bg-white hover:bg-gray-100 text-gray-900 shadow-md border border-gray-200"
                           >
                             <List className="w-7 h-7" />
@@ -588,8 +626,14 @@ export default function NewsDetailPage() {
                       </TooltipTrigger>
                       <TooltipContent side="right">Mục lục</TooltipContent>
                     </Tooltip>
-                    <PopoverContent side="right" align="start" className="w-72 max-h-96 overflow-y-auto">
-                      <p className="text-xs font-semibold text-muted-foreground mb-3">MỤC LỤC</p>
+                    <PopoverContent
+                      side="right"
+                      align="start"
+                      className="w-72 max-h-96 overflow-y-auto"
+                    >
+                      <p className="text-xs font-semibold text-muted-foreground mb-3">
+                        MỤC LỤC
+                      </p>
                       <div className="space-y-1">
                         {headings.map((h, i) => (
                           <button
@@ -599,7 +643,8 @@ export default function NewsDetailPage() {
                               "block w-full text-left py-1.5 text-sm hover:text-primary transition-colors truncate",
                               h.level === 1 && "font-medium",
                               h.level === 2 && "pl-3 text-muted-foreground",
-                              h.level === 3 && "pl-6 text-muted-foreground text-xs"
+                              h.level === 3 &&
+                                "pl-6 text-muted-foreground text-xs",
                             )}
                           >
                             {h.text}
@@ -613,10 +658,12 @@ export default function NewsDetailPage() {
                 {/* Zoom Out */}
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button 
+                    <Button
                       size="icon"
                       className="rounded-full w-14 h-14 bg-white hover:bg-gray-100 text-gray-900 shadow-md border border-gray-200"
-                      onClick={() => setFontSize(prev => Math.max(14, prev - 2))}
+                      onClick={() =>
+                        setFontSize((prev) => Math.max(14, prev - 2))
+                      }
                     >
                       <ZoomOut className="w-7 h-7" />
                     </Button>
@@ -627,10 +674,12 @@ export default function NewsDetailPage() {
                 {/* Zoom In */}
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button 
+                    <Button
                       size="icon"
                       className="rounded-full w-14 h-14 bg-white hover:bg-gray-100 text-gray-900 shadow-md border border-gray-200"
-                      onClick={() => setFontSize(prev => Math.min(24, prev + 2))}
+                      onClick={() =>
+                        setFontSize((prev) => Math.min(24, prev + 2))
+                      }
                     >
                       <ZoomIn className="w-7 h-7" />
                     </Button>
@@ -643,8 +692,8 @@ export default function NewsDetailPage() {
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <PopoverTrigger asChild>
-                        <Button 
-                          size="icon" 
+                        <Button
+                          size="icon"
                           className="rounded-full w-14 h-14 bg-white hover:bg-gray-100 text-gray-900 shadow-md border border-gray-200"
                         >
                           <Share2 className="w-7 h-7" />
@@ -654,7 +703,9 @@ export default function NewsDetailPage() {
                     <TooltipContent side="right">Chia sẻ</TooltipContent>
                   </Tooltip>
                   <PopoverContent side="right" align="start" className="w-52">
-                    <p className="text-xs font-semibold text-muted-foreground mb-3">CHIA SẺ BÀI VIẾT</p>
+                    <p className="text-xs font-semibold text-muted-foreground mb-3">
+                      CHIA SẺ BÀI VIẾT
+                    </p>
                     <div className="space-y-1">
                       <button
                         onClick={() => handleShare("facebook")}
@@ -691,7 +742,7 @@ export default function NewsDetailPage() {
                 {/* Print */}
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button 
+                    <Button
                       size="icon"
                       className="rounded-full w-14 h-14 bg-white hover:bg-gray-100 text-gray-900 shadow-md border border-gray-200"
                       onClick={() => window.print()}
@@ -713,33 +764,39 @@ export default function NewsDetailPage() {
               >
                 {/* Excerpt */}
                 {post.excerpt && (
-                  <div 
+                  <div
                     className="text-lg sm:text-xl text-muted-foreground leading-relaxed mb-8 pb-8 border-b tiptap font-medium italic"
                     dangerouslySetInnerHTML={{ __html: post.excerpt }}
                   />
                 )}
 
                 {/* Extended Attributes */}
-                {((post.extendedAttributes as any)?.["Photographer"] || 
+                {((post.extendedAttributes as any)?.["Photographer"] ||
                   (post.extendedAttributes as any)?.["Người chụp ảnh"] ||
-                  (post.extendedAttributes as any)?.["Editor"] || 
+                  (post.extendedAttributes as any)?.["Editor"] ||
                   (post.extendedAttributes as any)?.["Biên tập viên"]) && (
                   <div className="flex flex-wrap items-center gap-4 mb-8 text-sm text-muted-foreground">
-                    {((post.extendedAttributes as any)?.["Photographer"] || (post.extendedAttributes as any)?.["Người chụp ảnh"]) && (
+                    {((post.extendedAttributes as any)?.["Photographer"] ||
+                      (post.extendedAttributes as any)?.["Người chụp ảnh"]) && (
                       <span className="flex items-center gap-1.5 bg-secondary/50 px-3 py-1.5 rounded-full">
                         <Camera className="w-3.5 h-3.5" />
                         <span>Ảnh:</span>
                         <span className="font-medium text-foreground">
-                          {(post.extendedAttributes as any)?.["Photographer"] || (post.extendedAttributes as any)?.["Người chụp ảnh"]}
+                          {(post.extendedAttributes as any)?.["Photographer"] ||
+                            (post.extendedAttributes as any)?.[
+                              "Người chụp ảnh"
+                            ]}
                         </span>
                       </span>
                     )}
-                    {((post.extendedAttributes as any)?.["Editor"] || (post.extendedAttributes as any)?.["Biên tập viên"]) && (
+                    {((post.extendedAttributes as any)?.["Editor"] ||
+                      (post.extendedAttributes as any)?.["Biên tập viên"]) && (
                       <span className="flex items-center gap-1.5 bg-secondary/50 px-3 py-1.5 rounded-full">
                         <User className="w-3.5 h-3.5" />
                         <span>Biên tập:</span>
                         <span className="font-medium text-foreground">
-                          {(post.extendedAttributes as any)?.["Editor"] || (post.extendedAttributes as any)?.["Biên tập viên"]}
+                          {(post.extendedAttributes as any)?.["Editor"] ||
+                            (post.extendedAttributes as any)?.["Biên tập viên"]}
                         </span>
                       </span>
                     )}
@@ -756,11 +813,13 @@ export default function NewsDetailPage() {
                 {/* Tags */}
                 {post.tags && post.tags.length > 0 && (
                   <div className="mt-12 pt-8 border-t">
-                    <h3 className="text-sm font-semibold text-muted-foreground mb-4">THẺ BÀI VIẾT</h3>
+                    <h3 className="text-sm font-semibold text-muted-foreground mb-4">
+                      THẺ BÀI VIẾT
+                    </h3>
                     <div className="flex flex-wrap gap-2">
                       {post.tags.map((tag) => (
-                        <Link 
-                          key={tag.id} 
+                        <Link
+                          key={tag.id}
                           href={`/tin-tuc?tag=${tag.slug}`}
                           className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-secondary text-secondary-foreground text-sm hover:bg-primary hover:text-white transition-colors"
                         >
@@ -774,46 +833,65 @@ export default function NewsDetailPage() {
 
                 {/* Mobile Actions */}
                 <div className="flex lg:hidden items-center justify-center gap-2 mt-8 pt-8 border-t flex-wrap">
-                  <Button 
-                    size="sm" 
+                  <Button
+                    size="sm"
                     className="bg-white hover:bg-gray-100 text-gray-900 border border-gray-200 shadow-md"
-                    onClick={() => setFontSize(prev => Math.max(14, prev - 2))}
+                    onClick={() =>
+                      setFontSize((prev) => Math.max(14, prev - 2))
+                    }
                   >
                     <ZoomOut className="w-4 h-4" />
                   </Button>
-                  <Button 
-                    size="sm" 
+                  <Button
+                    size="sm"
                     className="bg-white hover:bg-gray-100 text-gray-900 border border-gray-200 shadow-md"
-                    onClick={() => setFontSize(prev => Math.min(24, prev + 2))}
+                    onClick={() =>
+                      setFontSize((prev) => Math.min(24, prev + 2))
+                    }
                   >
                     <ZoomIn className="w-4 h-4" />
                   </Button>
                   <Popover open={shareOpen} onOpenChange={setShareOpen}>
                     <PopoverTrigger asChild>
-                      <Button size="sm" className="bg-white hover:bg-gray-100 text-gray-900 border border-gray-200 shadow-md">
+                      <Button
+                        size="sm"
+                        className="bg-white hover:bg-gray-100 text-gray-900 border border-gray-200 shadow-md"
+                      >
                         <Share2 className="w-4 h-4 mr-2" />
                         Chia sẻ
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-48">
                       <div className="space-y-1">
-                        <button onClick={() => handleShare("facebook")} className="flex items-center gap-3 w-full py-2 px-2 text-sm hover:bg-accent rounded-md">
+                        <button
+                          onClick={() => handleShare("facebook")}
+                          className="flex items-center gap-3 w-full py-2 px-2 text-sm hover:bg-accent rounded-md"
+                        >
                           <Facebook className="w-4 h-4" /> Facebook
                         </button>
-                        <button onClick={() => handleShare("twitter")} className="flex items-center gap-3 w-full py-2 px-2 text-sm hover:bg-accent rounded-md">
+                        <button
+                          onClick={() => handleShare("twitter")}
+                          className="flex items-center gap-3 w-full py-2 px-2 text-sm hover:bg-accent rounded-md"
+                        >
                           <Twitter className="w-4 h-4" /> Twitter
                         </button>
-                        <button onClick={() => handleShare("linkedin")} className="flex items-center gap-3 w-full py-2 px-2 text-sm hover:bg-accent rounded-md">
+                        <button
+                          onClick={() => handleShare("linkedin")}
+                          className="flex items-center gap-3 w-full py-2 px-2 text-sm hover:bg-accent rounded-md"
+                        >
                           <Linkedin className="w-4 h-4" /> LinkedIn
                         </button>
-                        <button onClick={() => handleShare("copy")} className="flex items-center gap-3 w-full py-2 px-2 text-sm hover:bg-accent rounded-md">
+                        <button
+                          onClick={() => handleShare("copy")}
+                          className="flex items-center gap-3 w-full py-2 px-2 text-sm hover:bg-accent rounded-md"
+                        >
                           <Link2 className="w-4 h-4" /> Sao chép link
                         </button>
                       </div>
                     </PopoverContent>
                   </Popover>
-                  <Button 
-                    size="sm" 
+                  <Button
+                    size="sm"
                     className="bg-white hover:bg-gray-100 text-gray-900 border border-gray-200 shadow-md"
                     onClick={() => window.print()}
                   >
@@ -860,7 +938,9 @@ export default function NewsDetailPage() {
                                 {related.title}
                               </h4>
                               <time className="text-xs text-muted-foreground mt-1 block">
-                                {formatDate(related.publishedAt || related.createdAt)}
+                                {formatDate(
+                                  related.publishedAt || related.createdAt,
+                                )}
                               </time>
                             </div>
                           </Link>
@@ -884,7 +964,7 @@ export default function NewsDetailPage() {
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-0">
-                      <Link 
+                      <Link
                         href={`/tin-tuc?category=${post.categories[0].id}`}
                         className="text-sm font-medium hover:text-primary transition-colors"
                       >
