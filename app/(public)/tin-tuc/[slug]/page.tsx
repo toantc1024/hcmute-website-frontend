@@ -280,7 +280,7 @@ export default function NewsDetailPage() {
                 priority
               />
               {/* Blue Gradient Overlay from Bottom */}
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-700/95 via-slate-800/70 to-slate-900/20" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-800/60 via-slate-600/40 to-slate-900/20" />
 
               {/* White UTE Flower - Decorative (overflow hidden like footer) */}
               <motion.div

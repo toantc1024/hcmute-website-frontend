@@ -96,8 +96,8 @@ export default function UniversityLeadership() {
             />
           </div>
 
-          <div className="relative z-10 ">
-            <div className="px-6 sm:px-12  lg:px-24 xl:px-32 2xl:px-40 w-full">
+          <div className="relative z-10">
+            <div className="px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40 w-full">
               {/* Mobile layout: vertical stack - text on top, image below */}
               <div className="flex flex-col lg:hidden">
                 {/* Text content - Top on mobile */}
@@ -148,7 +148,7 @@ export default function UniversityLeadership() {
               </div>
 
               {/* Desktop layout: side by side - text left, image right */}
-              <div className="hidden lg:flex lg:items-end lg:gap-24 xl:gap-48 2xl:gap-64">
+              <div className="hidden lg:flex lg:items-end lg:gap-8 xl:gap-12">
                 {/* Text content - Left side, vertically centered */}
                 <div className="flex-1 py-12 flex items-center">
                   <AnimatePresence mode="wait">
