@@ -266,11 +266,10 @@ export default function NewsDetailPage() {
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-background">
-        {/* Hero Section - Full Width Cover Image with Title Overlay */}
+        {/* Hero Section - Cover Image with Back Button Only */}
         <section className="relative w-full overflow-hidden">
-          {/* Cover Image - Full Width */}
           {post.coverImageUrl ? (
-            <div className="relative w-full h-[50vh] sm:h-[60vh] lg:h-[70vh]">
+            <div className="relative w-full h-[40vh] sm:h-[50vh] lg:h-[60vh]">
               <Image
                 src={post.coverImageUrl}
                 alt={post.title}
@@ -279,10 +278,10 @@ export default function NewsDetailPage() {
                 className="object-cover"
                 priority
               />
-              {/* Blue Gradient Overlay from Bottom */}
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-800/60 via-slate-600/40 to-slate-900/20" />
+              {/* Subtle gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20" />
 
-              {/* White UTE Flower - Decorative (overflow hidden like footer) */}
+              {/* White UTE Flower - Decorative */}
               <motion.div
                 className="absolute -top-32 -left-32 w-96 h-96 opacity-10 pointer-events-none"
                 initial={{ opacity: 0, scale: 0.8, rotate: 15 }}
@@ -297,322 +296,274 @@ export default function NewsDetailPage() {
                 />
               </motion.div>
 
-              {/* Content Overlay */}
-              <div className="absolute inset-0 flex flex-col justify-end">
-                <div className="px-4 sm:px-8 lg:px-32 pb-8 sm:pb-12 lg:pb-16">
-                  {/* Back Button & Breadcrumb */}
-                  <motion.div
-                    className="flex items-center gap-4 mb-6"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: 0.1 }}
-                  >
-                    <Link href="/tin-tuc">
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        className="gap-2 bg-white/10 hover:bg-white/20 text-white border-white/20 backdrop-blur-sm"
-                      >
-                        <ArrowLeft className="w-4 h-4" />
-                        Quay lại
-                      </Button>
-                    </Link>
-                    <div className="hidden sm:flex items-center gap-2 text-sm text-white/70">
-                      <Link
-                        href="/"
-                        className="hover:text-white transition-colors"
-                      >
-                        Trang chủ
-                      </Link>
-                      <ChevronRight className="w-4 h-4" />
-                      <Link
-                        href="/tin-tuc"
-                        className="hover:text-white transition-colors"
-                      >
-                        Tin tức
-                      </Link>
-                      {post.categories?.[0] && (
-                        <>
-                          <ChevronRight className="w-4 h-4" />
-                          <span className="text-white">
-                            {post.categories[0].name}
-                          </span>
-                        </>
-                      )}
-                    </div>
-                  </motion.div>
-
-                  {/* Title */}
-                  <motion.h1
-                    className="text-2xl sm:text-3xl lg:text-5xl font-bold text-white leading-tight mb-4"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: 0.3 }}
-                  >
-                    {post.title}
-                  </motion.h1>
-
-                  {/* Meta Info */}
-                  <motion.div
-                    className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-white/80"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: 0.4 }}
-                  >
-                    {/* Authors */}
-                    <div className="flex flex-wrap items-center gap-x-2">
-                      {post.authors?.map((author, i) => (
-                        <span
-                          key={author.id}
-                          className="flex items-center gap-1"
-                        >
-                          {i > 0 && <span>,</span>}
-                          <span className="font-medium text-white">
-                            {author.displayName}
-                          </span>
-                        </span>
-                      ))}
-                      {post.extendedAttributes?.Author && (
-                        <span className="font-medium text-white">
-                          {post.extendedAttributes.Author}
-                        </span>
-                      )}
-                    </div>
-
-                    <span className="text-white/50">·</span>
-                    <time className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5" />
-                      {formatDate(post.publishedAt || post.createdAt)}
-                    </time>
-                    <span className="text-white/50">·</span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5" />
-                      {calculateReadTime(post.content)}
-                    </span>
-                    <span className="text-white/50">·</span>
-                    <span className="flex items-center gap-1">
-                      <Eye className="w-3.5 h-3.5" />
-                      {post.viewCount} lượt xem
-                    </span>
-                  </motion.div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            /* Fallback when no cover image */
-            <div className="relative w-full bg-gradient-to-br from-primary/90 via-primary to-primary/80 py-16 sm:py-20 lg:py-24 overflow-hidden">
-              {/* White UTE Flower - Decorative */}
-              <motion.div
-                className="absolute -top-32 -left-32 w-96 h-96 opacity-15 pointer-events-none"
-                initial={{ opacity: 0, scale: 0.8, rotate: 15 }}
-                animate={{ opacity: 0.15, scale: 1, rotate: 0 }}
-                transition={{ duration: 1, ease: "easeOut" }}
-              >
-                <Image
-                  src={FLOWER_WHITE}
-                  alt=""
-                  fill
-                  className="object-contain"
-                />
-              </motion.div>
-
-              <div className="px-4 sm:px-8 lg:px-32">
-                {/* Back Button & Breadcrumb */}
+              {/* Back Button Only */}
+              <div className="absolute top-4 sm:top-6 left-4 sm:left-8 lg:left-32 z-10">
                 <motion.div
-                  className="flex items-center gap-4 mb-6"
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: 0.1 }}
+                  transition={{ duration: 0.4 }}
                 >
                   <Link href="/tin-tuc">
                     <Button
                       variant="secondary"
                       size="sm"
-                      className="gap-2 bg-white/10 hover:bg-white/20 text-white border-white/20"
+                      className="gap-2 bg-white/90 hover:bg-white text-gray-900 shadow-lg backdrop-blur-sm"
                     >
                       <ArrowLeft className="w-4 h-4" />
-                      Quay lại
+                      Quay lại tin tức
                     </Button>
                   </Link>
-                  <div className="hidden sm:flex items-center gap-2 text-sm text-white/70">
-                    <Link
-                      href="/"
-                      className="hover:text-white transition-colors"
-                    >
-                      Trang chủ
-                    </Link>
-                    <ChevronRight className="w-4 h-4" />
-                    <Link
-                      href="/tin-tuc"
-                      className="hover:text-white transition-colors"
-                    >
-                      Tin tức
-                    </Link>
-                    {post.categories?.[0] && (
-                      <>
-                        <ChevronRight className="w-4 h-4" />
-                        <span className="text-white">
-                          {post.categories[0].name}
-                        </span>
-                      </>
-                    )}
-                  </div>
                 </motion.div>
-
-                {/* Category Badge */}
-                {post.categories?.[0] && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: 0.2 }}
-                  >
-                    <Link href={`/tin-tuc?category=${post.categories[0].id}`}>
-                      <Badge className="bg-white/20 hover:bg-white/30 text-white mb-4">
-                        {post.categories[0].name}
-                      </Badge>
-                    </Link>
-                  </motion.div>
-                )}
-
-                {/* Title */}
-                <motion.h1
-                  className="text-2xl sm:text-3xl lg:text-5xl font-bold text-white leading-tight mb-4"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: 0.3 }}
-                >
-                  {post.title}
-                </motion.h1>
-
-                {/* Meta Info */}
-                <motion.div
-                  className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-white/80"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: 0.4 }}
-                >
-                  {post.authors?.map((author, i) => (
-                    <span key={author.id} className="flex items-center gap-1">
-                      {i > 0 && <span>,</span>}
-                      <span className="font-medium text-white">
-                        {author.displayName}
-                      </span>
-                    </span>
-                  ))}
-                  <span className="text-white/50">·</span>
-                  <time className="flex items-center gap-1">
-                    <Calendar className="w-3.5 h-3.5" />
-                    {formatDate(post.publishedAt || post.createdAt)}
-                  </time>
-                  <span className="text-white/50">·</span>
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5" />
-                    {calculateReadTime(post.content)}
-                  </span>
-                  <span className="text-white/50">·</span>
-                  <span className="flex items-center gap-1">
-                    <Eye className="w-3.5 h-3.5" />
-                    {post.viewCount} lượt xem
-                  </span>
-                </motion.div>
+              </div>
+            </div>
+          ) : (
+            /* Minimal header when no cover image */
+            <div className="bg-gray-50 border-b">
+              <div className="px-4 sm:px-8 lg:px-32 py-4">
+                <Link href="/tin-tuc">
+                  <Button variant="ghost" size="sm" className="gap-2 -ml-2">
+                    <ArrowLeft className="w-4 h-4" />
+                    Quay lại tin tức
+                  </Button>
+                </Link>
               </div>
             </div>
           )}
         </section>
 
-        {/* Main Content Area */}
+        {/* Main Content Area - Centered */}
         <div className="px-4 sm:px-8 lg:px-32 py-8 lg:py-12">
-          <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
-            {/* Left Sidebar - Floating Actions (Fixed on scroll) */}
-            <aside className="hidden lg:block w-16 flex-shrink-0">
-              <div className="sticky top-24 flex flex-col gap-3">
-                {/* AI Assistant Button */}
-                <Popover open={aiOpen} onOpenChange={setAiOpen}>
+          <div className="max-w-4xl mx-auto">
+            {/* Title & Meta Section */}
+            <motion.header
+              className="mb-8 lg:mb-12"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              {/* Category Badge */}
+              {post.categories?.[0] && (
+                <Link href={`/tin-tuc?category=${post.categories[0].id}`}>
+                  <Badge className="bg-primary/10 hover:bg-primary/20 text-primary mb-4 font-medium">
+                    {post.categories[0].name}
+                  </Badge>
+                </Link>
+              )}
+
+              {/* Title */}
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-foreground leading-tight mb-6">
+                {post.title}
+              </h1>
+
+              {/* Meta Info */}
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground pb-6 border-b">
+                {/* Authors */}
+                <div className="flex flex-wrap items-center gap-x-2">
+                  {post.authors?.map((author, i) => (
+                    <span key={author.id} className="flex items-center gap-1">
+                      {i > 0 && <span>,</span>}
+                      <span className="font-medium text-foreground">
+                        {author.displayName}
+                      </span>
+                    </span>
+                  ))}
+                  {post.extendedAttributes?.Author && (
+                    <span className="font-medium text-foreground">
+                      {post.extendedAttributes.Author}
+                    </span>
+                  )}
+                </div>
+
+                <span className="text-muted-foreground/50">·</span>
+                <time className="flex items-center gap-1">
+                  <Calendar className="w-3.5 h-3.5" />
+                  {formatDate(post.publishedAt || post.createdAt)}
+                </time>
+                <span className="text-muted-foreground/50">·</span>
+                <span className="flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5" />
+                  {calculateReadTime(post.content)}
+                </span>
+                <span className="text-muted-foreground/50">·</span>
+                <span className="flex items-center gap-1">
+                  <Eye className="w-3.5 h-3.5" />
+                  {post.viewCount} lượt xem
+                </span>
+              </div>
+
+              {/* Excerpt */}
+              {post.excerpt && (
+                <div
+                  className="text-lg sm:text-xl text-muted-foreground leading-relaxed mt-6 tiptap font-medium"
+                  dangerouslySetInnerHTML={{ __html: post.excerpt }}
+                />
+              )}
+            </motion.header>
+
+            {/* Content Layout with Sidebars */}
+            <div className="flex gap-8 lg:gap-12">
+              {/* Left Sidebar - Floating Actions */}
+              <aside className="hidden lg:block w-16 flex-shrink-0">
+                <div className="sticky top-24 flex flex-col gap-3">
+                  {/* AI Assistant Button */}
+                  <Popover open={aiOpen} onOpenChange={setAiOpen}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <PopoverTrigger asChild>
+                          <Button
+                            size="icon"
+                            className="rounded-full w-14 h-14 bg-gradient-to-br from-blue-500 via-blue-400 to-blue-700 hover:from-blue-600 hover:via-blue-500 hover:to-blue-800 text-white shadow-xl shadow-blue-500/30 border-0 ring-4 ring-blue-300/30"
+                          >
+                            <Sparkles className="w-7 h-7" />
+                          </Button>
+                        </PopoverTrigger>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">Trợ lý AI</TooltipContent>
+                    </Tooltip>
+                    <PopoverContent side="right" align="start" className="w-64">
+                      <p className="text-xs font-semibold text-muted-foreground mb-3">
+                        TRỢ LÝ AI
+                      </p>
+                      <div className="space-y-1">
+                        <button
+                          onClick={() => {
+                            setAiOpen(false);
+                          }}
+                          className="flex items-center gap-3 w-full py-2.5 px-3 text-sm hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
+                        >
+                          <Volume2 className="w-5 h-5" />
+                          <div className="text-left">
+                            <div className="font-medium">Nghe tóm tắt</div>
+                            <div className="text-xs text-muted-foreground">
+                              AI đọc tóm tắt bài viết
+                            </div>
+                          </div>
+                        </button>
+                        <button
+                          onClick={() => {
+                            setAiOpen(false);
+                          }}
+                          className="flex items-center gap-3 w-full py-2.5 px-3 text-sm hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-colors"
+                        >
+                          <Headphones className="w-5 h-5" />
+                          <div className="text-left">
+                            <div className="font-medium">Nghe toàn bài</div>
+                            <div className="text-xs text-muted-foreground">
+                              AI đọc toàn bộ nội dung
+                            </div>
+                          </div>
+                        </button>
+                        <button
+                          onClick={() => {
+                            setAiOpen(false);
+                          }}
+                          className="flex items-center gap-3 w-full py-2.5 px-3 text-sm hover:bg-emerald-50 hover:text-emerald-600 rounded-lg transition-colors"
+                        >
+                          <FileDigit className="w-5 h-5" />
+                          <div className="text-left">
+                            <div className="font-medium">Tóm tắt nội dung</div>
+                            <div className="text-xs text-muted-foreground">
+                              AI tóm tắt điểm chính
+                            </div>
+                          </div>
+                        </button>
+                        <button
+                          onClick={() => {
+                            setAiOpen(false);
+                          }}
+                          className="flex items-center gap-3 w-full py-2.5 px-3 text-sm hover:bg-orange-50 hover:text-orange-600 rounded-lg transition-colors"
+                        >
+                          <Languages className="w-5 h-5" />
+                          <div className="text-left">
+                            <div className="font-medium">Dịch bài viết</div>
+                            <div className="text-xs text-muted-foreground">
+                              Dịch sang ngôn ngữ khác
+                            </div>
+                          </div>
+                        </button>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+
+                  {/* Outline */}
+                  {headings.length > 0 && (
+                    <Popover open={outlineOpen} onOpenChange={setOutlineOpen}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <PopoverTrigger asChild>
+                            <Button
+                              size="icon"
+                              className="rounded-full w-14 h-14 bg-white hover:bg-gray-100 text-gray-900 shadow-md border border-gray-200"
+                            >
+                              <List className="w-7 h-7" />
+                            </Button>
+                          </PopoverTrigger>
+                        </TooltipTrigger>
+                        <TooltipContent side="right">Mục lục</TooltipContent>
+                      </Tooltip>
+                      <PopoverContent
+                        side="right"
+                        align="start"
+                        className="w-72 max-h-96 overflow-y-auto"
+                      >
+                        <p className="text-xs font-semibold text-muted-foreground mb-3">
+                          MỤC LỤC
+                        </p>
+                        <div className="space-y-1">
+                          {headings.map((h, i) => (
+                            <button
+                              key={i}
+                              onClick={() => scrollToHeading(h.id)}
+                              className={cn(
+                                "block w-full text-left py-1.5 text-sm hover:text-primary transition-colors truncate",
+                                h.level === 1 && "font-medium",
+                                h.level === 2 && "pl-3 text-muted-foreground",
+                                h.level === 3 &&
+                                  "pl-6 text-muted-foreground text-xs",
+                              )}
+                            >
+                              {h.text}
+                            </button>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  )}
+
+                  {/* Zoom Out */}
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <PopoverTrigger asChild>
-                        <Button
-                          size="icon"
-                          className="rounded-full w-14 h-14 bg-gradient-to-br from-blue-500 via-blue-400 to-blue-700 hover:from-blue-600 hover:via-blue-500 hover:to-blue-800 text-white shadow-xl shadow-blue-500/30 border-0 ring-4 ring-blue-300/30"
-                        >
-                          <Sparkles className="w-7 h-7" />
-                        </Button>
-                      </PopoverTrigger>
+                      <Button
+                        size="icon"
+                        className="rounded-full w-14 h-14 bg-white hover:bg-gray-100 text-gray-900 shadow-md border border-gray-200"
+                        onClick={() =>
+                          setFontSize((prev) => Math.max(14, prev - 2))
+                        }
+                      >
+                        <ZoomOut className="w-7 h-7" />
+                      </Button>
                     </TooltipTrigger>
-                    <TooltipContent side="right">Trợ lý AI</TooltipContent>
+                    <TooltipContent side="right">Thu nhỏ chữ</TooltipContent>
                   </Tooltip>
-                  <PopoverContent side="right" align="start" className="w-64">
-                    <p className="text-xs font-semibold text-muted-foreground mb-3">
-                      TRỢ LÝ AI
-                    </p>
-                    <div className="space-y-1">
-                      <button
-                        onClick={() => {
-                          // TODO: Implement voice summary
-                          setAiOpen(false);
-                        }}
-                        className="flex items-center gap-3 w-full py-2.5 px-3 text-sm hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
-                      >
-                        <Volume2 className="w-5 h-5" />
-                        <div className="text-left">
-                          <div className="font-medium">Nghe tóm tắt</div>
-                          <div className="text-xs text-muted-foreground">
-                            AI đọc tóm tắt bài viết
-                          </div>
-                        </div>
-                      </button>
-                      <button
-                        onClick={() => {
-                          // TODO: Implement full article audio
-                          setAiOpen(false);
-                        }}
-                        className="flex items-center gap-3 w-full py-2.5 px-3 text-sm hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-colors"
-                      >
-                        <Headphones className="w-5 h-5" />
-                        <div className="text-left">
-                          <div className="font-medium">Nghe toàn bài</div>
-                          <div className="text-xs text-muted-foreground">
-                            AI đọc toàn bộ nội dung
-                          </div>
-                        </div>
-                      </button>
-                      <button
-                        onClick={() => {
-                          // TODO: Implement AI summary
-                          setAiOpen(false);
-                        }}
-                        className="flex items-center gap-3 w-full py-2.5 px-3 text-sm hover:bg-emerald-50 hover:text-emerald-600 rounded-lg transition-colors"
-                      >
-                        <FileDigit className="w-5 h-5" />
-                        <div className="text-left">
-                          <div className="font-medium">Tóm tắt nội dung</div>
-                          <div className="text-xs text-muted-foreground">
-                            AI tóm tắt điểm chính
-                          </div>
-                        </div>
-                      </button>
-                      <button
-                        onClick={() => {
-                          // TODO: Implement translate
-                          setAiOpen(false);
-                        }}
-                        className="flex items-center gap-3 w-full py-2.5 px-3 text-sm hover:bg-orange-50 hover:text-orange-600 rounded-lg transition-colors"
-                      >
-                        <Languages className="w-5 h-5" />
-                        <div className="text-left">
-                          <div className="font-medium">Dịch bài viết</div>
-                          <div className="text-xs text-muted-foreground">
-                            Dịch sang ngôn ngữ khác
-                          </div>
-                        </div>
-                      </button>
-                    </div>
-                  </PopoverContent>
-                </Popover>
 
-                {/* Outline */}
-                {headings.length > 0 && (
-                  <Popover open={outlineOpen} onOpenChange={setOutlineOpen}>
+                  {/* Zoom In */}
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size="icon"
+                        className="rounded-full w-14 h-14 bg-white hover:bg-gray-100 text-gray-900 shadow-md border border-gray-200"
+                        onClick={() =>
+                          setFontSize((prev) => Math.min(24, prev + 2))
+                        }
+                      >
+                        <ZoomIn className="w-7 h-7" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">Phóng to chữ</TooltipContent>
+                  </Tooltip>
+
+                  {/* Share */}
+                  <Popover open={shareOpen} onOpenChange={setShareOpen}>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <PopoverTrigger asChild>
@@ -620,439 +571,256 @@ export default function NewsDetailPage() {
                             size="icon"
                             className="rounded-full w-14 h-14 bg-white hover:bg-gray-100 text-gray-900 shadow-md border border-gray-200"
                           >
-                            <List className="w-7 h-7" />
+                            <Share2 className="w-7 h-7" />
                           </Button>
                         </PopoverTrigger>
                       </TooltipTrigger>
-                      <TooltipContent side="right">Mục lục</TooltipContent>
+                      <TooltipContent side="right">Chia sẻ</TooltipContent>
                     </Tooltip>
-                    <PopoverContent
-                      side="right"
-                      align="start"
-                      className="w-72 max-h-96 overflow-y-auto"
-                    >
+                    <PopoverContent side="right" align="start" className="w-52">
                       <p className="text-xs font-semibold text-muted-foreground mb-3">
-                        MỤC LỤC
+                        CHIA SẺ BÀI VIẾT
                       </p>
                       <div className="space-y-1">
-                        {headings.map((h, i) => (
-                          <button
-                            key={i}
-                            onClick={() => scrollToHeading(h.id)}
-                            className={cn(
-                              "block w-full text-left py-1.5 text-sm hover:text-primary transition-colors truncate",
-                              h.level === 1 && "font-medium",
-                              h.level === 2 && "pl-3 text-muted-foreground",
-                              h.level === 3 &&
-                                "pl-6 text-muted-foreground text-xs",
-                            )}
-                          >
-                            {h.text}
-                          </button>
-                        ))}
+                        <button
+                          onClick={() => handleShare("facebook")}
+                          className="flex items-center gap-3 w-full py-2.5 px-3 text-sm hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
+                        >
+                          <Facebook className="w-4 h-4" />
+                          Facebook
+                        </button>
+                        <button
+                          onClick={() => handleShare("twitter")}
+                          className="flex items-center gap-3 w-full py-2.5 px-3 text-sm hover:bg-sky-50 hover:text-sky-500 rounded-lg transition-colors"
+                        >
+                          <Twitter className="w-4 h-4" />
+                          Twitter
+                        </button>
+                        <button
+                          onClick={() => handleShare("linkedin")}
+                          className="flex items-center gap-3 w-full py-2.5 px-3 text-sm hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors"
+                        >
+                          <Linkedin className="w-4 h-4" />
+                          LinkedIn
+                        </button>
+                        <button
+                          onClick={() => handleShare("copy")}
+                          className="flex items-center gap-3 w-full py-2.5 px-3 text-sm hover:bg-gray-100 rounded-lg transition-colors"
+                        >
+                          <Link2 className="w-4 h-4" />
+                          Sao chép link
+                        </button>
                       </div>
                     </PopoverContent>
                   </Popover>
-                )}
 
-                {/* Zoom Out */}
-                <Tooltip>
-                  <TooltipTrigger asChild>
+                  {/* Print */}
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size="icon"
+                        className="rounded-full w-14 h-14 bg-white hover:bg-gray-100 text-gray-900 shadow-md border border-gray-200"
+                        onClick={() => window.print()}
+                      >
+                        <Printer className="w-7 h-7" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">In bài viết</TooltipContent>
+                  </Tooltip>
+                </div>
+              </aside>
+
+              {/* Main Article Content */}
+              <article className="flex-1 min-w-0">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.1 }}
+                >
+                  {/* Extended Attributes */}
+                  {((post.extendedAttributes as any)?.["Photographer"] ||
+                    (post.extendedAttributes as any)?.["Người chụp ảnh"] ||
+                    (post.extendedAttributes as any)?.["Editor"] ||
+                    (post.extendedAttributes as any)?.["Biên tập viên"]) && (
+                    <div className="flex flex-wrap items-center gap-4 mb-8 text-sm text-muted-foreground">
+                      {((post.extendedAttributes as any)?.["Photographer"] ||
+                        (post.extendedAttributes as any)?.[
+                          "Người chụp ảnh"
+                        ]) && (
+                        <span className="flex items-center gap-1.5 bg-secondary/50 px-3 py-1.5 rounded-full">
+                          <Camera className="w-3.5 h-3.5" />
+                          <span>Ảnh:</span>
+                          <span className="font-medium text-foreground">
+                            {(post.extendedAttributes as any)?.[
+                              "Photographer"
+                            ] ||
+                              (post.extendedAttributes as any)?.[
+                                "Người chụp ảnh"
+                              ]}
+                          </span>
+                        </span>
+                      )}
+                      {((post.extendedAttributes as any)?.["Editor"] ||
+                        (post.extendedAttributes as any)?.[
+                          "Biên tập viên"
+                        ]) && (
+                        <span className="flex items-center gap-1.5 bg-secondary/50 px-3 py-1.5 rounded-full">
+                          <User className="w-3.5 h-3.5" />
+                          <span>Biên tập:</span>
+                          <span className="font-medium text-foreground">
+                            {(post.extendedAttributes as any)?.["Editor"] ||
+                              (post.extendedAttributes as any)?.[
+                                "Biên tập viên"
+                              ]}
+                          </span>
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Content - TipTap HTML Render */}
+                  <div
+                    className="tiptap-content"
+                    style={{ fontSize: `${fontSize}px` }}
+                    dangerouslySetInnerHTML={{ __html: processedContent }}
+                  />
+
+                  {/* Tags */}
+                  {post.tags && post.tags.length > 0 && (
+                    <div className="mt-12 pt-8 border-t">
+                      <h3 className="text-sm font-semibold text-muted-foreground mb-4">
+                        THẺ BÀI VIẾT
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {post.tags.map((tag) => (
+                          <Link
+                            key={tag.id}
+                            href={`/tin-tuc?tag=${tag.slug}`}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-secondary text-secondary-foreground text-sm hover:bg-primary hover:text-white transition-colors"
+                          >
+                            <Hash className="w-3 h-3" />
+                            {tag.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Mobile Actions */}
+                  <div className="flex lg:hidden items-center justify-center gap-2 mt-8 pt-8 border-t flex-wrap">
                     <Button
-                      size="icon"
-                      className="rounded-full w-14 h-14 bg-white hover:bg-gray-100 text-gray-900 shadow-md border border-gray-200"
+                      size="sm"
+                      className="bg-white hover:bg-gray-100 text-gray-900 border border-gray-200 shadow-md"
                       onClick={() =>
                         setFontSize((prev) => Math.max(14, prev - 2))
                       }
                     >
-                      <ZoomOut className="w-7 h-7" />
+                      <ZoomOut className="w-4 h-4" />
                     </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="right">Thu nhỏ chữ</TooltipContent>
-                </Tooltip>
-
-                {/* Zoom In */}
-                <Tooltip>
-                  <TooltipTrigger asChild>
                     <Button
-                      size="icon"
-                      className="rounded-full w-14 h-14 bg-white hover:bg-gray-100 text-gray-900 shadow-md border border-gray-200"
+                      size="sm"
+                      className="bg-white hover:bg-gray-100 text-gray-900 border border-gray-200 shadow-md"
                       onClick={() =>
                         setFontSize((prev) => Math.min(24, prev + 2))
                       }
                     >
-                      <ZoomIn className="w-7 h-7" />
+                      <ZoomIn className="w-4 h-4" />
                     </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="right">Phóng to chữ</TooltipContent>
-                </Tooltip>
-
-                {/* Share */}
-                <Popover open={shareOpen} onOpenChange={setShareOpen}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
+                    <Popover open={shareOpen} onOpenChange={setShareOpen}>
                       <PopoverTrigger asChild>
                         <Button
-                          size="icon"
-                          className="rounded-full w-14 h-14 bg-white hover:bg-gray-100 text-gray-900 shadow-md border border-gray-200"
+                          size="sm"
+                          className="bg-white hover:bg-gray-100 text-gray-900 border border-gray-200 shadow-md"
                         >
-                          <Share2 className="w-7 h-7" />
+                          <Share2 className="w-4 h-4 mr-2" />
+                          Chia sẻ
                         </Button>
                       </PopoverTrigger>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">Chia sẻ</TooltipContent>
-                  </Tooltip>
-                  <PopoverContent side="right" align="start" className="w-52">
-                    <p className="text-xs font-semibold text-muted-foreground mb-3">
-                      CHIA SẺ BÀI VIẾT
-                    </p>
-                    <div className="space-y-1">
-                      <button
-                        onClick={() => handleShare("facebook")}
-                        className="flex items-center gap-3 w-full py-2.5 px-3 text-sm hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
-                      >
-                        <Facebook className="w-4 h-4" />
-                        Facebook
-                      </button>
-                      <button
-                        onClick={() => handleShare("twitter")}
-                        className="flex items-center gap-3 w-full py-2.5 px-3 text-sm hover:bg-sky-50 hover:text-sky-500 rounded-lg transition-colors"
-                      >
-                        <Twitter className="w-4 h-4" />
-                        Twitter
-                      </button>
-                      <button
-                        onClick={() => handleShare("linkedin")}
-                        className="flex items-center gap-3 w-full py-2.5 px-3 text-sm hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors"
-                      >
-                        <Linkedin className="w-4 h-4" />
-                        LinkedIn
-                      </button>
-                      <button
-                        onClick={() => handleShare("copy")}
-                        className="flex items-center gap-3 w-full py-2.5 px-3 text-sm hover:bg-gray-100 rounded-lg transition-colors"
-                      >
-                        <Link2 className="w-4 h-4" />
-                        Sao chép link
-                      </button>
-                    </div>
-                  </PopoverContent>
-                </Popover>
-
-                {/* Print */}
-                <Tooltip>
-                  <TooltipTrigger asChild>
+                      <PopoverContent className="w-48">
+                        <div className="space-y-1">
+                          <button
+                            onClick={() => handleShare("facebook")}
+                            className="flex items-center gap-3 w-full py-2 px-2 text-sm hover:bg-accent rounded-md"
+                          >
+                            <Facebook className="w-4 h-4" /> Facebook
+                          </button>
+                          <button
+                            onClick={() => handleShare("twitter")}
+                            className="flex items-center gap-3 w-full py-2 px-2 text-sm hover:bg-accent rounded-md"
+                          >
+                            <Twitter className="w-4 h-4" /> Twitter
+                          </button>
+                          <button
+                            onClick={() => handleShare("linkedin")}
+                            className="flex items-center gap-3 w-full py-2 px-2 text-sm hover:bg-accent rounded-md"
+                          >
+                            <Linkedin className="w-4 h-4" /> LinkedIn
+                          </button>
+                          <button
+                            onClick={() => handleShare("copy")}
+                            className="flex items-center gap-3 w-full py-2 px-2 text-sm hover:bg-accent rounded-md"
+                          >
+                            <Link2 className="w-4 h-4" /> Sao chép link
+                          </button>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
                     <Button
-                      size="icon"
-                      className="rounded-full w-14 h-14 bg-white hover:bg-gray-100 text-gray-900 shadow-md border border-gray-200"
+                      size="sm"
+                      className="bg-white hover:bg-gray-100 text-gray-900 border border-gray-200 shadow-md"
                       onClick={() => window.print()}
                     >
-                      <Printer className="w-7 h-7" />
+                      <Printer className="w-4 h-4 mr-2" />
+                      In
                     </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="right">In bài viết</TooltipContent>
-                </Tooltip>
-              </div>
-            </aside>
-
-            {/* Main Content */}
-            <article className="flex-1 min-w-0 max-w-3xl">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
-              >
-                {/* Excerpt */}
-                {post.excerpt && (
-                  <div
-                    className="text-lg sm:text-xl text-muted-foreground leading-relaxed mb-8 pb-8 border-b tiptap font-medium italic"
-                    dangerouslySetInnerHTML={{ __html: post.excerpt }}
-                  />
-                )}
-
-                {/* Extended Attributes */}
-                {((post.extendedAttributes as any)?.["Photographer"] ||
-                  (post.extendedAttributes as any)?.["Người chụp ảnh"] ||
-                  (post.extendedAttributes as any)?.["Editor"] ||
-                  (post.extendedAttributes as any)?.["Biên tập viên"]) && (
-                  <div className="flex flex-wrap items-center gap-4 mb-8 text-sm text-muted-foreground">
-                    {((post.extendedAttributes as any)?.["Photographer"] ||
-                      (post.extendedAttributes as any)?.["Người chụp ảnh"]) && (
-                      <span className="flex items-center gap-1.5 bg-secondary/50 px-3 py-1.5 rounded-full">
-                        <Camera className="w-3.5 h-3.5" />
-                        <span>Ảnh:</span>
-                        <span className="font-medium text-foreground">
-                          {(post.extendedAttributes as any)?.["Photographer"] ||
-                            (post.extendedAttributes as any)?.[
-                              "Người chụp ảnh"
-                            ]}
-                        </span>
-                      </span>
-                    )}
-                    {((post.extendedAttributes as any)?.["Editor"] ||
-                      (post.extendedAttributes as any)?.["Biên tập viên"]) && (
-                      <span className="flex items-center gap-1.5 bg-secondary/50 px-3 py-1.5 rounded-full">
-                        <User className="w-3.5 h-3.5" />
-                        <span>Biên tập:</span>
-                        <span className="font-medium text-foreground">
-                          {(post.extendedAttributes as any)?.["Editor"] ||
-                            (post.extendedAttributes as any)?.["Biên tập viên"]}
-                        </span>
-                      </span>
-                    )}
                   </div>
-                )}
+                </motion.div>
+              </article>
+            </div>
 
-                {/* Content - TipTap HTML Render with Justified Text */}
-                <div
-                  className="tiptap-content text-justify"
-                  style={{ fontSize: `${fontSize}px` }}
-                  dangerouslySetInnerHTML={{ __html: processedContent }}
-                />
-
-                {/* Tags */}
-                {post.tags && post.tags.length > 0 && (
-                  <div className="mt-12 pt-8 border-t">
-                    <h3 className="text-sm font-semibold text-muted-foreground mb-4">
-                      THẺ BÀI VIẾT
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {post.tags.map((tag) => (
-                        <Link
-                          key={tag.id}
-                          href={`/tin-tuc?tag=${tag.slug}`}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-secondary text-secondary-foreground text-sm hover:bg-primary hover:text-white transition-colors"
-                        >
-                          <Hash className="w-3 h-3" />
-                          {tag.name}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Mobile Actions */}
-                <div className="flex lg:hidden items-center justify-center gap-2 mt-8 pt-8 border-t flex-wrap">
-                  <Button
-                    size="sm"
-                    className="bg-white hover:bg-gray-100 text-gray-900 border border-gray-200 shadow-md"
-                    onClick={() =>
-                      setFontSize((prev) => Math.max(14, prev - 2))
-                    }
-                  >
-                    <ZoomOut className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    className="bg-white hover:bg-gray-100 text-gray-900 border border-gray-200 shadow-md"
-                    onClick={() =>
-                      setFontSize((prev) => Math.min(24, prev + 2))
-                    }
-                  >
-                    <ZoomIn className="w-4 h-4" />
-                  </Button>
-                  <Popover open={shareOpen} onOpenChange={setShareOpen}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        size="sm"
-                        className="bg-white hover:bg-gray-100 text-gray-900 border border-gray-200 shadow-md"
-                      >
-                        <Share2 className="w-4 h-4 mr-2" />
-                        Chia sẻ
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-48">
-                      <div className="space-y-1">
-                        <button
-                          onClick={() => handleShare("facebook")}
-                          className="flex items-center gap-3 w-full py-2 px-2 text-sm hover:bg-accent rounded-md"
-                        >
-                          <Facebook className="w-4 h-4" /> Facebook
-                        </button>
-                        <button
-                          onClick={() => handleShare("twitter")}
-                          className="flex items-center gap-3 w-full py-2 px-2 text-sm hover:bg-accent rounded-md"
-                        >
-                          <Twitter className="w-4 h-4" /> Twitter
-                        </button>
-                        <button
-                          onClick={() => handleShare("linkedin")}
-                          className="flex items-center gap-3 w-full py-2 px-2 text-sm hover:bg-accent rounded-md"
-                        >
-                          <Linkedin className="w-4 h-4" /> LinkedIn
-                        </button>
-                        <button
-                          onClick={() => handleShare("copy")}
-                          className="flex items-center gap-3 w-full py-2 px-2 text-sm hover:bg-accent rounded-md"
-                        >
-                          <Link2 className="w-4 h-4" /> Sao chép link
-                        </button>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                  <Button
-                    size="sm"
-                    className="bg-white hover:bg-gray-100 text-gray-900 border border-gray-200 shadow-md"
-                    onClick={() => window.print()}
-                  >
-                    <Printer className="w-4 h-4 mr-2" />
-                    In
-                  </Button>
-                </div>
-              </motion.div>
-            </article>
-
-            {/* Right Sidebar - Related News First (Fixed on scroll) */}
-            <aside className="w-full lg:w-80 flex-shrink-0">
-              <div className="lg:sticky lg:top-24 space-y-6">
-                {/* Related Posts - Sidebar Version */}
-                <Card className="border-primary/20">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-primary" />
-                      Tin liên quan
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    {relatedPosts.length > 0 ? (
-                      <div className="space-y-4">
-                        {relatedPosts.slice(0, 4).map((related, idx) => (
-                          <Link
-                            key={related.id}
-                            href={`/tin-tuc/${related.slug}`}
-                            className="group flex gap-3"
-                          >
-                            {related.coverImageUrl && (
-                              <div className="relative w-20 h-14 rounded-md overflow-hidden bg-muted flex-shrink-0">
-                                <Image
-                                  src={related.coverImageUrl}
-                                  alt={related.title}
-                                  fill
-                                  unoptimized
-                                  className="object-cover group-hover:scale-105 transition-transform duration-300"
-                                />
-                              </div>
+            {/* Related Posts Section */}
+            {relatedPosts.length > 0 && (
+              <section className="mt-16 pt-8 border-t">
+                <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-primary" />
+                  Bài viết liên quan
+                </h2>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {relatedPosts.map((related) => (
+                    <Link
+                      key={related.id}
+                      href={`/tin-tuc/${related.slug}`}
+                      className="group"
+                    >
+                      <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full">
+                        {related.coverImageUrl && (
+                          <div className="relative aspect-video bg-muted">
+                            <Image
+                              src={related.coverImageUrl}
+                              alt={related.title}
+                              fill
+                              unoptimized
+                              className="object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                          </div>
+                        )}
+                        <CardContent className="p-4">
+                          <h3 className="font-medium text-sm text-foreground line-clamp-2 group-hover:text-primary transition-colors mb-2">
+                            {related.title}
+                          </h3>
+                          <time className="text-xs text-muted-foreground">
+                            {formatDate(
+                              related.publishedAt || related.createdAt,
                             )}
-                            <div className="flex-1 min-w-0">
-                              <h4 className="text-sm font-medium text-foreground line-clamp-2 group-hover:text-primary transition-colors">
-                                {related.title}
-                              </h4>
-                              <time className="text-xs text-muted-foreground mt-1 block">
-                                {formatDate(
-                                  related.publishedAt || related.createdAt,
-                                )}
-                              </time>
-                            </div>
-                          </Link>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-sm text-muted-foreground text-center py-4">
-                        Chưa có bài viết liên quan
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
-
-                {/* Category Card */}
-                {post.categories?.[0] && (
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base flex items-center gap-2">
-                        <BookOpen className="w-4 h-4 text-primary" />
-                        Danh mục
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <Link
-                        href={`/tin-tuc?category=${post.categories[0].id}`}
-                        className="text-sm font-medium hover:text-primary transition-colors"
-                      >
-                        {post.categories[0].name}
-                      </Link>
-                      {post.categories[0].description && (
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {post.categories[0].description}
-                        </p>
-                      )}
-                    </CardContent>
-                  </Card>
-                )}
-
-                {/* Quick Actions */}
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base">Truy cập nhanh</CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="space-y-4">
-                      {quickActions.map((section, idx) => (
-                        <div key={idx} className="space-y-2">
-                          <div className="flex items-center gap-2 text-sm font-medium">
-                            <section.icon className="w-4 h-4 text-primary" />
-                            {section.title}
-                          </div>
-                          <div className="space-y-1 pl-6">
-                            {section.items.map((item, i) => (
-                              <Link
-                                key={i}
-                                href={item.href}
-                                className="flex items-center justify-between py-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
-                              >
-                                {item.name}
-                                <ExternalLink className="w-3 h-3" />
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </aside>
+                          </time>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
           </div>
-
-          {/* Related Posts - Bottom Grid */}
-          {relatedPosts.length > 0 && (
-            <section className="mt-16 pt-8 border-t">
-              <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                <FileText className="w-5 h-5 text-primary" />
-                Bài viết liên quan khác
-              </h2>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {relatedPosts.map((related) => (
-                  <Link
-                    key={related.id}
-                    href={`/tin-tuc/${related.slug}`}
-                    className="group"
-                  >
-                    <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full">
-                      {related.coverImageUrl && (
-                        <div className="relative aspect-video bg-muted">
-                          <Image
-                            src={related.coverImageUrl}
-                            alt={related.title}
-                            fill
-                            unoptimized
-                            className="object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        </div>
-                      )}
-                      <CardContent className="p-4">
-                        <h3 className="font-medium text-sm text-foreground line-clamp-2 group-hover:text-primary transition-colors mb-2">
-                          {related.title}
-                        </h3>
-                        <time className="text-xs text-muted-foreground">
-                          {formatDate(related.publishedAt || related.createdAt)}
-                        </time>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                ))}
-              </div>
-            </section>
-          )}
         </div>
       </div>
     </TooltipProvider>
