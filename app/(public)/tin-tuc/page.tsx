@@ -92,8 +92,7 @@ export default function TinTucPage() {
         const response = await postsApi.getPublishedPosts({
           cursor: loadMore ? cursorRef.current : undefined,
           limit: ITEMS_PER_PAGE,
-          categoryId:
-            selectedCategory !== "all" ? selectedCategory : undefined,
+          categoryId: selectedCategory !== "all" ? selectedCategory : undefined,
           search: debouncedSearch || undefined,
         });
 
