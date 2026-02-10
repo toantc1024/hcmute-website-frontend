@@ -468,232 +468,244 @@ export default function NewsDetailPage() {
           </section>
 
           {/* Main Layout Grid */}
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-16">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-16 pb-20 lg:pb-32">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
-              {/* Left Actions - Follows content */}
+              {/* Left Buttons - Sticky in grid */}
               <aside className="hidden lg:block lg:col-span-1">
                 <div className="sticky top-24 flex flex-col gap-3 items-center">
-                {/* Text Controls */}
-                <div className="flex flex-col gap-1.5 p-2 rounded-xl bg-card shadow-sm border border-border/50">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-9 w-9 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg"
-                        onClick={() => handleZoom("in")}
-                      >
-                        <ZoomIn className="w-4 h-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">Phóng to</TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-9 w-9 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg"
-                        onClick={() => handleZoom("out")}
-                      >
-                        <ZoomOut className="w-4 h-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">Thu nhỏ</TooltipContent>
-                  </Tooltip>
-                </div>
-
-                {/* AI Voice Button */}
-                <Popover open={aiOpen} onOpenChange={setAiOpen}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <PopoverTrigger asChild>
-                        <Button
-                          size="icon"
-                          className="h-11 w-11 rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-md hover:shadow-lg hover:scale-105 transition-all border-0"
-                        >
-                          <Sparkles className="w-4.5 h-4.5" />
-                        </Button>
-                      </PopoverTrigger>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">Trợ lý AI</TooltipContent>
-                  </Tooltip>
-                  <PopoverContent side="right" align="start" className="w-64">
-                    <p className="text-xs font-bold text-muted-foreground mb-3 uppercase tracking-wider">
-                      Trợ lý AI
-                    </p>
-                    <div className="space-y-1">
-                      <button
-                        onClick={() => {
-                          handleAiSummary();
-                          setAiOpen(false);
-                        }}
-                        className="flex items-center gap-3 w-full py-2.5 px-3 text-sm hover:bg-primary/10 hover:text-primary rounded-lg transition-colors"
-                      >
-                        <FileDigit className="w-5 h-5" />
-                        <div className="text-left">
-                          <div className="font-medium">Tóm tắt nội dung</div>
-                          <div className="text-xs text-muted-foreground">
-                            AI tóm tắt điểm chính
-                          </div>
-                        </div>
-                      </button>
-                      <button
-                        onClick={() => setAiOpen(false)}
-                        className="flex items-center gap-3 w-full py-2.5 px-3 text-sm hover:bg-accent rounded-lg transition-colors"
-                      >
-                        <Volume2 className="w-5 h-5" />
-                        <div className="text-left">
-                          <div className="font-medium">Nghe tóm tắt</div>
-                          <div className="text-xs text-muted-foreground">
-                            AI đọc tóm tắt bài viết
-                          </div>
-                        </div>
-                      </button>
-                      <button
-                        onClick={() => setAiOpen(false)}
-                        className="flex items-center gap-3 w-full py-2.5 px-3 text-sm hover:bg-accent rounded-lg transition-colors"
-                      >
-                        <Headphones className="w-5 h-5" />
-                        <div className="text-left">
-                          <div className="font-medium">Nghe toàn bài</div>
-                          <div className="text-xs text-muted-foreground">
-                            AI đọc toàn bộ nội dung
-                          </div>
-                        </div>
-                      </button>
-                      <button
-                        onClick={() => setAiOpen(false)}
-                        className="flex items-center gap-3 w-full py-2.5 px-3 text-sm hover:bg-accent rounded-lg transition-colors"
-                      >
-                        <Languages className="w-5 h-5" />
-                        <div className="text-left">
-                          <div className="font-medium">Dịch bài viết</div>
-                          <div className="text-xs text-muted-foreground">
-                            Dịch sang ngôn ngữ khác
-                          </div>
-                        </div>
-                      </button>
-                    </div>
-                  </PopoverContent>
-                </Popover>
-
-                {/* Outline */}
-                {headings.length > 0 && (
-                  <Popover open={outlineOpen} onOpenChange={setOutlineOpen}>
+                  {/* Text Controls */}
+                  <div className="flex flex-col gap-2 p-2 rounded-full bg-white shadow-md border border-border">
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-9 w-9 bg-card text-muted-foreground shadow-sm border border-border/50 hover:text-primary hover:border-primary/30 rounded-lg transition-all"
-                          >
-                            <List className="w-4 h-4" />
-                          </Button>
-                        </PopoverTrigger>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full border border-border"
+                          onClick={() => handleZoom("in")}
+                        >
+                          <ZoomIn className="w-4 h-4" />
+                        </Button>
                       </TooltipTrigger>
-                      <TooltipContent side="right">Mục lục</TooltipContent>
+                      <TooltipContent side="right">Phóng to</TooltipContent>
                     </Tooltip>
-                    <PopoverContent
-                      side="right"
-                      align="start"
-                      className="w-72 max-h-96 overflow-y-auto"
-                    >
-                      <p className="text-xs font-bold text-muted-foreground mb-3 uppercase tracking-wider">
-                        Mục lục
-                      </p>
-                      <div className="space-y-1">
-                        {headings.map((h, i) => (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full border border-border"
+                          onClick={() => handleZoom("out")}
+                        >
+                          <ZoomOut className="w-4 h-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">Thu nhỏ</TooltipContent>
+                    </Tooltip>
+                  </div>
+
+                  {/* AI Voice Button */}
+                  <div className="p-2.5 rounded-full bg-primary shadow-md">
+                    <Popover open={aiOpen} onOpenChange={setAiOpen}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-10 w-10 rounded-full text-primary-foreground hover:text-primary-foreground hover:bg-primary/80 transition-all border-0"
+                            >
+                              <Sparkles className="w-4 h-4" />
+                            </Button>
+                          </PopoverTrigger>
+                        </TooltipTrigger>
+                        <TooltipContent side="right">Trợ lý AI</TooltipContent>
+                      </Tooltip>
+                      <PopoverContent
+                        side="right"
+                        align="start"
+                        className="w-64"
+                      >
+                        <p className="text-xs font-bold text-muted-foreground mb-3 uppercase tracking-wider">
+                          Trợ lý AI
+                        </p>
+                        <div className="space-y-1">
                           <button
-                            key={i}
-                            onClick={() => scrollToHeading(h.id)}
-                            className={cn(
-                              "block w-full text-left py-1.5 text-sm hover:text-primary transition-colors truncate",
-                              h.level === 1 && "font-medium text-foreground",
-                              h.level === 2 && "pl-3 text-muted-foreground",
-                              h.level === 3 &&
-                                "pl-6 text-muted-foreground text-xs",
-                            )}
+                            onClick={() => {
+                              handleAiSummary();
+                              setAiOpen(false);
+                            }}
+                            className="flex items-center gap-3 w-full py-2.5 px-3 text-sm hover:bg-primary/10 hover:text-primary rounded-lg transition-colors"
                           >
-                            {h.text}
+                            <FileDigit className="w-5 h-5" />
+                            <div className="text-left">
+                              <div className="font-medium">
+                                Tóm tắt nội dung
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                AI tóm tắt điểm chính
+                              </div>
+                            </div>
                           </button>
-                        ))}
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                )}
+                          <button
+                            onClick={() => setAiOpen(false)}
+                            className="flex items-center gap-3 w-full py-2.5 px-3 text-sm hover:bg-accent rounded-lg transition-colors"
+                          >
+                            <Volume2 className="w-5 h-5" />
+                            <div className="text-left">
+                              <div className="font-medium">Nghe tóm tắt</div>
+                              <div className="text-xs text-muted-foreground">
+                                AI đọc tóm tắt bài viết
+                              </div>
+                            </div>
+                          </button>
+                          <button
+                            onClick={() => setAiOpen(false)}
+                            className="flex items-center gap-3 w-full py-2.5 px-3 text-sm hover:bg-accent rounded-lg transition-colors"
+                          >
+                            <Headphones className="w-5 h-5" />
+                            <div className="text-left">
+                              <div className="font-medium">Nghe toàn bài</div>
+                              <div className="text-xs text-muted-foreground">
+                                AI đọc toàn bộ nội dung
+                              </div>
+                            </div>
+                          </button>
+                          <button
+                            onClick={() => setAiOpen(false)}
+                            className="flex items-center gap-3 w-full py-2.5 px-3 text-sm hover:bg-accent rounded-lg transition-colors"
+                          >
+                            <Languages className="w-5 h-5" />
+                            <div className="text-left">
+                              <div className="font-medium">Dịch bài viết</div>
+                              <div className="text-xs text-muted-foreground">
+                                Dịch sang ngôn ngữ khác
+                              </div>
+                            </div>
+                          </button>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
 
-                {/* Share Controls */}
-                <div className="flex flex-col gap-1.5 p-2 rounded-xl bg-card shadow-sm border border-border/50">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-9 w-9 text-[#1877F2] hover:bg-[#1877F2]/10 rounded-lg transition-all"
-                        onClick={() => handleShare("facebook")}
-                      >
-                        <Facebook className="w-4 h-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">Facebook</TooltipContent>
-                  </Tooltip>
+                  {/* Outline */}
+                  {headings.length > 0 && (
+                    <div className="p-2.5 rounded-full bg-white shadow-md border border-border">
+                      <Popover open={outlineOpen} onOpenChange={setOutlineOpen}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-all"
+                              >
+                                <List className="w-4 h-4" />
+                              </Button>
+                            </PopoverTrigger>
+                          </TooltipTrigger>
+                          <TooltipContent side="right">Mục lục</TooltipContent>
+                        </Tooltip>
+                        <PopoverContent
+                          side="right"
+                          align="start"
+                          className="w-72 max-h-96 overflow-y-auto"
+                        >
+                          <p className="text-xs font-bold text-muted-foreground mb-3 uppercase tracking-wider">
+                            Mục lục
+                          </p>
+                          <div className="space-y-1">
+                            {headings.map((h, i) => (
+                              <button
+                                key={i}
+                                onClick={() => scrollToHeading(h.id)}
+                                className={cn(
+                                  "block w-full text-left py-1.5 text-sm hover:text-primary transition-colors truncate",
+                                  h.level === 1 &&
+                                    "font-medium text-foreground",
+                                  h.level === 2 && "pl-3 text-muted-foreground",
+                                  h.level === 3 &&
+                                    "pl-6 text-muted-foreground text-xs",
+                                )}
+                              >
+                                {h.text}
+                              </button>
+                            ))}
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  )}
 
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-9 w-9 text-[#1DA1F2] hover:bg-[#1DA1F2]/10 rounded-lg transition-all"
-                        onClick={() => handleShare("twitter")}
-                      >
-                        <Twitter className="w-4 h-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">Twitter</TooltipContent>
-                  </Tooltip>
+                  {/* Share Controls */}
+                  <div className="flex flex-col gap-2 p-2 rounded-full bg-white shadow-md border border-border">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-10 w-10 text-[#1877F2] hover:bg-[#1877F2]/10 rounded-full transition-all"
+                          onClick={() => handleShare("facebook")}
+                        >
+                          <Facebook className="w-4 h-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">Facebook</TooltipContent>
+                    </Tooltip>
 
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-9 w-9 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-all"
-                        onClick={copyLink}
-                      >
-                        {copied ? (
-                          <span className="text-xs text-green-600 font-semibold">
-                            ✓
-                          </span>
-                        ) : (
-                          <Copy className="w-4 h-4" />
-                        )}
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">
-                      {copied ? "Đã sao chép!" : "Sao chép link"}
-                    </TooltipContent>
-                  </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-10 w-10 text-[#1DA1F2] hover:bg-[#1DA1F2]/10 rounded-full transition-all"
+                          onClick={() => handleShare("twitter")}
+                        >
+                          <Twitter className="w-4 h-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">Twitter</TooltipContent>
+                    </Tooltip>
 
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-9 w-9 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-all"
-                        onClick={() => window.print()}
-                      >
-                        <Printer className="w-4 h-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">In bài viết</TooltipContent>
-                  </Tooltip>
-                </div>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-all"
+                          onClick={copyLink}
+                        >
+                          {copied ? (
+                            <span className="text-xs text-green-600 font-semibold">
+                              ✓
+                            </span>
+                          ) : (
+                            <Copy className="w-4 h-4" />
+                          )}
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">
+                        {copied ? "Đã sao chép!" : "Sao chép link"}
+                      </TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-all"
+                          onClick={() => window.print()}
+                        >
+                          <Printer className="w-4 h-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">In bài viết</TooltipContent>
+                    </Tooltip>
+                  </div>
                 </div>
               </aside>
 
-              {/* Main Content - Wider */}
+              {/* Main Content */}
               <article ref={contentRef} className="col-span-1 lg:col-span-7">
                 {/* AI Summary Card */}
                 <div className="mb-8 relative">
