@@ -375,100 +375,85 @@ export default function NewsDetailPage() {
               </div>
             </div>
 
-            {/* Hero Content */}
+            {/* Hero Content - Only Back Button and Photo Credits */}
             <div className="absolute bottom-0 left-0 w-full p-4 pb-8 sm:p-6 sm:pb-10 lg:p-12 z-20">
-              <div className="max-w-[1440px] mx-auto">
-                <div className="max-w-4xl">
-                  {/* Category Badges */}
-                  <motion.div
-                    className="flex flex-wrap gap-2 mb-4 lg:mb-6"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.1 }}
-                  >
-                    {post.categories?.map((cat, i) => (
-                      <Link key={cat.id} href={`/tin-tuc?category=${cat.id}`}>
-                        <span
-                          className={cn(
-                            "px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs font-bold tracking-wider uppercase backdrop-blur-md border cursor-pointer transition-colors",
-                            i === 0
-                              ? "bg-primary/90 text-primary-foreground border-primary/80 hover:bg-primary"
-                              : "bg-white/20 text-white border-white/30 hover:bg-white/30",
-                          )}
-                        >
-                          {cat.name}
-                        </span>
-                      </Link>
-                    ))}
-                  </motion.div>
-
-                  {/* Title */}
-                  <motion.h1
-                    className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold text-white leading-[1.15] mb-4 lg:mb-6 tracking-tight drop-shadow-sm"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
-                  >
-                    {post.title}
-                  </motion.h1>
-
-                  {/* Meta Info */}
-                  <motion.div
-                    className="flex flex-wrap items-center gap-3 sm:gap-4 lg:gap-6 text-xs sm:text-sm text-slate-300 font-medium"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.3 }}
-                  >
-                    {/* Author */}
-                    {(post.authors?.[0] || post.extendedAttributes?.Author) && (
-                      <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-100 text-slate-900 flex items-center justify-center font-bold text-xs">
-                          {(
-                            post.authors?.[0]?.displayName ||
-                            (post.extendedAttributes?.Author as string) ||
-                            "A"
-                          ).charAt(0)}
-                        </div>
-                        <span className="text-white">
-                          {post.authors?.[0]?.displayName ||
-                            post.extendedAttributes?.Author}
-                        </span>
-                      </div>
-                    )}
-
-                    <div className="w-1 h-1 bg-slate-500 rounded-full hidden sm:block" />
-
-                    {/* Date */}
-                    <div className="flex items-center gap-1.5 sm:gap-2">
-                      <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                      <span>
-                        {formatDate(post.publishedAt || post.createdAt)}
-                      </span>
-                    </div>
-
-                    <div className="w-1 h-1 bg-slate-500 rounded-full hidden sm:block" />
-
-                    {/* Views */}
-                    <div className="hidden sm:flex items-center gap-1.5 sm:gap-2">
-                      <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                      <span>{post.viewCount} lượt xem</span>
-                    </div>
-
-                    <div className="w-1 h-1 bg-slate-500 rounded-full hidden md:block" />
-
-                    {/* Read Time */}
-                    <div className="hidden md:flex items-center gap-1.5 sm:gap-2">
-                      <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                      <span>{calculateReadTime(post.content)}</span>
-                    </div>
-                  </motion.div>
-                </div>
-              </div>
+              {/* Photo/Author credits are handled separately above */}
             </div>
           </section>
 
           {/* Main Layout Grid */}
           <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-16 pb-20 lg:pb-32">
+            {/* Full Width Article Header - Above Content & Sidebar */}
+            <div className="mb-8 lg:mb-12">
+              {/* Category Badges */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                {post.categories?.map((cat, i) => (
+                  <Link key={cat.id} href={`/tin-tuc?category=${cat.id}`}>
+                    <Badge
+                      variant={i === 0 ? "default" : "secondary"}
+                      className={cn(
+                        "cursor-pointer transition-colors",
+                        i === 0
+                          ? "bg-primary hover:bg-primary/90"
+                          : "hover:bg-muted",
+                      )}
+                    >
+                      {cat.name}
+                    </Badge>
+                  </Link>
+                ))}
+              </div>
+
+              {/* Title */}
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-foreground leading-tight mb-6 tracking-tight">
+                {post.title}
+              </h1>
+
+              {/* Meta Info Row */}
+              <div className="flex flex-wrap items-center gap-3 sm:gap-4 lg:gap-6 text-sm text-muted-foreground">
+                {/* Author */}
+                {(post.authors?.[0] || post.extendedAttributes?.Author) && (
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs">
+                      {(
+                        post.authors?.[0]?.displayName ||
+                        (post.extendedAttributes?.Author as string) ||
+                        "A"
+                      ).charAt(0)}
+                    </div>
+                    <span className="font-medium text-foreground">
+                      {post.authors?.[0]?.displayName ||
+                        post.extendedAttributes?.Author}
+                    </span>
+                  </div>
+                )}
+
+                <div className="w-1 h-1 bg-muted-foreground/40 rounded-full hidden sm:block" />
+
+                {/* Date */}
+                <div className="flex items-center gap-1.5">
+                  <Calendar className="w-4 h-4" />
+                  <span>{formatDate(post.publishedAt || post.createdAt)}</span>
+                </div>
+
+                <div className="w-1 h-1 bg-muted-foreground/40 rounded-full hidden sm:block" />
+
+                {/* Views */}
+                <div className="flex items-center gap-1.5">
+                  <Eye className="w-4 h-4" />
+                  <span>{post.viewCount} lượt xem</span>
+                </div>
+
+                <div className="w-1 h-1 bg-muted-foreground/40 rounded-full hidden sm:block" />
+
+                {/* Read Time */}
+                <div className="flex items-center gap-1.5">
+                  <BookOpen className="w-4 h-4" />
+                  <span>{calculateReadTime(post.content)}</span>
+                </div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
               {/* Left Buttons - Sticky in grid */}
               <aside className="hidden lg:block lg:col-span-1">

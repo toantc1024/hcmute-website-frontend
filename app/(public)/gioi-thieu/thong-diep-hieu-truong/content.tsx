@@ -660,16 +660,16 @@ export default function RectorMessageContent() {
             </div>
           </div>
 
-          <div className="section-image-0 w-full aspect-[21/9] relative md:rounded-[2.5rem] overflow-hidden shadow-none md:shadow-2xl group">
+          <div className="section-image-0 w-full aspect-[21/9] relative rounded-[2.5rem] overflow-hidden shadow-2xl group">
             {/* Outline Border Effect (Shadow) */}
             <div className="absolute inset-0 bg-transparent border border-primary/50 rounded-[2.5rem] translate-x-3 translate-y-3 group-hover:translate-x-5 group-hover:translate-y-5 transition-transform duration-300 ease-out -z-10 hidden md:block" />
 
-            <div className="relative w-full h-full bg-white md:rounded-[2.5rem] overflow-hidden">
+            <div className="relative w-full h-full bg-white rounded-[2.5rem] overflow-hidden">
               <Image
                 src={contentSections[0].image}
                 alt={contentSections[0].title}
                 fill
-                className="object-cover"
+                className="object-cover rounded-[2.5rem]"
               />
             </div>
 
