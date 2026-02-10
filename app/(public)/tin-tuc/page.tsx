@@ -4,15 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  Search,
-  Calendar,
-  Eye,
-  ChevronDown,
-  LayoutGrid,
-  List,
-  Loader2,
-} from "lucide-react";
+import { Search, Calendar, Eye, ChevronDown, Loader2 } from "lucide-react";
 import {
   postsApi,
   categoriesApi,
@@ -53,7 +45,6 @@ export default function TinTucPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [viewMode, setViewMode] = useState<"grid" | "grouped">("grid");
 
   // Debounce search
   useEffect(() => {
@@ -119,19 +110,6 @@ export default function TinTucPage() {
     fetchPosts(false);
   }, [selectedCategory, debouncedSearch, fetchPosts]);
 
-  // Group posts by category for grouped view
-  const groupedPosts = posts.reduce(
-    (acc, post) => {
-      const categoryName = post.categories?.[0]?.name || "Khác";
-      if (!acc[categoryName]) {
-        acc[categoryName] = [];
-      }
-      acc[categoryName].push(post);
-      return acc;
-    },
-    {} as Record<string, PostAuditView[]>,
-  );
-
   const selectedCategoryName =
     selectedCategory !== "all"
       ? categories?.find((c) => c.id === selectedCategory)?.name
@@ -185,26 +163,6 @@ export default function TinTucPage() {
               ))}
             </SelectContent>
           </Select>
-
-          {/* View Mode Toggle */}
-          <div className="hidden md:flex items-center gap-1 p-1 bg-muted rounded-lg">
-            <Button
-              variant={viewMode === "grid" ? "secondary" : "ghost"}
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setViewMode("grid")}
-            >
-              <LayoutGrid className="w-4 h-4" />
-            </Button>
-            <Button
-              variant={viewMode === "grouped" ? "secondary" : "ghost"}
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setViewMode("grouped")}
-            >
-              <List className="w-4 h-4" />
-            </Button>
-          </div>
         </div>
       </header>
 
@@ -268,66 +226,6 @@ export default function TinTucPage() {
             >
               Xóa bộ lọc
             </Button>
-          </div>
-        ) : viewMode === "grouped" ? (
-          /* Grouped View by Category */
-          <div className="space-y-12">
-            {Object.entries(groupedPosts).map(
-              ([categoryName, categoryPosts]) => (
-                <section key={categoryName}>
-                  <div className="flex items-center gap-3 mb-6">
-                    <h2 className="text-xl font-bold text-foreground">
-                      {categoryName}
-                    </h2>
-                    <Badge variant="secondary">{categoryPosts.length}</Badge>
-                    <div className="flex-1 h-px bg-border" />
-                  </div>
-
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {categoryPosts.map((post, index) => (
-                      <motion.article
-                        key={post.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3, delay: index * 0.05 }}
-                      >
-                        <Link
-                          href={`/tin-tuc/${post.slug}`}
-                          className="group block"
-                        >
-                          <div className="relative aspect-video rounded-xl overflow-hidden bg-muted mb-3">
-                            {post.coverImageUrl ? (
-                              <Image
-                                src={post.coverImageUrl}
-                                alt={post.title}
-                                fill
-                                unoptimized
-                                className="object-cover transition-transform duration-500 group-hover:scale-110"
-                              />
-                            ) : (
-                              <div className="w-full h-full bg-gradient-to-br from-primary/80 to-primary flex items-center justify-center">
-                                <span className="text-primary-foreground/50 text-xl font-bold">
-                                  HCMUTE
-                                </span>
-                              </div>
-                            )}
-                          </div>
-
-                          <h3 className="font-medium text-foreground line-clamp-2 group-hover:text-primary transition-colors text-sm">
-                            {post.title}
-                          </h3>
-
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-2">
-                            <Calendar className="w-3 h-3" />
-                            {formatDate(post.publishedAt || post.createdAt)}
-                          </div>
-                        </Link>
-                      </motion.article>
-                    ))}
-                  </div>
-                </section>
-              ),
-            )}
           </div>
         ) : (
           /* Grid View */
