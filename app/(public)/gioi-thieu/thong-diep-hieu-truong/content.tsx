@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
@@ -75,6 +75,11 @@ export default function RectorMessageContent() {
   const lineStartRef = useRef<HTMLDivElement>(null);
   const endingBtnRef = useRef<HTMLAnchorElement>(null);
   const highlightStartRef = useRef<HTMLDivElement>(null);
+  const [activeSection, setActiveSection] = useState(-1);
+  const [lastSectionReached, setLastSectionReached] = useState(false);
+  const [visibleSections, setVisibleSections] = useState<Set<number>>(
+    new Set(),
+  );
 
   useGSAP(
     () => {
@@ -180,6 +185,37 @@ export default function RectorMessageContent() {
         };
         requestAnimationFrame(() => requestAnimationFrame(tryPosition));
         window.addEventListener("resize", positionTimeline);
+      }
+
+      // Track active section for timeline indicators
+      contentSections.forEach((_, index) => {
+        if (index === 0) return; // Skip first section (full width)
+        ScrollTrigger.create({
+          trigger: `.section-${index}`,
+          start: "top 60%",
+          end: "bottom 40%",
+          onEnter: () => setActiveSection(index),
+          onEnterBack: () => {
+            setActiveSection(index);
+          },
+          onLeave: () => {},
+          onLeaveBack: () => {
+            if (index === 1) setActiveSection(-1);
+          },
+        });
+      });
+
+      // Button glow: triggered when beam indicator reaches the button
+      if (endingBtnRef.current) {
+        ScrollTrigger.create({
+          trigger: endingBtnRef.current,
+          start: "top 80%",
+          end: "bottom 20%",
+          onEnter: () => setLastSectionReached(true),
+          onLeave: () => setLastSectionReached(false),
+          onEnterBack: () => setLastSectionReached(true),
+          onLeaveBack: () => setLastSectionReached(false),
+        });
       }
 
       // Beam animation: glowing dot travels down the line on scroll
@@ -449,6 +485,43 @@ export default function RectorMessageContent() {
         );
       });
 
+      // Shimmer effect on section titles - one-time sweep when title reaches center of screen
+      gsap.utils.toArray<Element>(".shimmer-title").forEach((el) => {
+        ScrollTrigger.create({
+          trigger: el,
+          start: "top center",
+          once: true,
+          onEnter: () => {
+            el.classList.add("shimmer-active");
+          },
+        });
+      });
+
+      // Scroll-based section visibility for .id keyword text effect
+      contentSections.slice(1).forEach((_, idx) => {
+        const index = idx + 1;
+        ScrollTrigger.create({
+          trigger: `.section-${index}`,
+          start: "top 70%",
+          end: "bottom 30%",
+          onEnter: () => setVisibleSections((prev) => new Set(prev).add(index)),
+          onLeave: () =>
+            setVisibleSections((prev) => {
+              const next = new Set(prev);
+              next.delete(index);
+              return next;
+            }),
+          onEnterBack: () =>
+            setVisibleSections((prev) => new Set(prev).add(index)),
+          onLeaveBack: () =>
+            setVisibleSections((prev) => {
+              const next = new Set(prev);
+              next.delete(index);
+              return next;
+            }),
+        });
+      });
+
       // Ending decoration - smooth fade in
       gsap.fromTo(
         ".ending-flower",
@@ -553,11 +626,11 @@ export default function RectorMessageContent() {
       {/* Central Timeline - solid blue, positioned from image to button */}
       <div
         ref={timelineRef}
-        className="absolute left-1/2 w-[2px] -translate-x-1/2 hidden md:block pointer-events-none z-10"
+        className="absolute left-1/2 w-[3px] -translate-x-1/2 hidden md:block pointer-events-none z-10"
         style={{ top: 0, height: 0 }}
       >
         {/* Solid blue line */}
-        <div className="w-full h-full bg-gradient-to-b from-blue-400 via-blue-400 to-blue-500" />
+        <div className="w-full h-full bg-blue-400 shadow-[0_0_6px_2px_rgba(59,130,246,0.3)]" />
         {/* Beam dot - travels down the line on scroll */}
         <div
           ref={beamRef}
@@ -663,6 +736,7 @@ export default function RectorMessageContent() {
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+          <div className="absolute inset-0 shadow-[inset_0_0_60px_rgba(0,0,0,0.3)] pointer-events-none" />
         </div>
       </section>
 
@@ -752,8 +826,10 @@ export default function RectorMessageContent() {
           </svg>
 
           <div className="section-text-0 w-full text-center space-y-6">
-            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight font-inter-black">
-              {contentSections[0].title}
+            <h2 className="shimmer-title text-3xl md:text-5xl font-bold tracking-tight font-inter-black">
+              <AuroraText className="font-extrabold">
+                {contentSections[0].title}
+              </AuroraText>
             </h2>
             {/* Applied BLUR Class */}
             <p className="section-text-blur-0 text-lg md:text-xl text-slate-600 leading-relaxed text-justify md:text-center w-full">
@@ -837,6 +913,7 @@ export default function RectorMessageContent() {
                 fill
                 className="object-cover rounded-[2.5rem]"
               />
+              <div className="absolute inset-0 shadow-[inset_0_0_80px_rgba(0,0,0,0.25)] rounded-[2.5rem] pointer-events-none" />
             </div>
 
             {/* Flower Behind First Section */}
@@ -858,92 +935,280 @@ export default function RectorMessageContent() {
             return (
               <section
                 key={section.id}
-                className={`section-${index} relative grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24 min-h-[50vh] items-center py-12 group`}
+                className={`section-${index} relative py-12 group/section`}
               >
-                {/* 3D Sphere Marker - Desktop Only - REPLACED WITH CLEAN DESIGN */}
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 hidden md:flex items-center justify-center">
-                  <div
-                    className={`sphere-marker-${index} relative w-24 h-24 rounded-full bg-white border border-blue-100 flex items-center justify-center transform transition-transform hover:scale-110 duration-500 z-10 shadow-sm`}
-                  >
-                    <div className="relative w-20 h-20 p-2">
-                      <Image
-                        src={FLOWER_ICON}
-                        alt="Flower Icon"
-                        fill
-                        className="object-contain"
+                {/* Desktop layout: 2-column grid */}
+                <div className="hidden md:grid grid-cols-2 gap-24 min-h-[50vh] items-center">
+                  {/* Sphere Marker on Timeline - Desktop */}
+                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 flex items-center justify-center group/marker">
+                    <div className={`sphere-marker-${index} relative`}>
+                      {/* Ping ring - visible on hover */}
+                      <div
+                        className={cn(
+                          "absolute inset-1 rounded-full border border-blue-400/50 transition-opacity",
+                          activeSection === index
+                            ? "opacity-100 animate-ping"
+                            : "opacity-0 group-hover/marker:opacity-100 group-hover/marker:animate-ping",
+                        )}
+                        style={{ animationDuration: "2s" }}
                       />
+                      {/* Glow effect */}
+                      <div
+                        className={cn(
+                          "absolute inset-0 rounded-full transition-all duration-500",
+                          activeSection === index
+                            ? "shadow-[0_0_16px_4px_rgba(59,130,246,0.3)]"
+                            : "group-hover/marker:shadow-[0_0_12px_4px_rgba(59,130,246,0.15)]",
+                        )}
+                      />
+                      <div
+                        className={cn(
+                          "relative w-24 h-24 rounded-full bg-white flex items-center justify-center transform transition-all duration-500 z-10 shadow-md",
+                          activeSection === index
+                            ? "border-2 border-blue-400 shadow-blue-200/60 scale-110"
+                            : "border border-blue-100 shadow-blue-100/50 group-hover/marker:scale-110 group-hover/marker:border-blue-300",
+                        )}
+                      >
+                        <div className="relative w-20 h-20 p-2">
+                          <Image
+                            src={FLOWER_ICON}
+                            alt="Flower Icon"
+                            fill
+                            className="object-contain"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Left Side Content (Alternating) - Desktop */}
+                  <div
+                    className={cn(
+                      index % 2 === 1
+                        ? "order-2 pl-12"
+                        : "order-1 pr-12 text-right",
+                    )}
+                  >
+                    <div className={`section-text-${index} space-y-6 relative`}>
+                      <h2 className="shimmer-title text-3xl md:text-4xl font-bold tracking-tight">
+                        <AuroraText className="font-extrabold">
+                          {section.title}
+                        </AuroraText>
+                      </h2>
+
+                      <div
+                        className={cn(
+                          "prose prose-lg text-slate-600 leading-relaxed",
+                          index % 2 === 1 ? "text-left" : "ml-auto text-right",
+                        )}
+                      >
+                        <p className="text-justify md:text-inherit">
+                          {section.content}
+                        </p>
+                      </div>
+
+                      {section.highlight && (
+                        <div
+                          className={cn(
+                            "highlight-badge inline-flex items-center gap-3 px-6 py-4 rounded-2xl bg-slate-50 border border-slate-100 shadow-sm",
+                            index % 2 === 1 ? "flex-row" : "flex-row-reverse",
+                          )}
+                        >
+                          <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
+                          <p className="font-medium text-slate-800">
+                            {section.highlight}
+                          </p>
+                        </div>
+                      )}
+
+                      {section.quote && (
+                        <figure
+                          className={cn(
+                            "quote-block relative p-6 rounded-3xl bg-blue-50 border border-blue-100",
+                            index % 2 === 1
+                              ? "rounded-tl-none"
+                              : "rounded-tr-none",
+                          )}
+                        >
+                          <Quote className="w-8 h-8 text-blue-300 absolute -top-4 -left-2 fill-current" />
+                          <blockquote className="text-lg italic font-medium text-slate-800 relative z-10">
+                            "{section.quote}"
+                          </blockquote>
+                        </figure>
+                      )}
+
+                      {section.isConclusion && (
+                        <div
+                          className={cn(
+                            "signature-block pt-8 mt-8 border-t border-slate-200",
+                            index % 2 === 1
+                              ? "flex flex-row items-center gap-4"
+                              : "flex flex-row-reverse items-center gap-4",
+                          )}
+                        >
+                          <div className="signature-avatar relative w-16 h-16 rounded-full overflow-hidden border-2 border-white shadow-lg shrink-0">
+                            <Image
+                              src="/PGS_TS_LGH.png"
+                              alt="PGS. TS. Lê Hiếu Giang"
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                          <div
+                            className={cn(
+                              index % 2 === 1 ? "text-left" : "text-right",
+                            )}
+                          >
+                            <p className="font-bold text-slate-900 text-lg whitespace-nowrap">
+                              PGS. TS. Lê Hiếu Giang
+                            </p>
+                            <p className="text-slate-500 text-sm">
+                              Hiệu trưởng{" "}
+                              <span className="whitespace-nowrap">
+                                Trường Đại học Công nghệ Kỹ thuật TP. Hồ Chí
+                                Minh
+                              </span>
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Right Side Image (Alternating) - Desktop */}
+                  <div
+                    className={cn(
+                      index % 2 === 1
+                        ? "order-1 pr-12 pl-0"
+                        : "order-2 pl-12 pr-0",
+                    )}
+                  >
+                    <div className="relative w-full aspect-[4/3] group perspective-1000">
+                      {/* Offset border effect */}
+                      <div
+                        className={cn(
+                          "absolute inset-0 pointer-events-none translate-x-4 translate-y-4 transition-transform duration-300 ease-out -z-10 hidden md:block border-2 border-blue-300/50",
+                          index % 2 === 1
+                            ? "rounded-[2.5rem] rounded-tr-none"
+                            : "rounded-[2.5rem] rounded-tl-none",
+                        )}
+                      />
+                      <div
+                        className={cn(
+                          `section-image-${index} relative w-full h-full overflow-hidden shadow-xl bg-white`,
+                          index % 2 === 1
+                            ? "rounded-[2.5rem] rounded-tr-none"
+                            : "rounded-[2.5rem] rounded-tl-none",
+                        )}
+                      >
+                        <Image
+                          src={section.image}
+                          alt={section.title}
+                          fill
+                          className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                        />
+                        {/* Dark inset overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none z-10" />
+                        <div className="absolute inset-0 shadow-[inset_0_0_60px_rgba(0,0,0,0.2)] pointer-events-none z-10" />
+                        {/* Keyword - bottom right, outline with fill on image hover */}
+                        <div className="absolute bottom-6 right-6 z-20">
+                          <div className="relative">
+                            {/* Outline text layer (always visible) */}
+                            <span
+                              className="relative text-3xl md:text-4xl lg:text-5xl font-black italic uppercase tracking-wider leading-none select-none"
+                              style={{
+                                color: "transparent",
+                                WebkitTextStroke: "1.5px rgba(255,255,255,1)",
+                              }}
+                            >
+                              {section.id.toUpperCase()}
+                            </span>
+                            {/* Filled text layer - fades in when section is scrolled into view */}
+                            <span
+                              className={cn(
+                                "absolute text-3xl md:text-4xl lg:text-5xl font-black italic text-white uppercase tracking-wider leading-none transition-all",
+                                visibleSections.has(index)
+                                  ? "opacity-100 -top-[2px] -left-[3px] duration-150 ease-out"
+                                  : "opacity-0 top-[6px] left-[8px] duration-500 ease-in-out",
+                              )}
+                              style={{
+                                textShadow:
+                                  "0 2px 8px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.2)",
+                              }}
+                            >
+                              {section.id.toUpperCase()}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Left Side Content (Alternating) */}
-                <div
-                  className={cn(
-                    "order-2 md:order-1",
-                    index % 2 === 1
-                      ? "md:order-2 md:pl-12"
-                      : "md:order-1 md:pr-12 md:text-right",
-                  )}
-                >
-                  <div className={`section-text-${index} space-y-6 relative`}>
-                    <h2 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">
-                      {section.title}
-                    </h2>
-
+                {/* Mobile layout: timeline on left, content on right */}
+                <div className="flex md:hidden gap-4">
+                  {/* Left: timeline line + flower indicator */}
+                  <div className="flex flex-col items-center shrink-0 w-12">
+                    <div className="w-[3px] flex-1 bg-blue-400" />
                     <div
                       className={cn(
-                        "prose prose-lg text-slate-600 leading-relaxed",
-                        index % 2 === 1
-                          ? "md:text-left"
-                          : "md:ml-auto md:text-right",
+                        "relative w-10 h-10 rounded-full bg-white border-2 flex items-center justify-center shrink-0 my-1 shadow-sm",
+                        activeSection === index
+                          ? "border-blue-400 shadow-blue-200/60"
+                          : "border-blue-200",
                       )}
                     >
-                      <p className="text-justify md:text-inherit">
-                        {section.content}
-                      </p>
+                      <div className="relative w-8 h-8 p-1">
+                        <Image
+                          src={FLOWER_ICON}
+                          alt=""
+                          fill
+                          className="object-contain"
+                        />
+                      </div>
                     </div>
-
+                    <div className="w-[3px] flex-1 bg-blue-400" />
+                  </div>
+                  {/* Right: content */}
+                  <div className="flex-1 space-y-4 py-4">
+                    <h2 className="shimmer-title text-2xl font-bold tracking-tight">
+                      <AuroraText className="font-extrabold">
+                        {section.title}
+                      </AuroraText>
+                    </h2>
+                    <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-lg">
+                      <Image
+                        src={section.image}
+                        alt={section.title}
+                        fill
+                        className="object-cover"
+                        sizes="100vw"
+                      />
+                      <div className="absolute inset-0 shadow-[inset_0_0_40px_rgba(0,0,0,0.2)] rounded-2xl pointer-events-none" />
+                    </div>
+                    <p className="text-base text-slate-600 leading-relaxed text-justify">
+                      {section.content}
+                    </p>
                     {section.highlight && (
-                      <div
-                        className={cn(
-                          "highlight-badge inline-flex items-center gap-3 px-6 py-4 rounded-2xl bg-slate-50 border border-slate-100 shadow-sm",
-                          index % 2 === 1 ? "flex-row" : "flex-row-reverse",
-                        )}
-                      >
+                      <div className="inline-flex items-center gap-2 px-4 py-3 rounded-xl bg-slate-50 border border-slate-100 shadow-sm">
                         <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
-                        <p className="font-medium text-slate-800">
+                        <p className="font-medium text-slate-800 text-sm">
                           {section.highlight}
                         </p>
                       </div>
                     )}
-
                     {section.quote && (
-                      <figure
-                        className={cn(
-                          "quote-block relative p-6 rounded-3xl bg-blue-50 border border-blue-100",
-                          index % 2 === 1
-                            ? "rounded-tl-none"
-                            : "rounded-tr-none",
-                        )}
-                      >
-                        <Quote className="w-8 h-8 text-blue-300 absolute -top-4 -left-2 fill-current" />
-                        {/* Quote icon position adjustment based on side could be nice but keeping plain for now */}
-                        <blockquote className="text-lg italic font-medium text-slate-800 relative z-10">
+                      <figure className="quote-block relative p-4 rounded-2xl bg-blue-50 border border-blue-100 rounded-tl-none">
+                        <Quote className="w-6 h-6 text-blue-300 absolute -top-3 -left-1 fill-current" />
+                        <blockquote className="text-base italic font-medium text-slate-800 relative z-10">
                           "{section.quote}"
                         </blockquote>
                       </figure>
                     )}
-
                     {section.isConclusion && (
-                      <div
-                        className={cn(
-                          "signature-block pt-8 mt-8 border-t border-slate-200",
-                          index % 2 === 1
-                            ? "flex flex-row items-center gap-4"
-                            : "flex flex-row-reverse items-center gap-4",
-                        )}
-                      >
-                        <div className="signature-avatar relative w-16 h-16 rounded-full overflow-hidden border-2 border-white shadow-lg shrink-0">
+                      <div className="signature-block pt-6 mt-6 border-t border-slate-200 flex flex-row items-center gap-3">
+                        <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-lg shrink-0">
                           <Image
                             src="/PGS_TS_LGH.png"
                             alt="PGS. TS. Lê Hiếu Giang"
@@ -951,73 +1216,16 @@ export default function RectorMessageContent() {
                             className="object-cover"
                           />
                         </div>
-                        <div
-                          className={cn(
-                            index % 2 === 1 ? "text-left" : "text-right",
-                          )}
-                        >
-                          <p className="font-bold text-slate-900 text-lg whitespace-nowrap">
+                        <div>
+                          <p className="font-bold text-slate-900 text-sm">
                             PGS. TS. Lê Hiếu Giang
                           </p>
-                          <p className="text-slate-500 text-sm">
-                            Hiệu trưởng{" "}
-                            <span className="whitespace-nowrap">
-                              Trường Đại học Công nghệ Kỹ thuật TP. Hồ Chí Minh
-                            </span>
+                          <p className="text-slate-500 text-xs">
+                            Hiệu trưởng Trường ĐH Công nghệ Kỹ thuật TP.HCM
                           </p>
                         </div>
                       </div>
                     )}
-                  </div>
-                </div>
-
-                {/* Right Side Image (Alternating) */}
-                <div
-                  className={cn(
-                    "order-1 md:order-2",
-                    index % 2 === 1
-                      ? "md:order-1 md:pr-12 md:pl-0"
-                      : "md:order-2 md:pl-12 md:pr-0",
-                  )}
-                >
-                  <div className="relative w-full aspect-[4/3] group perspective-1000">
-                    {/* Border effect - offset behind (uniform dashed) */}
-                    <div
-                      className={cn(
-                        "absolute inset-0 border border-solid border-primary/50 pointer-events-none translate-x-3 translate-y-3 transition-transform duration-300 ease-out group-hover:translate-x-5 group-hover:translate-y-5",
-                        index % 2 === 1
-                          ? "rounded-[2.5rem] rounded-tr-none"
-                          : "rounded-[2.5rem] rounded-tl-none",
-                      )}
-                    />
-                    <div
-                      className={cn(
-                        `section-image-${index} relative w-full h-full overflow-hidden shadow-xl bg-white`,
-                        index % 2 === 1
-                          ? "rounded-[2.5rem] rounded-tr-none"
-                          : "rounded-[2.5rem] rounded-tl-none",
-                      )}
-                    >
-                      <Image
-                        src={section.image}
-                        alt={section.title}
-                        fill
-                        className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                      />
-
-                      {/* Glassmorphism Badge */}
-                      <div
-                        className={cn(
-                          "absolute top-4 px-6 py-3 bg-white/90 backdrop-blur-md rounded-full shadow-lg border border-white/50 z-20",
-                          index % 2 === 1 ? "left-4" : "right-4",
-                        )}
-                      >
-                        <span className="text-sm font-black text-slate-800 uppercase tracking-widest drop-shadow-sm">
-                          {section.id.toUpperCase()}
-                        </span>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </section>
@@ -1031,21 +1239,26 @@ export default function RectorMessageContent() {
           <a
             ref={endingBtnRef}
             href="/gioi-thieu"
-            className="ending-button relative inline-flex items-center justify-center px-10 py-5 text-lg font-bold text-primary bg-white rounded-full shadow-lg border border-primary/20 overflow-hidden group hover:shadow-xl transition-shadow duration-300"
+            className={cn(
+              "ending-button relative inline-flex items-center justify-center w-full md:w-auto px-10 py-5 text-lg font-bold rounded-full overflow-hidden group transition-all duration-500 bg-white text-primary border border-primary/20 hover:bg-primary hover:text-white hover:border-primary hover:shadow-xl",
+              lastSectionReached
+                ? "shadow-[0_0_24px_8px_rgba(59,130,246,0.35)]"
+                : "shadow-lg",
+            )}
           >
             <span className="relative z-10 flex items-center gap-2">
               Khám phá thêm
               <svg
-                className="w-5 h-5 transition-transform group-hover:translate-x-1"
+                className="w-5 h-5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
+                strokeWidth={2}
               >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  d="M7 17L17 7M17 7H7M17 7v10"
                 />
               </svg>
             </span>

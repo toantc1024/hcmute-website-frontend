@@ -278,6 +278,43 @@
   animation: background-position-spin 3s linear infinite;
 }
 
+/* Title shimmer sweep - one-time shine effect */
+@keyframes shimmer-sweep {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.shimmer-title {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-title::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent 25%,
+    rgba(255, 255, 255, 0.4) 40%,
+    rgba(255, 255, 255, 0.8) 50%,
+    rgba(255, 255, 255, 0.4) 60%,
+    transparent 75%
+  );
+  background-size: 200% 100%;
+  background-position: -200% center;
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+}
+
+.shimmer-title.shimmer-active::after {
+  animation: shimmer-sweep 0.8s ease-in-out forwards;
+}
+
 /* Workflow dashed line animation */
 @keyframes dash-flow {
   0% {
