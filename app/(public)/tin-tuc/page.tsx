@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { motion } from "motion/react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -9,13 +9,9 @@ import {
   Calendar,
   Eye,
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
   LayoutGrid,
   List,
-  SlidersHorizontal,
+  Loader2,
 } from "lucide-react";
 import {
   postsApi,
@@ -33,7 +29,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -50,9 +45,9 @@ export default function TinTucPage() {
   const [posts, setPosts] = useState<PostAuditView[]>([]);
   const [categories, setCategories] = useState<CategoryView[]>([]);
   const [loading, setLoading] = useState(true);
-  const [totalPages, setTotalPages] = useState(1);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const cursorRef = useRef<string | undefined>(undefined);
 
   // Filters
   const [searchQuery, setSearchQuery] = useState("");
@@ -64,7 +59,6 @@ export default function TinTucPage() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchQuery);
-      setCurrentPage(1);
     }, 300);
     return () => clearTimeout(timer);
   }, [searchQuery]);
@@ -83,37 +77,48 @@ export default function TinTucPage() {
     fetchCategories();
   }, []);
 
-  // Fetch posts
-  const fetchPosts = useCallback(async () => {
-    try {
-      setLoading(true);
+  // Fetch posts (initial or load more)
+  const fetchPosts = useCallback(
+    async (loadMore = false) => {
+      try {
+        if (loadMore) {
+          setLoadingMore(true);
+        } else {
+          setLoading(true);
+          setPosts([]);
+          cursorRef.current = undefined;
+        }
 
-      const response = await postsApi.getPublishedPosts({
-        page: currentPage - 1,
-        limit: ITEMS_PER_PAGE,
-        categoryId: selectedCategory !== "all" ? selectedCategory : undefined,
-        search: debouncedSearch || undefined,
-      });
+        const response = await postsApi.getPublishedPosts({
+          cursor: loadMore ? cursorRef.current : undefined,
+          limit: ITEMS_PER_PAGE,
+          categoryId:
+            selectedCategory !== "all" ? selectedCategory : undefined,
+          search: debouncedSearch || undefined,
+        });
 
-      setPosts(response.content);
-      setTotalPages(response.totalPages || 1);
-      setTotalItems(response.totalElements || response.content.length);
-    } catch (error) {
-      console.error("Failed to fetch posts:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [currentPage, selectedCategory, debouncedSearch]);
+        if (loadMore) {
+          setPosts((prev) => [...prev, ...response.content]);
+        } else {
+          setPosts(response.content);
+        }
+
+        setHasMore(response.hasNext);
+        cursorRef.current = response.cursor;
+      } catch (error) {
+        console.error("Failed to fetch posts:", error);
+      } finally {
+        setLoading(false);
+        setLoadingMore(false);
+      }
+    },
+    [selectedCategory, debouncedSearch],
+  );
 
   // Initial load and filter changes
   useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts]);
-
-  // Reset page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedCategory]);
+    fetchPosts(false);
+  }, [selectedCategory, debouncedSearch, fetchPosts]);
 
   // Group posts by category for grouped view
   const groupedPosts = posts.reduce(
@@ -132,31 +137,6 @@ export default function TinTucPage() {
     selectedCategory !== "all"
       ? categories?.find((c) => c.id === selectedCategory)?.name
       : null;
-
-  // Pagination helpers
-  const getPageNumbers = () => {
-    const pages: (number | string)[] = [];
-    const maxVisible = 5;
-
-    if (totalPages <= maxVisible + 2) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
-    } else {
-      pages.push(1);
-
-      if (currentPage > 3) pages.push("...");
-
-      const start = Math.max(2, currentPage - 1);
-      const end = Math.min(totalPages - 1, currentPage + 1);
-
-      for (let i = start; i <= end; i++) pages.push(i);
-
-      if (currentPage < totalPages - 2) pages.push("...");
-
-      pages.push(totalPages);
-    }
-
-    return pages;
-  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -237,7 +217,9 @@ export default function TinTucPage() {
               {selectedCategoryName || "Tin tức"}
             </h1>
             <p className="text-muted-foreground text-sm">
-              {loading ? "Đang tải..." : `${totalItems} bài viết`}
+              {loading
+                ? "Đang tải..."
+                : `${posts.length} bài viết${hasMore ? "+" : ""}`}
               {debouncedSearch && ` cho "${debouncedSearch}"`}
             </p>
           </div>
@@ -417,149 +399,65 @@ export default function TinTucPage() {
           </div>
         )}
 
-        {/* Creative Pagination */}
-        {totalPages > 1 && !loading && (
-          <div className="mt-16 flex flex-col items-center gap-6">
-            {/* Progress Indicator */}
-            <div className="w-full max-w-md">
-              <div className="flex items-center justify-between text-sm text-muted-foreground mb-2">
-                <span>
-                  Trang {currentPage} / {totalPages}
-                </span>
-                <span>
-                  {Math.min(currentPage * ITEMS_PER_PAGE, totalItems)} /{" "}
-                  {totalItems} bài viết
-                </span>
-              </div>
-              <div className="h-1 bg-muted rounded-full overflow-hidden">
+        {/* Load More - Creative Button */}
+        {hasMore && !loading && (
+          <div className="mt-16 flex flex-col items-center gap-4">
+            {/* Progress indicator */}
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>Đang hiển thị {posts.length} bài viết</span>
+              <div className="w-8 h-px bg-border" />
+              <span className="text-primary font-medium">Còn thêm nữa</span>
+            </div>
+
+            {/* Load more button */}
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => fetchPosts(true)}
+              disabled={loadingMore}
+              className="gap-3 px-8 py-6 text-base rounded-full border-2 hover:border-primary hover:bg-primary/5 transition-all"
+            >
+              {loadingMore ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Đang tải thêm...
+                </>
+              ) : (
+                <>
+                  <span>Xem thêm bài viết</span>
+                  <ChevronDown className="w-5 h-5" />
+                </>
+              )}
+            </Button>
+
+            {/* Decorative dots */}
+            <div className="flex items-center gap-1 mt-2">
+              {[...Array(3)].map((_, i) => (
                 <motion.div
-                  className="h-full bg-primary rounded-full"
-                  initial={{ width: 0 }}
+                  key={i}
+                  className="w-1.5 h-1.5 rounded-full bg-primary/40"
                   animate={{
-                    width: `${(currentPage / totalPages) * 100}%`,
+                    scale: [1, 1.2, 1],
+                    opacity: [0.4, 1, 0.4],
                   }}
-                  transition={{ duration: 0.3 }}
-                />
-              </div>
-            </div>
-
-            {/* Pagination Controls */}
-            <div className="flex items-center gap-2">
-              {/* First Page */}
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-10 w-10"
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage(1)}
-              >
-                <ChevronsLeft className="w-4 h-4" />
-              </Button>
-
-              {/* Previous */}
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-10 w-10"
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </Button>
-
-              {/* Page Numbers */}
-              <div className="hidden sm:flex items-center gap-1">
-                {getPageNumbers().map((page, i) =>
-                  page === "..." ? (
-                    <span
-                      key={`ellipsis-${i}`}
-                      className="px-2 text-muted-foreground"
-                    >
-                      ...
-                    </span>
-                  ) : (
-                    <Button
-                      key={page}
-                      variant={currentPage === page ? "default" : "ghost"}
-                      size="icon"
-                      className={cn(
-                        "h-10 w-10 transition-all",
-                        currentPage === page && "shadow-lg scale-110",
-                      )}
-                      onClick={() => setCurrentPage(page as number)}
-                    >
-                      {page}
-                    </Button>
-                  ),
-                )}
-              </div>
-
-              {/* Mobile Page Input */}
-              <div className="sm:hidden flex items-center gap-2">
-                <Input
-                  type="number"
-                  min={1}
-                  max={totalPages}
-                  value={currentPage}
-                  onChange={(e) => {
-                    const val = parseInt(e.target.value);
-                    if (val >= 1 && val <= totalPages) {
-                      setCurrentPage(val);
-                    }
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    delay: i * 0.2,
                   }}
-                  className="w-16 h-10 text-center"
                 />
-                <span className="text-muted-foreground">/ {totalPages}</span>
-              </div>
-
-              {/* Next */}
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-10 w-10"
-                disabled={currentPage === totalPages}
-                onClick={() =>
-                  setCurrentPage((p) => Math.min(totalPages, p + 1))
-                }
-              >
-                <ChevronRight className="w-4 h-4" />
-              </Button>
-
-              {/* Last Page */}
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-10 w-10"
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage(totalPages)}
-              >
-                <ChevronsRight className="w-4 h-4" />
-              </Button>
+              ))}
             </div>
+          </div>
+        )}
 
-            {/* Quick Jump */}
-            <div className="flex items-center gap-3 text-sm text-muted-foreground">
-              <span>Nhảy đến:</span>
-              <div className="flex gap-1">
-                {[1, Math.ceil(totalPages / 2), totalPages]
-                  .filter((v, i, a) => a.indexOf(v) === i)
-                  .map((page) => (
-                    <Button
-                      key={page}
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 px-2"
-                      onClick={() => setCurrentPage(page)}
-                    >
-                      {page === 1
-                        ? "Đầu"
-                        : page === totalPages
-                          ? "Cuối"
-                          : "Giữa"}
-                    </Button>
-                  ))}
-              </div>
-            </div>
+        {/* End of content indicator */}
+        {!hasMore && posts.length > 0 && (
+          <div className="mt-16 flex flex-col items-center gap-2 text-muted-foreground">
+            <div className="w-12 h-px bg-border" />
+            <span className="text-sm">
+              Đã hiển thị tất cả {posts.length} bài viết
+            </span>
           </div>
         )}
       </div>
