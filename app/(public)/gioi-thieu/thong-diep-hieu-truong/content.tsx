@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { AuroraText } from "@/components/ui/aurora-text";
 import { GridPattern } from "@/components/ui/grid-pattern";
 import { InteractiveGridPattern } from "@/components/ui/interactive-grid-pattern";
+import { BorderBeam } from "@/components/ui/border-beam";
 
 // Register GSAP plugins
 if (typeof window !== "undefined") {
@@ -69,7 +70,10 @@ const contentSections = [
 export default function RectorMessageContent() {
   const containerRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
-  const progressBarRef = useRef<HTMLDivElement>(null);
+  const timelineRef = useRef<HTMLDivElement>(null);
+  const beamRef = useRef<HTMLDivElement>(null);
+  const lineStartRef = useRef<HTMLDivElement>(null);
+  const endingBtnRef = useRef<HTMLAnchorElement>(null);
   const highlightStartRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
@@ -133,40 +137,89 @@ export default function RectorMessageContent() {
         },
       });
 
-      // Progress Bar Animation
-      const firstImg = document.querySelector(".section-image-0");
+      // Timeline: position line from image bottom to button center
+      if (
+        timelineRef.current &&
+        lineStartRef.current &&
+        endingBtnRef.current &&
+        containerRef.current
+      ) {
+        const positionTimeline = () => {
+          // Use offset-based calculation (stable, not affected by scroll)
+          const container = containerRef.current!;
+          const startEl = lineStartRef.current!;
+          const btnEl = endingBtnRef.current!;
 
-      if (firstImg && progressBarRef.current) {
+          // Walk up offsetParents to get absolute offset from container
+          let startTop = 0;
+          let el: HTMLElement | null = startEl;
+          while (el && el !== container) {
+            startTop += el.offsetTop;
+            el = el.offsetParent as HTMLElement | null;
+          }
+          const startY = startTop + startEl.offsetHeight;
+
+          let btnTop = 0;
+          el = btnEl;
+          while (el && el !== container) {
+            btnTop += el.offsetTop;
+            el = el.offsetParent as HTMLElement | null;
+          }
+          const endY = btnTop + btnEl.offsetHeight / 2;
+
+          timelineRef.current!.style.top = `${startY}px`;
+          timelineRef.current!.style.height = `${endY - startY}px`;
+        };
+
+        // Wait for images to load and layout to settle
+        const tryPosition = () => {
+          positionTimeline();
+          // Re-check after images may have loaded
+          setTimeout(positionTimeline, 500);
+          setTimeout(positionTimeline, 1500);
+        };
+        requestAnimationFrame(() => requestAnimationFrame(tryPosition));
+        window.addEventListener("resize", positionTimeline);
+      }
+
+      // Beam animation: glowing dot travels down the line on scroll
+      if (beamRef.current && containerRef.current) {
         gsap.fromTo(
-          progressBarRef.current,
-          { height: "0%" },
+          beamRef.current,
+          { top: "0%" },
           {
-            height: "100%",
+            top: "100%",
             ease: "none",
             scrollTrigger: {
-              trigger: firstImg,
-              start: "bottom center",
+              trigger: containerRef.current,
+              start: "20% top",
               end: "bottom bottom",
-              scrub: true,
-            },
-          },
-        );
-      } else if (highlightStartRef.current && progressBarRef.current) {
-        gsap.fromTo(
-          progressBarRef.current,
-          { height: "0%" },
-          {
-            height: "100%",
-            ease: "none",
-            scrollTrigger: {
-              trigger: highlightStartRef.current,
-              start: "bottom center",
-              end: "bottom bottom",
-              scrub: true,
+              scrub: 0.5,
             },
           },
         );
       }
+
+      // Sphere markers: fast smooth zoom when scrolled into view
+      gsap.utils
+        .toArray<Element>('[class*="sphere-marker-"]')
+        .forEach((marker) => {
+          gsap.fromTo(
+            marker,
+            { scale: 0.3, opacity: 0 },
+            {
+              scale: 1,
+              opacity: 1,
+              duration: 0.4,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: marker,
+                start: "top 85%",
+                toggleActions: "play none none reverse",
+              },
+            },
+          );
+        });
 
       // Hero Animation - Professional and smooth
       const heroTl = gsap.timeline();
@@ -497,9 +550,22 @@ export default function RectorMessageContent() {
         </div>
       </div>
 
-      {/* Central Progress Line - Starts from later sections */}
-      <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-1 -translate-x-1/2 hidden md:block pointer-events-none z-10">
-        <div ref={progressBarRef} className="w-full bg-blue-400 h-0" />
+      {/* Central Timeline - solid blue, positioned from image to button */}
+      <div
+        ref={timelineRef}
+        className="absolute left-1/2 w-[2px] -translate-x-1/2 hidden md:block pointer-events-none z-10"
+        style={{ top: 0, height: 0 }}
+      >
+        {/* Solid blue line */}
+        <div className="w-full h-full bg-gradient-to-b from-blue-400 via-blue-400 to-blue-500" />
+        {/* Beam dot - travels down the line on scroll */}
+        <div
+          ref={beamRef}
+          className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2"
+          style={{ top: "0%" }}
+        >
+          <div className="w-3 h-3 rounded-full bg-blue-400 shadow-[0_0_12px_4px_rgba(59,130,246,0.6),0_0_24px_8px_rgba(59,130,246,0.3)]" />
+        </div>
       </div>
 
       {/* UTE Flower Decoration - Half flower at top right with fade */}
@@ -602,26 +668,108 @@ export default function RectorMessageContent() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 w-full mb-32 mt-24">
         {/* First Section - Full Width Image + Text */}
-        <div className={`section-0 py-12 md:py-24 space-y-12`}>
-          <div className="section-text-0 max-w-4xl mx-auto text-center space-y-6">
+        <div className={`section-0 py-12 md:py-24 space-y-12 relative`}>
+          {/* Large Outline Cog Decoration - Far from content */}
+          <svg
+            className="absolute -left-16 md:-left-32 lg:-left-48 -top-8 md:-top-16 w-56 h-56 md:w-80 md:h-80 lg:w-[28rem] lg:h-[28rem] pointer-events-none -z-10"
+            viewBox="0 0 24 24"
+            fill="none"
+            strokeWidth="0.2"
+          >
+            <defs>
+              <linearGradient
+                id="cogGradient1"
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="100%"
+              >
+                <stop
+                  offset="0%"
+                  stopColor="rgb(59, 130, 246)"
+                  stopOpacity="0.3"
+                />
+                <stop
+                  offset="50%"
+                  stopColor="rgb(37, 99, 235)"
+                  stopOpacity="0.15"
+                />
+                <stop
+                  offset="100%"
+                  stopColor="rgb(29, 78, 216)"
+                  stopOpacity="0.05"
+                />
+              </linearGradient>
+            </defs>
+            <path
+              stroke="url(#cogGradient1)"
+              d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
+            />
+            <path
+              stroke="url(#cogGradient1)"
+              d="M19.622 10.395l-1.097-2.65L20 6l-2-2-1.735 1.483-2.707-1.113L12.935 2h-1.954l-.632 2.401-2.645 1.115L6 4 4 6l1.453 1.789-1.08 2.657L2 11v2l2.401.655L5.516 16.3 4 18l2 2 1.791-1.46 2.606 1.072L11 22h2l.604-2.387 2.651-1.098C16.697 18.831 18 20 18 20l2-2-1.484-1.75 1.098-2.652 2.386-.62V11l-2.378-.605Z"
+            />
+          </svg>
+          <svg
+            className="absolute -right-16 md:-right-32 lg:-right-48 -bottom-8 md:-bottom-16 w-48 h-48 md:w-72 md:h-72 lg:w-96 lg:h-96 pointer-events-none -z-10"
+            viewBox="0 0 24 24"
+            fill="none"
+            strokeWidth="0.2"
+          >
+            <defs>
+              <linearGradient
+                id="cogGradient2"
+                x1="100%"
+                y1="0%"
+                x2="0%"
+                y2="100%"
+              >
+                <stop
+                  offset="0%"
+                  stopColor="rgb(59, 130, 246)"
+                  stopOpacity="0.3"
+                />
+                <stop
+                  offset="50%"
+                  stopColor="rgb(37, 99, 235)"
+                  stopOpacity="0.15"
+                />
+                <stop
+                  offset="100%"
+                  stopColor="rgb(29, 78, 216)"
+                  stopOpacity="0.05"
+                />
+              </linearGradient>
+            </defs>
+            <path
+              stroke="url(#cogGradient2)"
+              d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
+            />
+            <path
+              stroke="url(#cogGradient2)"
+              d="M19.622 10.395l-1.097-2.65L20 6l-2-2-1.735 1.483-2.707-1.113L12.935 2h-1.954l-.632 2.401-2.645 1.115L6 4 4 6l1.453 1.789-1.08 2.657L2 11v2l2.401.655L5.516 16.3 4 18l2 2 1.791-1.46 2.606 1.072L11 22h2l.604-2.387 2.651-1.098C16.697 18.831 18 20 18 20l2-2-1.484-1.75 1.098-2.652 2.386-.62V11l-2.378-.605Z"
+            />
+          </svg>
+
+          <div className="section-text-0 w-full text-center space-y-6">
             <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight font-inter-black">
               {contentSections[0].title}
             </h2>
             {/* Applied BLUR Class */}
-            <p className="section-text-blur-0 text-lg md:text-xl text-slate-600 leading-relaxed text-justify md:text-center max-w-3xl mx-auto">
+            <p className="section-text-blur-0 text-lg md:text-xl text-slate-600 leading-relaxed text-justify md:text-center w-full">
               {contentSections[0].content}
             </p>
 
             {/* Anchor for Timeline Start */}
             <div
               ref={highlightStartRef}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-50 text-blue-700 rounded-full font-bold shadow-sm mx-auto border border-blue-100"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-blue-50 text-blue-700 rounded-full font-bold shadow-sm mx-auto border border-blue-100 text-lg"
             >
               {contentSections[0].highlight}
             </div>
 
             {/* 1962 SINCE Banner - Inspired by UTE Poster Design */}
-            <div className="since-banner relative w-full max-w-2xl mx-auto mt-12 py-8">
+            <div className="since-banner relative w-full mx-auto mt-12 py-8 overflow-visible">
               {/* Decorative Lines */}
               <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1/4 h-px">
                 <div className="since-line-left w-full h-full bg-gradient-to-r from-transparent via-primary/60 to-primary origin-right" />
@@ -642,14 +790,14 @@ export default function RectorMessageContent() {
                 {/* Year 1962 - Bold Typography */}
                 <div className="since-year relative">
                   <span
-                    className="text-6xl md:text-8xl lg:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-b from-primary via-primary to-primary/70 tracking-tight drop-shadow-sm"
+                    className="text-6xl md:text-8xl lg:text-9xl font-black italic text-primary tracking-tight drop-shadow-sm"
                     style={{ fontFamily: "'Inter', sans-serif" }}
                   >
                     1962
                   </span>
                   {/* Subtle shadow text behind */}
                   <span
-                    className="absolute inset-0 text-6xl md:text-8xl lg:text-9xl font-black text-primary/5 tracking-tight -z-10 translate-x-1 translate-y-1"
+                    className="absolute inset-0 text-6xl md:text-8xl lg:text-9xl font-black italic text-primary/5 tracking-tight -z-10 translate-x-1 translate-y-1"
                     style={{ fontFamily: "'Inter', sans-serif" }}
                   >
                     1962
@@ -675,7 +823,10 @@ export default function RectorMessageContent() {
             </div>
           </div>
 
-          <div className="section-image-0 w-full aspect-[21/9] relative rounded-[2.5rem] overflow-hidden shadow-2xl group">
+          <div
+            ref={lineStartRef}
+            className="section-image-0 w-full aspect-[21/9] relative rounded-[2.5rem] overflow-hidden shadow-2xl group"
+          >
             {/* Outline Border Effect (Shadow) */}
             <div className="absolute inset-0 bg-transparent border border-primary/50 rounded-[2.5rem] translate-x-3 translate-y-3 group-hover:translate-x-5 group-hover:translate-y-5 transition-transform duration-300 ease-out -z-10 hidden md:block" />
 
@@ -712,7 +863,7 @@ export default function RectorMessageContent() {
                 {/* 3D Sphere Marker - Desktop Only - REPLACED WITH CLEAN DESIGN */}
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 hidden md:flex items-center justify-center">
                   <div
-                    className={`sphere-marker-${index} relative w-24 h-24 rounded-full bg-white border-4 border-blue-50 flex items-center justify-center transform transition-transform hover:scale-110 duration-500 z-10 shadow-sm`}
+                    className={`sphere-marker-${index} relative w-24 h-24 rounded-full bg-white border border-blue-100 flex items-center justify-center transform transition-transform hover:scale-110 duration-500 z-10 shadow-sm`}
                   >
                     <div className="relative w-20 h-20 p-2">
                       <Image
@@ -792,7 +943,7 @@ export default function RectorMessageContent() {
                             : "flex flex-row-reverse items-center gap-4",
                         )}
                       >
-                        <div className="signature-avatar relative w-16 h-16 rounded-full overflow-hidden border-4 border-white shadow-lg shrink-0">
+                        <div className="signature-avatar relative w-16 h-16 rounded-full overflow-hidden border-2 border-white shadow-lg shrink-0">
                           <Image
                             src="/PGS_TS_LGH.png"
                             alt="PGS. TS. Lê Hiếu Giang"
@@ -874,16 +1025,38 @@ export default function RectorMessageContent() {
           })}
         </div>
 
-        {/* Ending Decoration */}
-        <div className="py-24 flex justify-center">
-          <div className="ending-flower w-24 h-24 relative opacity-0 grayscale hover:grayscale-0 transition-all duration-700">
-            <Image
-              src="/assets/FLOWER_UTE.png"
-              alt="UTE"
-              fill
-              className="object-contain"
+        {/* Ending - Khám phá thêm Button with BorderBeam */}
+        <div className="pt-16 pb-24 flex flex-col items-center relative z-20">
+          {/* Khám phá thêm Button */}
+          <a
+            ref={endingBtnRef}
+            href="/gioi-thieu"
+            className="ending-button relative inline-flex items-center justify-center px-10 py-5 text-lg font-bold text-primary bg-white rounded-full shadow-lg border border-primary/20 overflow-hidden group hover:shadow-xl transition-shadow duration-300"
+          >
+            <span className="relative z-10 flex items-center gap-2">
+              Khám phá thêm
+              <svg
+                className="w-5 h-5 transition-transform group-hover:translate-x-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                />
+              </svg>
+            </span>
+            <BorderBeam
+              size={80}
+              duration={2}
+              colorFrom="#3b82f6"
+              colorTo="#1d4ed8"
+              borderWidth={2}
             />
-          </div>
+          </a>
         </div>
       </div>
     </div>
