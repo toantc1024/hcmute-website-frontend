@@ -168,75 +168,71 @@ export default function RectorMessageContent() {
         );
       }
 
-      // Hero Animation - Enhanced with more dramatic effects
+      // Hero Animation - Professional and smooth
       const heroTl = gsap.timeline();
       
-      // Badge entrance with bounce
+      // Badge entrance - smooth fade
       heroTl
         .from(".hero-badge", {
-          scale: 0,
+          y: -20,
           opacity: 0,
           duration: 0.8,
-          ease: "elastic.out(1, 0.5)",
+          ease: "power3.out",
         })
-        // Title splits in with stagger
+        // Title slides in smoothly
         .from(".hero-title", {
-          y: 100,
-          opacity: 0,
-          duration: 1.2,
-          ease: "power4.out",
-        }, "-=0.4")
-        // Description slides up
-        .from(".hero-description", {
           y: 60,
           opacity: 0,
           duration: 1,
           ease: "power3.out",
-        }, "-=0.7")
-        // Image reveal with dramatic clip-path
+        }, "-=0.5")
+        // Description slides up
+        .from(".hero-description", {
+          y: 40,
+          opacity: 0,
+          duration: 0.9,
+          ease: "power3.out",
+        }, "-=0.6")
+        // Image reveal with elegant clip-path
         .from(
           ".hero-image-wrapper",
           {
-            scale: 1.1,
+            scale: 1.05,
             opacity: 0,
-            duration: 1.8,
-            ease: "expo.out",
+            duration: 1.4,
+            ease: "power2.out",
           },
-          "-=0.6",
+          "-=0.5",
         )
         .fromTo(
           ".hero-image-wrapper",
-          { clipPath: "inset(50% 20% 50% 20%)" },
+          { clipPath: "inset(10% 5% 10% 5%)" },
           {
             clipPath: "inset(0% 0% 0% 0%)",
-            duration: 1.8,
-            ease: "power4.inOut",
+            duration: 1.4,
+            ease: "power3.inOut",
           },
           "<",
         );
 
-      // Section Animations
+      // Section Animations - Professional and smooth
       contentSections.forEach((section, index) => {
         const isEven = index % 2 === 0;
         
-        // Image Slide In with 3D perspective
+        // Image Slide In - elegant reveal
         if (index === 0) {
-          // First section: Dramatic scale and blur reveal
+          // First section: Smooth scale and fade
           gsap.fromTo(
             `.section-text-blur-0`,
             { 
-              y: 80, 
+              y: 50, 
               opacity: 0, 
-              scale: 0.9,
-              filter: "blur(10px)"
             },
             {
               y: 0,
               opacity: 1,
-              scale: 1,
-              filter: "blur(0px)",
-              duration: 1.4,
-              ease: "power4.out",
+              duration: 1,
+              ease: "power3.out",
               scrollTrigger: {
                 trigger: `.section-text-blur-0`,
                 start: "top 85%",
@@ -248,19 +244,14 @@ export default function RectorMessageContent() {
           gsap.fromTo(
             `.section-image-0`,
             { 
-              scale: 0.8, 
+              scale: 0.95, 
               opacity: 0, 
-              rotateY: 15,
-              skewY: 3,
-              transformPerspective: 1000
             },
             {
               scale: 1,
               opacity: 1,
-              rotateY: 0,
-              skewY: 0,
-              duration: 1.6,
-              ease: "power3.out",
+              duration: 1.2,
+              ease: "power2.out",
               scrollTrigger: {
                 trigger: `.section-${index}`,
                 start: "top 80%",
@@ -268,28 +259,21 @@ export default function RectorMessageContent() {
             },
           );
         } else {
-          const slideFromX = isEven ? 200 : -200;
-          const rotateFrom = isEven ? 8 : -8;
-          const skewFrom = isEven ? 5 : -5;
+          const slideFromX = isEven ? 80 : -80;
 
-          // Image with 3D rotation + skew effect
+          // Image with smooth slide effect
           gsap.fromTo(
             `.section-image-${index}`,
             { 
               x: slideFromX, 
               opacity: 0, 
-              rotateY: rotateFrom * 2,
-              skewY: skewFrom,
-              scale: 0.85,
-              transformPerspective: 1200
+              scale: 0.95,
             },
             {
               x: 0,
               opacity: 1,
-              rotateY: 0,
-              skewY: 0,
               scale: 1,
-              duration: 1.6,
+              duration: 1.2,
               ease: "power3.out",
               scrollTrigger: {
                 trigger: `.section-${index}`,
@@ -299,7 +283,7 @@ export default function RectorMessageContent() {
           );
         }
 
-        // Text Content Reveal with skew + stagger
+        // Text Content Reveal - clean fade up
         const textTl = gsap.timeline({
           scrollTrigger: {
             trigger: `.section-${index}`,
@@ -311,16 +295,14 @@ export default function RectorMessageContent() {
         textTl.fromTo(
           `.section-text-${index}`,
           { 
-            y: 60, 
+            y: 40, 
             opacity: 0,
-            skewY: isEven ? 2 : -2,
           },
           {
             y: 0,
             opacity: 1,
-            skewY: 0,
-            duration: 1,
-            ease: "power4.out",
+            duration: 0.9,
+            ease: "power3.out",
           },
         );
 
@@ -329,16 +311,14 @@ export default function RectorMessageContent() {
           gsap.fromTo(
             `.section-${index} .quote-block`,
             {
-              scale: 0.9,
               opacity: 0,
-              y: 40,
+              y: 30,
             },
             {
-              scale: 1,
               opacity: 1,
               y: 0,
-              duration: 1.2,
-              ease: "back.out(1.4)",
+              duration: 1,
+              ease: "power3.out",
               scrollTrigger: {
                 trigger: `.section-${index} .quote-block`,
                 start: "top 85%",
@@ -347,40 +327,38 @@ export default function RectorMessageContent() {
             },
           );
           
-          // Signature avatar bounce in
+          // Signature block - smooth fade in (no spinning for PGS. TS. Lê Hiếu Giang)
           gsap.fromTo(
-            `.section-${index} .signature-avatar`,
+            `.section-${index} .signature-block`,
             {
-              scale: 0,
-              rotation: -180,
+              opacity: 0,
+              y: 20,
             },
             {
-              scale: 1,
-              rotation: 0,
-              duration: 1,
-              ease: "elastic.out(1, 0.5)",
+              opacity: 1,
+              y: 0,
+              duration: 0.8,
+              ease: "power2.out",
               scrollTrigger: {
                 trigger: `.section-${index} .signature-block`,
-                start: "top 85%",
+                start: "top 90%",
               },
             },
           );
         }
 
-        // Marker with spring pop effect
+        // Marker - smooth scale in
         gsap.fromTo(
           `.sphere-marker-${index}`,
           { 
-            rotation: -360, 
-            scale: 0, 
+            scale: 0.5, 
             opacity: 0,
           },
           {
-            rotation: 0,
             scale: 1,
             opacity: 1,
-            duration: 1.4,
-            ease: "elastic.out(1.2, 0.4)",
+            duration: 0.8,
+            ease: "power2.out",
             scrollTrigger: {
               trigger: `.section-${index}`,
               start: "top 80%",
@@ -389,21 +367,19 @@ export default function RectorMessageContent() {
           },
         );
 
-        // Highlight badge pop effect
+        // Highlight badge - smooth fade in
         gsap.fromTo(
           `.section-${index} .highlight-badge`,
           {
-            scale: 0.5,
             opacity: 0,
-            y: 20,
+            y: 15,
           },
           {
-            scale: 1,
             opacity: 1,
             y: 0,
-            duration: 0.8,
-            delay: 0.3,
-            ease: "back.out(2)",
+            duration: 0.7,
+            delay: 0.2,
+            ease: "power3.out",
             scrollTrigger: {
               trigger: `.section-${index}`,
               start: "top 75%",
@@ -412,26 +388,70 @@ export default function RectorMessageContent() {
         );
       });
 
-      // Ending decoration spin in
+      // Ending decoration - smooth fade in
       gsap.fromTo(
         ".ending-flower",
         {
-          scale: 0,
-          rotation: -720,
+          scale: 0.8,
           opacity: 0,
         },
         {
           scale: 1,
-          rotation: 0,
           opacity: 0.2,
-          duration: 2,
-          ease: "elastic.out(1, 0.3)",
+          duration: 1,
+          ease: "power2.out",
           scrollTrigger: {
             trigger: ".ending-flower",
             start: "top 90%",
           },
         },
       );
+
+      // 1962 SINCE Banner Animation - Professional and elegant
+      const sinceTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: ".since-banner",
+          start: "top 85%",
+          toggleActions: "play none none reverse",
+        },
+      });
+
+      // Smooth staggered entrance
+      sinceTl
+        .fromTo(
+          ".since-line-left",
+          { scaleX: 0, opacity: 0 },
+          { scaleX: 1, opacity: 1, duration: 0.8, ease: "power3.out" },
+        )
+        .fromTo(
+          ".since-line-right",
+          { scaleX: 0, opacity: 0 },
+          { scaleX: 1, opacity: 1, duration: 0.8, ease: "power3.out" },
+          "<",
+        )
+        .fromTo(
+          ".since-text",
+          { y: 20, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" },
+          "-=0.4",
+        )
+        .fromTo(
+          ".since-year",
+          { y: 30, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            ease: "power3.out",
+          },
+          "-=0.3",
+        )
+        .fromTo(
+          ".since-tagline",
+          { y: 15, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.5, stagger: 0.1, ease: "power3.out" },
+          "-=0.4",
+        );
     },
     { scope: containerRef },
   );
@@ -590,13 +610,61 @@ export default function RectorMessageContent() {
             >
               {contentSections[0].highlight}
             </div>
+
+            {/* 1962 SINCE Banner - Inspired by UTE Poster Design */}
+            <div className="since-banner relative w-full max-w-2xl mx-auto mt-12 py-8">
+              {/* Decorative Lines */}
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1/4 h-px">
+                <div className="since-line-left w-full h-full bg-gradient-to-r from-transparent via-primary/60 to-primary origin-right" />
+              </div>
+              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1/4 h-px">
+                <div className="since-line-right w-full h-full bg-gradient-to-l from-transparent via-primary/60 to-primary origin-left" />
+              </div>
+
+              {/* Center Content */}
+              <div className="relative flex flex-col items-center gap-4">
+                {/* SINCE Text */}
+                <div className="since-text flex items-center gap-3">
+                  <span className="text-sm md:text-base font-bold tracking-[0.3em] text-primary uppercase">
+                    Since
+                  </span>
+                </div>
+
+                {/* Year 1962 - Bold Typography */}
+                <div className="since-year relative">
+                  <span className="text-6xl md:text-8xl lg:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-b from-primary via-primary to-primary/70 tracking-tight drop-shadow-sm" style={{ fontFamily: "'Inter', sans-serif" }}>
+                    1962
+                  </span>
+                  {/* Subtle shadow text behind */}
+                  <span className="absolute inset-0 text-6xl md:text-8xl lg:text-9xl font-black text-primary/5 tracking-tight -z-10 translate-x-1 translate-y-1" style={{ fontFamily: "'Inter', sans-serif" }}>
+                    1962
+                  </span>
+                </div>
+
+                {/* Taglines - Vietnamese */}
+                <div className="flex flex-col md:flex-row items-center gap-2 md:gap-6 mt-2">
+                  <div className="since-tagline flex items-center gap-2 px-4 py-2 bg-primary/5 rounded-full border border-primary/20">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                    <span className="text-sm font-semibold text-primary tracking-wide">
+                      Khẳng định tầm vóc
+                    </span>
+                  </div>
+                  <div className="since-tagline flex items-center gap-2 px-4 py-2 bg-primary/5 rounded-full border border-primary/20">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                    <span className="text-sm font-semibold text-primary tracking-wide">
+                      Vươn mình phát triển
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="section-image-0 w-full aspect-[21/9] relative md:rounded-[2.5rem] overflow-hidden shadow-none md:shadow-2xl group">
             {/* Outline Border Effect (Shadow) */}
-            <div className="absolute inset-0 bg-transparent border-2 border-slate-300 rounded-[2.5rem] translate-x-3 translate-y-3 group-hover:translate-x-5 group-hover:translate-y-5 transition-transform duration-300 ease-out -z-10 hidden md:block" />
+            <div className="absolute inset-0 bg-transparent border border-primary/50 rounded-[2.5rem] translate-x-3 translate-y-3 group-hover:translate-x-5 group-hover:translate-y-5 transition-transform duration-300 ease-out -z-10 hidden md:block" />
 
-            <div className="relative w-full h-full bg-white md:rounded-[2.5rem] overflow-hidden border-4 border-white">
+            <div className="relative w-full h-full bg-white md:rounded-[2.5rem] overflow-hidden">
               <Image
                 src={contentSections[0].image}
                 alt={contentSections[0].title}
@@ -747,7 +815,7 @@ export default function RectorMessageContent() {
                     {/* Border effect - offset behind (uniform dashed) */}
                     <div
                       className={cn(
-                        "absolute inset-0 border-2 border-dashed border-slate-300 pointer-events-none translate-x-3 translate-y-3 transition-transform duration-300 ease-out group-hover:translate-x-5 group-hover:translate-y-5",
+                        "absolute inset-0 border border-solid border-primary/50 pointer-events-none translate-x-3 translate-y-3 transition-transform duration-300 ease-out group-hover:translate-x-5 group-hover:translate-y-5",
                         index % 2 === 1
                           ? "rounded-[2.5rem] rounded-tr-none"
                           : "rounded-[2.5rem] rounded-tl-none",
@@ -755,7 +823,7 @@ export default function RectorMessageContent() {
                     />
                     <div
                       className={cn(
-                        `section-image-${index} relative w-full h-full overflow-hidden shadow-xl border-2 border-slate-200 bg-white`,
+                        `section-image-${index} relative w-full h-full overflow-hidden shadow-xl bg-white`,
                         index % 2 === 1
                           ? "rounded-[2.5rem] rounded-tr-none"
                           : "rounded-[2.5rem] rounded-tl-none",
