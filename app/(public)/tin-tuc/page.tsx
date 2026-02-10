@@ -4,7 +4,19 @@ import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
 import Image from "next/image";
-import { Search, Filter, Calendar, Eye, ChevronDown, X } from "lucide-react";
+import {
+  Search,
+  Calendar,
+  Eye,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  LayoutGrid,
+  List,
+  SlidersHorizontal,
+} from "lucide-react";
 import {
   postsApi,
   categoriesApi,
@@ -13,6 +25,15 @@ import {
 } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -23,20 +44,30 @@ const formatDate = (dateString: string) => {
   });
 };
 
+const ITEMS_PER_PAGE = 12;
+
 export default function TinTucPage() {
   const [posts, setPosts] = useState<PostAuditView[]>([]);
   const [categories, setCategories] = useState<CategoryView[]>([]);
   const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [cursor, setCursor] = useState<string | undefined>();
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
 
   // Filters
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<
-    string | undefined
-  >();
-  const [showFilters, setShowFilters] = useState(false);
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [viewMode, setViewMode] = useState<"grid" | "grouped">("grid");
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setCurrentPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   // Fetch categories
   useEffect(() => {
@@ -53,58 +84,88 @@ export default function TinTucPage() {
   }, []);
 
   // Fetch posts
-  const fetchPosts = useCallback(
-    async (loadMore = false) => {
-      try {
-        if (loadMore) {
-          setLoadingMore(true);
-        } else {
-          setLoading(true);
-          setPosts([]);
-        }
+  const fetchPosts = useCallback(async () => {
+    try {
+      setLoading(true);
 
-        const response = await postsApi.getPublishedPosts({
-          cursor: loadMore ? cursor : undefined,
-          limit: 12,
-          categoryId: selectedCategory,
-          search: searchQuery || undefined,
-        });
+      const response = await postsApi.getPublishedPosts({
+        page: currentPage - 1,
+        limit: ITEMS_PER_PAGE,
+        categoryId: selectedCategory !== "all" ? selectedCategory : undefined,
+        search: debouncedSearch || undefined,
+      });
 
-        if (loadMore) {
-          setPosts((prev) => [...prev, ...response.content]);
-        } else {
-          setPosts(response.content);
-        }
-
-        setHasMore(response.hasNext);
-        setCursor(response.cursor);
-      } catch (error) {
-        console.error("Failed to fetch posts:", error);
-      } finally {
-        setLoading(false);
-        setLoadingMore(false);
-      }
-    },
-    [cursor, selectedCategory, searchQuery],
-  );
+      setPosts(response.content);
+      setTotalPages(response.totalPages || 1);
+      setTotalItems(response.totalElements || response.content.length);
+    } catch (error) {
+      console.error("Failed to fetch posts:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [currentPage, selectedCategory, debouncedSearch]);
 
   // Initial load and filter changes
   useEffect(() => {
-    fetchPosts(false);
-  }, [selectedCategory, searchQuery]);
+    fetchPosts();
+  }, [fetchPosts]);
 
-  const selectedCategoryName = categories?.find(
-    (c) => c.id === selectedCategory,
-  )?.name;
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory]);
+
+  // Group posts by category for grouped view
+  const groupedPosts = posts.reduce(
+    (acc, post) => {
+      const categoryName = post.categories?.[0]?.name || "Khác";
+      if (!acc[categoryName]) {
+        acc[categoryName] = [];
+      }
+      acc[categoryName].push(post);
+      return acc;
+    },
+    {} as Record<string, PostAuditView[]>,
+  );
+
+  const selectedCategoryName =
+    selectedCategory !== "all"
+      ? categories?.find((c) => c.id === selectedCategory)?.name
+      : null;
+
+  // Pagination helpers
+  const getPageNumbers = () => {
+    const pages: (number | string)[] = [];
+    const maxVisible = 5;
+
+    if (totalPages <= maxVisible + 2) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+
+      if (currentPage > 3) pages.push("...");
+
+      const start = Math.max(2, currentPage - 1);
+      const end = Math.min(totalPages - 1, currentPage + 1);
+
+      for (let i = start; i <= end; i++) pages.push(i);
+
+      if (currentPage < totalPages - 2) pages.push("...");
+
+      pages.push(totalPages);
+    }
+
+    return pages;
+  };
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b">
-        <div className="px-4 sm:px-8 lg:px-32 h-14 flex items-center gap-4">
+        <div className="px-4 sm:px-8 lg:px-32 h-16 flex items-center gap-4">
           <Link
             href="/"
-            className="text-sm text-muted-foreground hover:text-foreground"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             ← Trang chủ
           </Link>
@@ -112,112 +173,102 @@ export default function TinTucPage() {
           <div className="flex-1" />
 
           {/* Search */}
-          <div className="relative w-full max-w-md">
+          <div className="relative w-full max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               type="text"
               placeholder="Tìm kiếm tin tức..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 h-9 bg-muted/50 border-0 focus-visible:ring-1"
+              className="pl-9 h-10 bg-muted/50 border-0 focus-visible:ring-1"
             />
           </div>
 
-          {/* Filter Toggle */}
-          <Button
-            variant={showFilters ? "secondary" : "ghost"}
-            size="sm"
-            className="gap-2"
-            onClick={() => setShowFilters(!showFilters)}
+          {/* Category Dropdown */}
+          <Select
+            value={selectedCategory}
+            onValueChange={(value) => setSelectedCategory(value)}
           >
-            <Filter className="w-4 h-4" />
-            <span className="hidden sm:inline">Lọc</span>
-            {selectedCategory && (
-              <span className="w-2 h-2 rounded-full bg-primary" />
-            )}
-          </Button>
-        </div>
+            <SelectTrigger className="w-[180px] h-10">
+              <SelectValue placeholder="Chọn danh mục" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tất cả danh mục</SelectItem>
+              {categories.map((category) => (
+                <SelectItem key={category.id} value={category.id}>
+                  {category.name}
+                  {category.postCount !== undefined && (
+                    <span className="ml-1 text-muted-foreground">
+                      ({category.postCount})
+                    </span>
+                  )}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-        {/* Category Filters */}
-        <AnimatePresence>
-          {showFilters && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="border-t overflow-hidden"
+          {/* View Mode Toggle */}
+          <div className="hidden md:flex items-center gap-1 p-1 bg-muted rounded-lg">
+            <Button
+              variant={viewMode === "grid" ? "secondary" : "ghost"}
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setViewMode("grid")}
             >
-              <div className="px-4 sm:px-8 lg:px-32 py-3">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-xs text-muted-foreground mr-2">
-                    Danh mục:
-                  </span>
-
-                  <Button
-                    variant={!selectedCategory ? "secondary" : "ghost"}
-                    size="sm"
-                    className="h-7 text-xs"
-                    onClick={() => setSelectedCategory(undefined)}
-                  >
-                    Tất cả
-                  </Button>
-
-                  {categories.map((category) => (
-                    <Button
-                      key={category.id}
-                      variant={
-                        selectedCategory === category.id ? "secondary" : "ghost"
-                      }
-                      size="sm"
-                      className="h-7 text-xs"
-                      onClick={() =>
-                        setSelectedCategory(
-                          selectedCategory === category.id
-                            ? undefined
-                            : category.id,
-                        )
-                      }
-                    >
-                      {category.name}
-                      {category.postCount !== undefined && (
-                        <span className="ml-1 text-muted-foreground">
-                          ({category.postCount})
-                        </span>
-                      )}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              <LayoutGrid className="w-4 h-4" />
+            </Button>
+            <Button
+              variant={viewMode === "grouped" ? "secondary" : "ghost"}
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setViewMode("grouped")}
+            >
+              <List className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
       </header>
 
-      {/* Page Title */}
+      {/* Page Title & Stats */}
       <div className="px-4 sm:px-8 lg:px-32 py-8">
-        <div className="flex items-center gap-3 mb-8">
-          <h1 className="text-2xl font-bold">
-            {selectedCategoryName || "Tin tức"}
-          </h1>
-          {selectedCategory && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 text-xs"
-              onClick={() => setSelectedCategory(undefined)}
-            >
-              <X className="w-3 h-3 mr-1" />
-              Xóa bộ lọc
-            </Button>
-          )}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">
+              {selectedCategoryName || "Tin tức"}
+            </h1>
+            <p className="text-muted-foreground text-sm">
+              {loading ? "Đang tải..." : `${totalItems} bài viết`}
+              {debouncedSearch && ` cho "${debouncedSearch}"`}
+            </p>
+          </div>
+
+          {/* Category Tags - Quick Filter */}
+          <div className="hidden lg:flex items-center gap-2 flex-wrap justify-end max-w-xl">
+            {categories.slice(0, 5).map((category) => (
+              <Badge
+                key={category.id}
+                variant={
+                  selectedCategory === category.id ? "default" : "outline"
+                }
+                className="cursor-pointer hover:bg-primary/10 transition-colors"
+                onClick={() =>
+                  setSelectedCategory(
+                    selectedCategory === category.id ? "all" : category.id,
+                  )
+                }
+              >
+                {category.name}
+              </Badge>
+            ))}
+          </div>
         </div>
 
-        {/* Posts Grid */}
+        {/* Posts */}
         {loading ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
               <div key={i} className="space-y-3 animate-pulse">
-                <div className="aspect-video rounded-lg bg-muted" />
+                <div className="aspect-video rounded-xl bg-muted" />
                 <div className="h-4 bg-muted rounded w-3/4" />
                 <div className="h-4 bg-muted rounded w-1/2" />
               </div>
@@ -231,109 +282,285 @@ export default function TinTucPage() {
               size="sm"
               onClick={() => {
                 setSearchQuery("");
-                setSelectedCategory(undefined);
+                setSelectedCategory("all");
               }}
             >
               Xóa bộ lọc
             </Button>
           </div>
+        ) : viewMode === "grouped" ? (
+          /* Grouped View by Category */
+          <div className="space-y-12">
+            {Object.entries(groupedPosts).map(
+              ([categoryName, categoryPosts]) => (
+                <section key={categoryName}>
+                  <div className="flex items-center gap-3 mb-6">
+                    <h2 className="text-xl font-bold text-foreground">
+                      {categoryName}
+                    </h2>
+                    <Badge variant="secondary">{categoryPosts.length}</Badge>
+                    <div className="flex-1 h-px bg-border" />
+                  </div>
+
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {categoryPosts.map((post, index) => (
+                      <motion.article
+                        key={post.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: index * 0.05 }}
+                      >
+                        <Link
+                          href={`/tin-tuc/${post.slug}`}
+                          className="group block"
+                        >
+                          <div className="relative aspect-video rounded-xl overflow-hidden bg-muted mb-3">
+                            {post.coverImageUrl ? (
+                              <Image
+                                src={post.coverImageUrl}
+                                alt={post.title}
+                                fill
+                                unoptimized
+                                className="object-cover transition-transform duration-500 group-hover:scale-110"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-gradient-to-br from-primary/80 to-primary flex items-center justify-center">
+                                <span className="text-primary-foreground/50 text-xl font-bold">
+                                  HCMUTE
+                                </span>
+                              </div>
+                            )}
+                          </div>
+
+                          <h3 className="font-medium text-foreground line-clamp-2 group-hover:text-primary transition-colors text-sm">
+                            {post.title}
+                          </h3>
+
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-2">
+                            <Calendar className="w-3 h-3" />
+                            {formatDate(post.publishedAt || post.createdAt)}
+                          </div>
+                        </Link>
+                      </motion.article>
+                    ))}
+                  </div>
+                </section>
+              ),
+            )}
+          </div>
         ) : (
-          <>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
-              {posts.map((post, index) => (
-                <motion.article
-                  key={post.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.03 }}
-                >
-                  <Link href={`/tin-tuc/${post.slug}`} className="group block">
-                    {/* Thumbnail with gradient overlay */}
-                    <div className="relative aspect-video rounded-xl overflow-hidden bg-muted mb-3">
-                      {post.coverImageUrl ? (
-                        <Image
-                          src={post.coverImageUrl}
-                          alt={post.title}
-                          fill
-                          unoptimized
-                          className="object-cover transition-transform duration-500 group-hover:scale-110"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-                          <span className="text-white/50 text-2xl font-bold">
-                            HCM-UTE
-                          </span>
-                        </div>
-                      )}
-                      {/* Gradient overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    </div>
-
-                    {/* Content */}
-                    <div className="space-y-2">
-                      {/* Category */}
-                      {post.categories?.[0] && (
-                        <span className="text-xs font-medium text-primary">
-                          {post.categories[0].name}
+          /* Grid View */
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
+            {posts.map((post, index) => (
+              <motion.article
+                key={post.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.03 }}
+              >
+                <Link href={`/tin-tuc/${post.slug}`} className="group block">
+                  {/* Thumbnail */}
+                  <div className="relative aspect-video rounded-xl overflow-hidden bg-muted mb-3">
+                    {post.coverImageUrl ? (
+                      <Image
+                        src={post.coverImageUrl}
+                        alt={post.title}
+                        fill
+                        unoptimized
+                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-primary/80 to-primary flex items-center justify-center">
+                        <span className="text-primary-foreground/50 text-2xl font-bold">
+                          HCMUTE
                         </span>
-                      )}
-
-                      {/* Title */}
-                      <h2 className="font-medium text-foreground line-clamp-2 group-hover:text-primary transition-colors">
-                        {post.title}
-                      </h2>
-
-                      {/* Excerpt */}
-                      {post.excerpt && (
-                        <div
-                          className="text-sm text-muted-foreground line-clamp-2"
-                          dangerouslySetInnerHTML={{ __html: post.excerpt }}
-                        />
-                      )}
-
-                      {/* Meta */}
-                      <div className="flex items-center gap-3 text-xs text-muted-foreground pt-1">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3" />
-                          {formatDate(post.publishedAt || post.createdAt)}
-                        </span>
-                        {post.viewCount > 0 && (
-                          <span className="flex items-center gap-1">
-                            <Eye className="w-3 h-3" />
-                            {post.viewCount}
-                          </span>
-                        )}
                       </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </div>
+
+                  {/* Content */}
+                  <div className="space-y-2">
+                    {post.categories?.[0] && (
+                      <Badge variant="secondary" className="text-xs">
+                        {post.categories[0].name}
+                      </Badge>
+                    )}
+
+                    <h2 className="font-medium text-foreground line-clamp-2 group-hover:text-primary transition-colors">
+                      {post.title}
+                    </h2>
+
+                    {post.excerpt && (
+                      <div
+                        className="text-sm text-muted-foreground line-clamp-2"
+                        dangerouslySetInnerHTML={{ __html: post.excerpt }}
+                      />
+                    )}
+
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground pt-1">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {formatDate(post.publishedAt || post.createdAt)}
+                      </span>
+                      {post.viewCount > 0 && (
+                        <span className="flex items-center gap-1">
+                          <Eye className="w-3 h-3" />
+                          {post.viewCount}
+                        </span>
+                      )}
                     </div>
-                  </Link>
-                </motion.article>
-              ))}
+                  </div>
+                </Link>
+              </motion.article>
+            ))}
+          </div>
+        )}
+
+        {/* Creative Pagination */}
+        {totalPages > 1 && !loading && (
+          <div className="mt-16 flex flex-col items-center gap-6">
+            {/* Progress Indicator */}
+            <div className="w-full max-w-md">
+              <div className="flex items-center justify-between text-sm text-muted-foreground mb-2">
+                <span>
+                  Trang {currentPage} / {totalPages}
+                </span>
+                <span>
+                  {Math.min(currentPage * ITEMS_PER_PAGE, totalItems)} /{" "}
+                  {totalItems} bài viết
+                </span>
+              </div>
+              <div className="h-1 bg-muted rounded-full overflow-hidden">
+                <motion.div
+                  className="h-full bg-primary rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{
+                    width: `${(currentPage / totalPages) * 100}%`,
+                  }}
+                  transition={{ duration: 0.3 }}
+                />
+              </div>
             </div>
 
-            {/* Load More */}
-            {hasMore && (
-              <div className="flex justify-center mt-12">
-                <Button
-                  variant="outline"
-                  onClick={() => fetchPosts(true)}
-                  disabled={loadingMore}
-                  className="gap-2"
-                >
-                  {loadingMore ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-muted-foreground border-t-primary rounded-full animate-spin" />
-                      Đang tải...
-                    </>
+            {/* Pagination Controls */}
+            <div className="flex items-center gap-2">
+              {/* First Page */}
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-10 w-10"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(1)}
+              >
+                <ChevronsLeft className="w-4 h-4" />
+              </Button>
+
+              {/* Previous */}
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-10 w-10"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+
+              {/* Page Numbers */}
+              <div className="hidden sm:flex items-center gap-1">
+                {getPageNumbers().map((page, i) =>
+                  page === "..." ? (
+                    <span
+                      key={`ellipsis-${i}`}
+                      className="px-2 text-muted-foreground"
+                    >
+                      ...
+                    </span>
                   ) : (
-                    <>
-                      Xem thêm
-                      <ChevronDown className="w-4 h-4" />
-                    </>
-                  )}
-                </Button>
+                    <Button
+                      key={page}
+                      variant={currentPage === page ? "default" : "ghost"}
+                      size="icon"
+                      className={cn(
+                        "h-10 w-10 transition-all",
+                        currentPage === page && "shadow-lg scale-110",
+                      )}
+                      onClick={() => setCurrentPage(page as number)}
+                    >
+                      {page}
+                    </Button>
+                  ),
+                )}
               </div>
-            )}
-          </>
+
+              {/* Mobile Page Input */}
+              <div className="sm:hidden flex items-center gap-2">
+                <Input
+                  type="number"
+                  min={1}
+                  max={totalPages}
+                  value={currentPage}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value);
+                    if (val >= 1 && val <= totalPages) {
+                      setCurrentPage(val);
+                    }
+                  }}
+                  className="w-16 h-10 text-center"
+                />
+                <span className="text-muted-foreground">/ {totalPages}</span>
+              </div>
+
+              {/* Next */}
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-10 w-10"
+                disabled={currentPage === totalPages}
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(totalPages, p + 1))
+                }
+              >
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+
+              {/* Last Page */}
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-10 w-10"
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(totalPages)}
+              >
+                <ChevronsRight className="w-4 h-4" />
+              </Button>
+            </div>
+
+            {/* Quick Jump */}
+            <div className="flex items-center gap-3 text-sm text-muted-foreground">
+              <span>Nhảy đến:</span>
+              <div className="flex gap-1">
+                {[1, Math.ceil(totalPages / 2), totalPages]
+                  .filter((v, i, a) => a.indexOf(v) === i)
+                  .map((page) => (
+                    <Button
+                      key={page}
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 px-2"
+                      onClick={() => setCurrentPage(page)}
+                    >
+                      {page === 1
+                        ? "Đầu"
+                        : page === totalPages
+                          ? "Cuối"
+                          : "Giữa"}
+                    </Button>
+                  ))}
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>
