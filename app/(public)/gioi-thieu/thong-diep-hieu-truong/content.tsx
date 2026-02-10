@@ -89,7 +89,7 @@ export default function RectorMessageContent() {
         });
         // Subtle rotation
         gsap.to(flower as Element, {
-          rotation: (i % 2 === 0 ? 15 : -15),
+          rotation: i % 2 === 0 ? 15 : -15,
           ease: "none",
           scrollTrigger: {
             trigger: flower as Element,
@@ -123,7 +123,7 @@ export default function RectorMessageContent() {
           end: "bottom bottom",
           scrub: 2,
         },
-        onUpdate: function() {
+        onUpdate: function () {
           const progress = this.progress();
           const originY = 30 + progress * 40; // 30% → 70%
           const el = document.querySelector(".grid-bg-pattern") as HTMLElement;
@@ -170,7 +170,7 @@ export default function RectorMessageContent() {
 
       // Hero Animation - Professional and smooth
       const heroTl = gsap.timeline();
-      
+
       // Badge entrance - smooth fade
       heroTl
         .from(".hero-badge", {
@@ -180,19 +180,27 @@ export default function RectorMessageContent() {
           ease: "power3.out",
         })
         // Title slides in smoothly
-        .from(".hero-title", {
-          y: 60,
-          opacity: 0,
-          duration: 1,
-          ease: "power3.out",
-        }, "-=0.5")
+        .from(
+          ".hero-title",
+          {
+            y: 60,
+            opacity: 0,
+            duration: 1,
+            ease: "power3.out",
+          },
+          "-=0.5",
+        )
         // Description slides up
-        .from(".hero-description", {
-          y: 40,
-          opacity: 0,
-          duration: 0.9,
-          ease: "power3.out",
-        }, "-=0.6")
+        .from(
+          ".hero-description",
+          {
+            y: 40,
+            opacity: 0,
+            duration: 0.9,
+            ease: "power3.out",
+          },
+          "-=0.6",
+        )
         // Image reveal with elegant clip-path
         .from(
           ".hero-image-wrapper",
@@ -218,15 +226,15 @@ export default function RectorMessageContent() {
       // Section Animations - Professional and smooth
       contentSections.forEach((section, index) => {
         const isEven = index % 2 === 0;
-        
+
         // Image Slide In - elegant reveal
         if (index === 0) {
           // First section: Smooth scale and fade
           gsap.fromTo(
             `.section-text-blur-0`,
-            { 
-              y: 50, 
-              opacity: 0, 
+            {
+              y: 50,
+              opacity: 0,
             },
             {
               y: 0,
@@ -243,9 +251,9 @@ export default function RectorMessageContent() {
 
           gsap.fromTo(
             `.section-image-0`,
-            { 
-              scale: 0.95, 
-              opacity: 0, 
+            {
+              scale: 0.95,
+              opacity: 0,
             },
             {
               scale: 1,
@@ -264,9 +272,9 @@ export default function RectorMessageContent() {
           // Image with smooth slide effect
           gsap.fromTo(
             `.section-image-${index}`,
-            { 
-              x: slideFromX, 
-              opacity: 0, 
+            {
+              x: slideFromX,
+              opacity: 0,
               scale: 0.95,
             },
             {
@@ -291,11 +299,11 @@ export default function RectorMessageContent() {
             toggleActions: "play none none reverse",
           },
         });
-        
+
         textTl.fromTo(
           `.section-text-${index}`,
-          { 
-            y: 40, 
+          {
+            y: 40,
             opacity: 0,
           },
           {
@@ -326,7 +334,7 @@ export default function RectorMessageContent() {
               },
             },
           );
-          
+
           // Signature block - smooth fade in (no spinning for PGS. TS. Lê Hiếu Giang)
           gsap.fromTo(
             `.section-${index} .signature-block`,
@@ -350,8 +358,8 @@ export default function RectorMessageContent() {
         // Marker - smooth scale in
         gsap.fromTo(
           `.sphere-marker-${index}`,
-          { 
-            scale: 0.5, 
+          {
+            scale: 0.5,
             opacity: 0,
           },
           {
@@ -462,14 +470,14 @@ export default function RectorMessageContent() {
       className="relative w-full overflow-hidden bg-white font-sans"
     >
       {/* Modern Grid Background - 3D Perspective Effect */}
-      <div 
+      <div
         className="grid-bg-pattern absolute inset-0 z-0 pointer-events-none"
         style={{
           perspective: "800px",
           perspectiveOrigin: "50% 30%",
         }}
       >
-        <div 
+        <div
           style={{
             transform: "rotateX(55deg) scale(2.5)",
             transformOrigin: "50% 0%",
@@ -483,7 +491,7 @@ export default function RectorMessageContent() {
             y={-1}
             strokeDasharray="0"
             className={cn(
-              "[mask-image:radial-gradient(ellipse_70%_50%_at_50%_50%,white_20%,transparent_100%)] opacity-[0.06] stroke-slate-400"
+              "[mask-image:radial-gradient(ellipse_70%_50%_at_50%_50%,white_20%,transparent_100%)] opacity-[0.06] stroke-slate-400",
             )}
           />
         </div>
@@ -569,8 +577,11 @@ export default function RectorMessageContent() {
           </h1>
 
           <p className="hero-description text-lg md:text-xl text-slate-500 leading-relaxed max-w-2xl mx-auto font-medium">
-            <span className="whitespace-nowrap">Trường Đại học Công nghệ Kỹ thuật TP. Hồ Chí Minh</span> (HCMUTE) - Nơi ươm mầm tài
-            năng, khơi dậy đam mê và đồng hành cùng sự phát triển bền vững.
+            <span className="whitespace-nowrap">
+              Trường Đại học Công nghệ Kỹ thuật TP. Hồ Chí Minh
+            </span>{" "}
+            (HCMUTE) - Nơi ươm mầm tài năng, khơi dậy đam mê và đồng hành cùng
+            sự phát triển bền vững.
           </p>
 
           {/* Button Removed */}
@@ -590,8 +601,6 @@ export default function RectorMessageContent() {
       </section>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 w-full mb-32 mt-24">
-
-
         {/* First Section - Full Width Image + Text */}
         <div className={`section-0 py-12 md:py-24 space-y-12`}>
           <div className="section-text-0 max-w-4xl mx-auto text-center space-y-6">
@@ -632,11 +641,17 @@ export default function RectorMessageContent() {
 
                 {/* Year 1962 - Bold Typography */}
                 <div className="since-year relative">
-                  <span className="text-6xl md:text-8xl lg:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-b from-primary via-primary to-primary/70 tracking-tight drop-shadow-sm" style={{ fontFamily: "'Inter', sans-serif" }}>
+                  <span
+                    className="text-6xl md:text-8xl lg:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-b from-primary via-primary to-primary/70 tracking-tight drop-shadow-sm"
+                    style={{ fontFamily: "'Inter', sans-serif" }}
+                  >
                     1962
                   </span>
                   {/* Subtle shadow text behind */}
-                  <span className="absolute inset-0 text-6xl md:text-8xl lg:text-9xl font-black text-primary/5 tracking-tight -z-10 translate-x-1 translate-y-1" style={{ fontFamily: "'Inter', sans-serif" }}>
+                  <span
+                    className="absolute inset-0 text-6xl md:text-8xl lg:text-9xl font-black text-primary/5 tracking-tight -z-10 translate-x-1 translate-y-1"
+                    style={{ fontFamily: "'Inter', sans-serif" }}
+                  >
                     1962
                   </span>
                 </div>
@@ -794,7 +809,10 @@ export default function RectorMessageContent() {
                             PGS. TS. Lê Hiếu Giang
                           </p>
                           <p className="text-slate-500 text-sm">
-                            Hiệu trưởng <span className="whitespace-nowrap">Trường Đại học Công nghệ Kỹ thuật TP. Hồ Chí Minh</span>
+                            Hiệu trưởng{" "}
+                            <span className="whitespace-nowrap">
+                              Trường Đại học Công nghệ Kỹ thuật TP. Hồ Chí Minh
+                            </span>
                           </p>
                         </div>
                       </div>
