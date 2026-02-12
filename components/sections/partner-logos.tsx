@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Marquee } from "@/components/ui/marquee";
 import { Globe } from "@/components/ui/globe";
+import { Container } from "@/components/layout";
 
 const universityLogos = [
   "/linked-university/Untitled-1-01.png",
@@ -36,7 +37,7 @@ export default function PartnerLogos() {
       <div className="hidden lg:block max-w-xl size-full opacity-[.4] absolute top-0 left-0 -translate-x-1/2">
         <Globe className="right-0" />
       </div>
-      <div className="px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40 w-full relative z-10">
+      <Container className="relative z-10">
         <motion.div
           className="text-center mb-8 lg:mb-16"
           initial={{ opacity: 0, y: 20 }}
@@ -82,7 +83,7 @@ export default function PartnerLogos() {
           <div className="pointer-events-none absolute inset-y-0 left-0 h-full w-1/4 sm:w-1/3 bg-gradient-to-r from-white"></div>
           <div className="pointer-events-none absolute inset-y-0 right-0 h-full w-1/4 sm:w-1/3 bg-gradient-to-l from-white"></div>
         </div>
-      </div>
+      </Container>
     </section>
   );
 }

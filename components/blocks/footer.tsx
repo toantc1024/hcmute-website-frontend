@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import Link from "next/link";
 import Image from "next/image";
+import { Container } from "@/components/layout";
 import {
   MapPin,
   Phone,
@@ -94,7 +95,7 @@ export default function Footer() {
       <div className="absolute top-0 left-0 right-0 h-1 bg-white/20" />
 
       <div className="relative">
-        <div className="w-full mx-auto px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40 py-16">
+        <Container className="py-16">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             <motion.div
               className="lg:col-span-4"
@@ -122,10 +123,7 @@ export default function Footer() {
               <div className="space-y-3 text-sm">
                 <div className="flex items-start gap-3 text-blue-100">
                   <MapPin className="w-4 h-4 mt-1 text-white shrink-0" />
-                  <span>
-                    01 Võ Văn Ngân, Phường Thủ Đức, TP. Hồ Chí
-                    Minh
-                  </span>
+                  <span>01 Võ Văn Ngân, Phường Thủ Đức, TP. Hồ Chí Minh</span>
                 </div>
                 <div className="flex items-center gap-3 text-blue-100">
                   <Phone className="w-4 h-4 text-white shrink-0" />
@@ -252,10 +250,10 @@ export default function Footer() {
               </div>
             </div>
           </div>
-        </div>
+        </Container>
 
         <div className="border-t border-white/20">
-          <div className="w-full mx-auto px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40 py-6">
+          <Container className="py-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <p className="text-blue-100 text-sm text-center md:text-left">
                 © {new Date().getFullYear()} Trường Đại học Công nghệ Kỹ Thuật
@@ -265,7 +263,7 @@ export default function Footer() {
                 Thực hiện bởi Phòng Quản trị Thương hiệu & Truyền thông
               </p>
             </div>
-          </div>
+          </Container>
         </div>
       </div>
     </footer>

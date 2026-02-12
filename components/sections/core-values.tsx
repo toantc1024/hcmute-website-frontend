@@ -16,6 +16,7 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
+import { Container } from "@/components/layout";
 
 const coreValuesData = [
   {
@@ -84,7 +85,7 @@ export default function CoreValues() {
       id="values"
       className="py-12 lg:py-20 relative bg-white overflow-hidden"
     >
-      <div className="px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40 relative z-10">
+      <Container className="relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-0 items-start">
           <motion.div
             className="space-y-4 lg:space-y-6"
@@ -184,7 +185,7 @@ export default function CoreValues() {
             </div>
           </motion.div>
         </div>
-      </div>
+      </Container>
     </section>
   );
 }

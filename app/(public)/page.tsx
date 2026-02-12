@@ -7,24 +7,14 @@ import {
   Newspaper,
   Users,
   Building2,
-  Clock,
   Award,
   Handshake,
   Sparkles,
-  ExternalLink,
-  X,
   BarChart3,
-  GraduationCap,
   Play,
-  Bot,
-  Link2,
-  FileText,
-  Video,
-  Cloud,
-  VideoIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "motion/react";
+import { UTEExtensionsDialog } from "@/components/blocks/ute-extensions-dialog";
 
 import {
   HeroCarousel,
@@ -48,52 +38,6 @@ const sectionNavItems = [
   { id: "units", label: "Đơn vị", icon: Building2 },
   { id: "news", label: "Tin tức", icon: Newspaper },
   { id: "partners", label: "Đối tác", icon: Handshake },
-];
-
-// AI Systems data
-const aiSystems = [
-  {
-    name: "UTE AI",
-    description: "Trợ lý AI thông minh",
-    url: "https://ai.hcmute.edu.vn",
-    Icon: Bot,
-    color: "from-blue-500 to-indigo-600",
-  },
-  {
-    name: "SLINK",
-    description: "Rút gọn liên kết",
-    url: "https://link.hcmute.edu.vn",
-    Icon: Link2,
-    color: "from-emerald-500 to-teal-600",
-  },
-  {
-    name: "UTE Form",
-    description: "Tạo biểu mẫu trực tuyến",
-    url: "https://form.hcmute.edu.vn",
-    Icon: FileText,
-    color: "from-purple-500 to-pink-600",
-  },
-  {
-    name: "LiveHub",
-    description: "Nền tảng livestream",
-    url: "https://livehub.hcmute.edu.vn",
-    Icon: Video,
-    color: "from-red-500 to-orange-600",
-  },
-  {
-    name: "UTE Drive",
-    description: "Lưu trữ đám mây",
-    url: "https://drive.hcmute.edu.vn",
-    Icon: Cloud,
-    color: "from-cyan-500 to-blue-600",
-  },
-  {
-    name: "UTE Meet",
-    description: "Họp trực tuyến",
-    url: "https://meet.hcmute.edu.vn",
-    Icon: VideoIcon,
-    color: "from-green-500 to-emerald-600",
-  },
 ];
 
 export default function HomePage() {
@@ -154,82 +98,8 @@ export default function HomePage() {
 
   return (
     <div className="relative overflow-x-hidden">
-      {/* AI Systems Panel Overlay */}
-      <AnimatePresence>
-        {showAiPanel && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100]"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setShowAiPanel(false)}
-            />
-            {/* Panel */}
-            <motion.div
-              className="fixed inset-x-4 top-1/2 -translate-y-1/2 z-[110] max-w-2xl mx-auto"
-              initial={{ opacity: 0, scale: 0.9, y: "-40%" }}
-              animate={{ opacity: 1, scale: 1, y: "-50%" }}
-              exit={{ opacity: 0, scale: 0.9, y: "-40%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            >
-              <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-                {/* Header */}
-                <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 px-6 py-5 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                      <Sparkles className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <h2 className="text-white font-bold text-lg">
-                        Hệ thống UTE
-                      </h2>
-                      <p className="text-white/70 text-sm">
-                        Các dịch vụ số của trường
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setShowAiPanel(false)}
-                    className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
-                  >
-                    <X className="w-4 h-4 text-white" />
-                  </button>
-                </div>
-                {/* Grid */}
-                <div className="p-6 grid grid-cols-2 sm:grid-cols-3 gap-4">
-                  {aiSystems.map((system) => (
-                    <a
-                      key={system.name}
-                      href={system.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group relative bg-gray-50 hover:bg-white rounded-xl p-4 border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all duration-300"
-                    >
-                      <div
-                        className={cn(
-                          "w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center mb-3 group-hover:scale-110 transition-transform",
-                          system.color,
-                        )}
-                      >
-                        <system.Icon className="w-6 h-6 text-white" />
-                      </div>
-                      <h3 className="font-semibold text-gray-900 mb-1 flex items-center gap-1">
-                        {system.name}
-                        <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-50 transition-opacity" />
-                      </h3>
-                      <p className="text-xs text-gray-500">
-                        {system.description}
-                      </p>
-                    </a>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      {/* UTE Extensions Dialog */}
+      <UTEExtensionsDialog open={showAiPanel} onOpenChange={setShowAiPanel} />
 
       {/* Floating navigation - fade with Tailwind only */}
       <div
@@ -270,11 +140,11 @@ export default function HomePage() {
           </div>
         </aside>
 
-        {/* AI Systems button */}
+        {/* UTE Extensions button */}
         <button
           onClick={() => setShowAiPanel(true)}
-          className="p-3 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 text-white rounded-full shadow-lg hover:shadow-xl hover:scale-110 active:scale-95 transition-all duration-200 ring-4 ring-blue-400/20"
-          title="Hệ thống UTE"
+          className="p-3 bg-neutral-900 text-white rounded-full shadow-lg border border-white/10 hover:bg-neutral-800 hover:scale-110 active:scale-95 transition-all duration-200 ring-4 ring-neutral-500/10"
+          title="UTE Extensions"
         >
           <Sparkles className="w-6 h-6" />
         </button>

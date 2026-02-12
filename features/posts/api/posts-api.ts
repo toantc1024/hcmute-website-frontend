@@ -341,14 +341,36 @@ export const postsApi = {
     return response.data.data;
   },
 
-  forcePublish: async (postId: string): Promise<PostDetailView> => {
+  forcePublish: async (
+    postId: string,
+    publishedAt?: string,
+  ): Promise<PostDetailView> => {
     const response = await apiClient.post<ApiResponse<PostDetailView>>(
       `/api/v1/admin/posts/${postId}/publish`,
+      publishedAt ? { publishedAt } : undefined,
     );
 
     if (!response.data.result) {
       throw new Error(
         getErrorMessage(response.data, "Không thể xuất bản bài viết"),
+      );
+    }
+
+    return response.data.data;
+  },
+
+  schedulePost: async (
+    postId: string,
+    publishedAt: string,
+  ): Promise<PostDetailView> => {
+    const response = await apiClient.post<ApiResponse<PostDetailView>>(
+      `/api/v1/admin/posts/${postId}/schedule`,
+      { publishedAt },
+    );
+
+    if (!response.data.result) {
+      throw new Error(
+        getErrorMessage(response.data, "Không thể đặt lịch xuất bản"),
       );
     }
 

@@ -13,6 +13,7 @@ import {
 import { AuroraText } from "@/components/ui/aurora-text";
 import { AnimatedTabs } from "@/components/ui/animated-tabs";
 import { MagicCard } from "@/components/ui/magic-card";
+import { Container } from "@/components/layout";
 
 interface Unit {
   name: string;
@@ -184,7 +185,7 @@ export default function UnitsSection() {
   return (
     <>
       <section id="units" className="py-12 lg:py-20 bg-white overflow-hidden">
-        <div className="w-full px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40">
+        <Container>
           <motion.div
             className="text-center mb-8 lg:mb-12"
             initial={{ opacity: 0, y: 20 }}
@@ -275,7 +276,7 @@ export default function UnitsSection() {
               </div>
             )}
           </div>
-        </div>
+        </Container>
       </section>
 
       <AnimatePresence>

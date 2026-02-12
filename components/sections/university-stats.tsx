@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import { NumberTicker } from "@/components/ui/number-ticker";
 import { AuroraText } from "@/components/ui/aurora-text";
+import { Container } from "@/components/layout";
 
 interface StatItem {
   number?: number;
@@ -63,9 +64,9 @@ export default function UniversityStats() {
   return (
     <section
       id="stats"
-      className="py-12 lg:py-20 px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40 bg-gradient-to-br from-gray-50 to-blue-50 overflow-hidden"
+      className="py-12 lg:py-20 bg-gradient-to-br from-gray-50 to-blue-50 overflow-hidden"
     >
-      <div className="w-full">
+      <Container className="w-full">
         <motion.div
           className="text-center mb-12"
           initial={{ opacity: 0, y: 20 }}
@@ -120,7 +121,7 @@ export default function UniversityStats() {
             </motion.div>
           ))}
         </motion.div>
-      </div>
+      </Container>
     </section>
   );
 }

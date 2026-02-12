@@ -6,6 +6,7 @@ import { AuroraText } from "@/components/ui/aurora-text";
 import { GridPattern } from "@/components/ui/grid-pattern";
 import { AnimatedTabs } from "@/components/ui/animated-tabs";
 import { cn } from "@/lib/utils";
+import { Container } from "@/components/layout";
 
 interface TimelineEvent {
   yearRange: string;
@@ -430,7 +431,7 @@ export default function VideoIntroduction() {
         />
       </div>
 
-      <div className="w-full text-center px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40 relative">
+      <Container className="text-center relative">
         <motion.div
           className="text-center mb-8"
           initial={{ opacity: 0, y: 20 }}
@@ -448,8 +449,8 @@ export default function VideoIntroduction() {
             </AuroraText>
           </h2>
           <p className="text-base lg:text-lg text-gray-600 mx-auto">
-            Hành trình 63 năm xây dựng và phát triển của Trường Đại học Công nghệ
-            Kỹ thuật TP.HCM
+            Hành trình 63 năm xây dựng và phát triển của Trường Đại học Công
+            nghệ Kỹ thuật TP.HCM
           </p>
         </motion.div>
 
@@ -566,7 +567,7 @@ export default function VideoIntroduction() {
             </AnimatePresence>
           </div>
         </div>
-      </div>
+      </Container>
     </section>
   );
 }

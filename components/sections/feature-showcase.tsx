@@ -5,6 +5,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
 import { AuroraText } from "@/components/ui/aurora-text";
+import { Container } from "@/components/layout";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -435,9 +436,10 @@ export default function FeatureShowcase() {
       </div>
 
       {/* Desktop Layout - Original Vertical Scroll */}
-      <div
+      <Container
+        as="div"
         ref={containerRef}
-        className="hidden lg:block relative px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40"
+        className="hidden lg:block relative"
       >
         <div className="flex flex-col lg:flex-row lg:gap-12">
           {/* Left - Pinned Image */}
@@ -481,7 +483,7 @@ export default function FeatureShowcase() {
             ))}
           </div>
         </div>
-      </div>
+      </Container>
     </section>
   );
 }

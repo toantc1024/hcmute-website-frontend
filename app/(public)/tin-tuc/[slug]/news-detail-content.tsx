@@ -410,42 +410,18 @@ export default function NewsDetailContent() {
 
               {/* Meta Info Row */}
               <div className="flex flex-wrap items-center gap-3 sm:gap-4 lg:gap-6 text-sm text-muted-foreground">
-                {/* Author */}
-                {(post.authors?.[0] || post.extendedAttributes?.Author) && (
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs">
-                      {(
-                        post.authors?.[0]?.displayName ||
-                        (post.extendedAttributes?.Author as string) ||
-                        "A"
-                      ).charAt(0)}
-                    </div>
-                    <span className="font-medium text-foreground">
-                      {post.authors?.[0]?.displayName ||
-                        post.extendedAttributes?.Author}
-                    </span>
-                  </div>
-                )}
-
-                <div className="w-1 h-1 bg-muted-foreground/40 rounded-full hidden sm:block" />
-
-                {/* Date */}
                 <div className="flex items-center gap-1.5">
                   <Calendar className="w-4 h-4" />
                   <span>{formatDate(post.publishedAt || post.createdAt)}</span>
                 </div>
 
                 <div className="w-1 h-1 bg-muted-foreground/40 rounded-full hidden sm:block" />
-
-                {/* Views */}
                 <div className="flex items-center gap-1.5">
                   <Eye className="w-4 h-4" />
                   <span>{post.viewCount} lượt xem</span>
                 </div>
 
                 <div className="w-1 h-1 bg-muted-foreground/40 rounded-full hidden sm:block" />
-
-                {/* Read Time */}
                 <div className="flex items-center gap-1.5">
                   <BookOpen className="w-4 h-4" />
                   <span>{calculateReadTime(post.content)}</span>
@@ -755,39 +731,6 @@ export default function NewsDetailContent() {
                     )}
                   </div>
                 </div>
-
-                {/* Extended Attributes */}
-                {((post.extendedAttributes as any)?.["Photographer"] ||
-                  (post.extendedAttributes as any)?.["Người chụp ảnh"] ||
-                  (post.extendedAttributes as any)?.["Editor"] ||
-                  (post.extendedAttributes as any)?.["Biên tập viên"]) && (
-                  <div className="flex flex-wrap items-center gap-3 mb-8 text-sm text-slate-500">
-                    {((post.extendedAttributes as any)?.["Photographer"] ||
-                      (post.extendedAttributes as any)?.["Người chụp ảnh"]) && (
-                      <span className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-lg">
-                        <Camera className="w-3.5 h-3.5" />
-                        <span>Ảnh:</span>
-                        <span className="font-medium text-slate-700">
-                          {(post.extendedAttributes as any)?.["Photographer"] ||
-                            (post.extendedAttributes as any)?.[
-                              "Người chụp ảnh"
-                            ]}
-                        </span>
-                      </span>
-                    )}
-                    {((post.extendedAttributes as any)?.["Editor"] ||
-                      (post.extendedAttributes as any)?.["Biên tập viên"]) && (
-                      <span className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-lg">
-                        <User className="w-3.5 h-3.5" />
-                        <span>Biên tập:</span>
-                        <span className="font-medium text-slate-700">
-                          {(post.extendedAttributes as any)?.["Editor"] ||
-                            (post.extendedAttributes as any)?.["Biên tập viên"]}
-                        </span>
-                      </span>
-                    )}
-                  </div>
-                )}
 
                 {/* Excerpt */}
                 {post.excerpt && (

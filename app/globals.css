@@ -192,6 +192,15 @@
   .nav-dropdown-exit {
     animation: nav-dropdown-exit 0.2s ease-in forwards;
   }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 @keyframes nav-dropdown-enter {
@@ -313,6 +322,64 @@
 
 .shimmer-title.shimmer-active::after {
   animation: shimmer-sweep 0.8s ease-in-out forwards;
+}
+
+/* SpotlightCard hover effect */
+.spotlight-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    600px circle at var(--mouse-x) var(--mouse-y),
+    var(--spotlight-color),
+    transparent 40%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.spotlight-card:hover::before,
+.spotlight-card:focus-within::before {
+  opacity: 1;
+}
+
+/* Button shiny shimmer effect on hover */
+@keyframes btn-shimmer {
+  0% {
+    transform: translateX(-100%) skewX(-15deg);
+  }
+  100% {
+    transform: translateX(200%) skewX(-15deg);
+  }
+}
+
+[data-slot="button"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0) 25%,
+    rgba(255, 255, 255, 0.25) 50%,
+    rgba(255, 255, 255, 0) 75%,
+    transparent 100%
+  );
+  transform: translateX(-100%) skewX(-15deg);
+  pointer-events: none;
+  z-index: 1;
+}
+
+[data-slot="button"]:hover::after {
+  animation: btn-shimmer 0.6s ease-in-out;
+}
+
+/* Exclude shimmer from ghost and link variants */
+[data-slot="button"][data-variant="ghost"]::after,
+[data-slot="button"][data-variant="link"]::after {
+  display: none;
 }
 
 /* Workflow dashed line animation */

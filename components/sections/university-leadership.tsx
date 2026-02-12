@@ -5,6 +5,7 @@ import { useState } from "react";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import Image from "next/image";
 import { AuroraText } from "@/components/ui/aurora-text";
+import { Container } from "@/components/layout";
 
 const AGENT_BACKGROUND = "/assets/agent-cta-background.webp";
 
@@ -45,7 +46,7 @@ export default function UniversityLeadership() {
       id="leadership"
       className="py-12 lg:py-20 relative overflow-hidden"
     >
-      <div className="w-full px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40 relative">
+      <Container className="relative">
         <motion.div
           className="text-center mb-8 lg:mb-12"
           initial={{ opacity: 0, y: 30 }}
@@ -64,11 +65,11 @@ export default function UniversityLeadership() {
             phát triển nhân tài
           </p>
         </motion.div>
-      </div>
+      </Container>
 
       <div className="relative">
         {/* Navigation buttons - on top */}
-        <div className="w-full px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40   pb-4 relative z-20">
+        <Container className="pb-4 relative z-20">
           <div className="flex justify-center lg:justify-start gap-3">
             <button
               onClick={prevSlide}
@@ -83,7 +84,7 @@ export default function UniversityLeadership() {
               <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
             </button>
           </div>
-        </div>
+        </Container>
 
         {/* Blue background section */}
         <div className="relative w-full bg-blue-600">
@@ -97,7 +98,7 @@ export default function UniversityLeadership() {
           </div>
 
           <div className="relative z-10">
-            <div className="px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-40 w-full">
+            <Container className="w-full">
               {/* Mobile layout: vertical stack - text on top, image below */}
               <div className="flex flex-col lg:hidden">
                 {/* Text content - Top on mobile */}
@@ -195,7 +196,7 @@ export default function UniversityLeadership() {
                   </AnimatePresence>
                 </div>
               </div>
-            </div>
+            </Container>
           </div>
         </div>
       </div>

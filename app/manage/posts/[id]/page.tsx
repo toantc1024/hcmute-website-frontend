@@ -59,6 +59,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { PageLoader, ButtonLoader } from "@/components/ui/loader";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -284,6 +286,7 @@ export default function PostDetailPage() {
 
   const [showPublishDialog, setShowPublishDialog] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
+  const [scheduledPublishDate, setScheduledPublishDate] = useState<string>("");
 
   const fetchPost = useCallback(
     async (showRefreshState = false) => {
@@ -412,8 +415,16 @@ export default function PostDetailPage() {
 
     try {
       setIsPublishing(true);
-      await postsApi.forcePublish(postId);
-      toast.success("Đã đăng bài viết thành công!");
+      // Pass scheduledPublishDate if set, otherwise publish immediately
+      const publishedAt = scheduledPublishDate
+        ? new Date(scheduledPublishDate).toISOString()
+        : undefined;
+      await postsApi.forcePublish(postId, publishedAt);
+      toast.success(
+        scheduledPublishDate
+          ? "Đã đặt lịch đăng bài thành công!"
+          : "Đã đăng bài viết thành công!",
+      );
 
       const updatedPost = await postsApi.getPostById(postId);
       setPost(updatedPost);
@@ -424,6 +435,7 @@ export default function PostDetailPage() {
     } finally {
       setIsPublishing(false);
       setShowPublishDialog(false);
+      setScheduledPublishDate("");
     }
   };
 
@@ -894,7 +906,13 @@ export default function PostDetailPage() {
       </AlertDialog>
 
       {/* TEMPORARY_POST: Force Publish / Unpublish Dialog */}
-      <AlertDialog open={showPublishDialog} onOpenChange={setShowPublishDialog}>
+      <AlertDialog
+        open={showPublishDialog}
+        onOpenChange={(open) => {
+          setShowPublishDialog(open);
+          if (!open) setScheduledPublishDate("");
+        }}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
@@ -905,21 +923,44 @@ export default function PostDetailPage() {
                 ? "Hủy đăng bài?"
                 : "Đăng bài ngay?"}
             </AlertDialogTitle>
-            <AlertDialogDescription>
-              {post.status === PostStatus.PUBLISHED ? (
-                <>
-                  Bài viết sẽ được gỡ khỏi trang công khai. Người dùng sẽ không
-                  thể xem bài viết này cho đến khi bạn đăng lại.
-                </>
-              ) : (
-                <>
-                  <span className="text-yellow-600 font-medium">
-                    [TEMPORARY_POST]
-                  </span>{" "}
-                  Bạn đang sử dụng tính năng đăng bài nhanh. Bài viết sẽ được
-                  xuất bản ngay lập tức mà không cần qua quy trình phê duyệt.
-                </>
-              )}
+            <AlertDialogDescription asChild>
+              <div>
+                {post.status === PostStatus.PUBLISHED ? (
+                  <p>
+                    Bài viết sẽ được gỡ khỏi trang công khai. Người dùng sẽ
+                    không thể xem bài viết này cho đến khi bạn đăng lại.
+                  </p>
+                ) : (
+                  <>
+                    <p>
+                      <span className="text-yellow-600 font-medium">
+                        [TEMPORARY_POST]
+                      </span>{" "}
+                      Bạn đang sử dụng tính năng đăng bài nhanh. Bài viết sẽ
+                      được xuất bản ngay lập tức mà không cần qua quy trình phê
+                      duyệt.
+                    </p>
+                    <div className="mt-4 space-y-2">
+                      <Label htmlFor="publishDate" className="text-foreground">
+                        Ngày xuất bản (tùy chọn)
+                      </Label>
+                      <Input
+                        id="publishDate"
+                        type="datetime-local"
+                        value={scheduledPublishDate}
+                        onChange={(e) =>
+                          setScheduledPublishDate(e.target.value)
+                        }
+                        className="w-full"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Để trống để xuất bản ngay lập tức, hoặc chọn ngày để đặt
+                        lịch xuất bản.
+                      </p>
+                    </div>
+                  </>
+                )}
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -950,7 +991,7 @@ export default function PostDetailPage() {
                 ) : (
                   <Rocket className="mr-2 size-4" />
                 )}
-                Đăng bài
+                {scheduledPublishDate ? "Đặt lịch đăng" : "Đăng bài"}
               </AlertDialogAction>
             )}
           </AlertDialogFooter>
