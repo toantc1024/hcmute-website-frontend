@@ -7,4 +7,4 @@ export {
 } from "./tiptap-editor";
 export { Toolbar, type AIAction } from "./toolbar";
 export { ImageBlock } from "./image-block-extension";
-export { FileAttachment } from "./file-attachment-extension";
+export { FileAttachment as FileAttachmentExtension } from "./file-attachment-extension";

@@ -81,7 +81,10 @@ import { SearchableTagSelect } from "@/components/ui/searchable-tag-select";
 import { TagManagementModal } from "./tag-management-modal";
 import { CategoryManagementModal } from "./category-management-modal";
 import { ImageUploadModal } from "./image-upload-modal";
-import { FileAttachmentModal, type FileAttachment } from "./file-attachment-modal";
+import {
+  FileAttachmentModal,
+  type FileAttachment,
+} from "./file-attachment-modal";
 import { SimpleDescriptionEditor } from "./simple-description-editor";
 import {
   ImageCropper,
@@ -340,22 +343,19 @@ export function PostForm({
     return result.publicUrl;
   }, []);
 
-  const handleFileAttachment = useCallback(
-    (attachment: FileAttachment) => {
-      const { file, displayType, title } = attachment;
-      
-      // Insert file attachment block via TipTap editor
-      editorRef.current?.insertFileAttachment({
-        src: file.publicUrl,
-        fileName: file.fileName,
-        fileType: file.fileType,
-        fileSize: 0, // API doesn't return file size
-        displayType,
-        title: title || file.fileName,
-      });
-    },
-    [],
-  );
+  const handleFileAttachment = useCallback((attachment: FileAttachment) => {
+    const { file, displayType, title } = attachment;
+
+    // Insert file attachment block via TipTap editor
+    editorRef.current?.insertFileAttachment({
+      src: file.publicUrl,
+      fileName: file.fileName,
+      fileType: file.fileType,
+      fileSize: 0, // API doesn't return file size
+      displayType,
+      title: title || file.fileName,
+    });
+  }, []);
 
   const handleAIAssist = useCallback(
     async (action: string, selectedText?: string): Promise<string> => {
@@ -607,9 +607,20 @@ export function PostForm({
         };
 
         // Debug: Log the payload to check for non-string UUIDs
-        console.log('[PostForm] Create payload:', JSON.stringify(createPayload, null, 2));
-        console.log('[PostForm] categoryIds type:', typeof selectedCategoryIds, selectedCategoryIds);
-        console.log('[PostForm] coverImageId type:', typeof createCoverImageId, createCoverImageId);
+        console.log(
+          "[PostForm] Create payload:",
+          JSON.stringify(createPayload, null, 2),
+        );
+        console.log(
+          "[PostForm] categoryIds type:",
+          typeof selectedCategoryIds,
+          selectedCategoryIds,
+        );
+        console.log(
+          "[PostForm] coverImageId type:",
+          typeof createCoverImageId,
+          createCoverImageId,
+        );
 
         postId = await postsApi.createPost(createPayload);
       }

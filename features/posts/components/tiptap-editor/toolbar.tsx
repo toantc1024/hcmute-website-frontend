@@ -114,7 +114,12 @@ function ToolbarButton({
   );
 }
 
-export function Toolbar({ editor, onImageUpload, onFileAttachment, onAIAssist }: ToolbarProps) {
+export function Toolbar({
+  editor,
+  onImageUpload,
+  onFileAttachment,
+  onAIAssist,
+}: ToolbarProps) {
   const [linkUrl, setLinkUrl] = useState("");
   const [isLinkPopoverOpen, setIsLinkPopoverOpen] = useState(false);
   const [showImageDialog, setShowImageDialog] = useState(false);
@@ -335,7 +340,10 @@ export function Toolbar({ editor, onImageUpload, onFileAttachment, onAIAssist }:
         <Separator orientation="vertical" className="mx-1 h-6" />
 
         {/* Link */}
-        <Popover open={isLinkPopoverOpen} onOpenChange={handleLinkPopoverOpenChange}>
+        <Popover
+          open={isLinkPopoverOpen}
+          onOpenChange={handleLinkPopoverOpenChange}
+        >
           <PopoverTrigger asChild>
             <Button
               type="button"
@@ -404,10 +412,7 @@ export function Toolbar({ editor, onImageUpload, onFileAttachment, onAIAssist }:
 
         {/* File Attachment */}
         {onFileAttachment && (
-          <ToolbarButton
-            onClick={onFileAttachment}
-            tooltip="Đính kèm tệp"
-          >
+          <ToolbarButton onClick={onFileAttachment} tooltip="Đính kèm tệp">
             <Paperclip className="size-4" />
           </ToolbarButton>
         )}

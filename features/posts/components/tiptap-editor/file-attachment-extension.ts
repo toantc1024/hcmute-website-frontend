@@ -17,14 +17,16 @@ declare module "@tiptap/core" {
         displayType: "iframe" | "link";
         title?: string;
       }) => ReturnType;
-      updateFileAttachment: (attributes: Partial<{
-        src: string;
-        fileName: string;
-        fileType: string;
-        fileSize?: number;
-        displayType: "iframe" | "link";
-        title?: string;
-      }>) => ReturnType;
+      updateFileAttachment: (
+        attributes: Partial<{
+          src: string;
+          fileName: string;
+          fileType: string;
+          fileSize?: number;
+          displayType: "iframe" | "link";
+          title?: string;
+        }>,
+      ) => ReturnType;
     };
   }
 }
@@ -74,12 +76,15 @@ export const FileAttachment = Node.create<FileAttachmentOptions>({
         getAttrs: (node) => {
           if (typeof node === "string") return false;
           const element = node as HTMLElement;
-          
+
           return {
             src: element.getAttribute("data-src") || null,
             fileName: element.getAttribute("data-filename") || "",
             fileType: element.getAttribute("data-filetype") || "",
-            fileSize: parseInt(element.getAttribute("data-filesize") || "0", 10),
+            fileSize: parseInt(
+              element.getAttribute("data-filesize") || "0",
+              10,
+            ),
             displayType: element.getAttribute("data-displaytype") || "link",
             title: element.getAttribute("data-title") || "",
           };
@@ -89,11 +94,14 @@ export const FileAttachment = Node.create<FileAttachmentOptions>({
   },
 
   renderHTML({ HTMLAttributes }) {
-    const { src, fileName, fileType, fileSize, displayType, title } = HTMLAttributes;
-    
-    const isPdf = fileType === "application/pdf" || fileName?.toLowerCase().endsWith(".pdf");
+    const { src, fileName, fileType, fileSize, displayType, title } =
+      HTMLAttributes;
+
+    const isPdf =
+      fileType === "application/pdf" ||
+      fileName?.toLowerCase().endsWith(".pdf");
     const displayTitle = title || fileName;
-    
+
     // For iframe display (PDF only)
     if (displayType === "iframe" && isPdf && src) {
       return [
@@ -111,7 +119,11 @@ export const FileAttachment = Node.create<FileAttachmentOptions>({
         [
           "div",
           { class: "file-attachment-header" },
-          ["span", { class: "file-attachment-title" }, displayTitle || "Tài liệu PDF"],
+          [
+            "span",
+            { class: "file-attachment-title" },
+            displayTitle || "Tài liệu PDF",
+          ],
         ],
         [
           "iframe",

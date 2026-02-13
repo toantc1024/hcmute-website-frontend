@@ -131,8 +131,7 @@ function formatFileSize(bytes: number): string {
 
 function isPdfFile(fileType: string, fileName: string): boolean {
   return (
-    fileType === "application/pdf" ||
-    fileName.toLowerCase().endsWith(".pdf")
+    fileType === "application/pdf" || fileName.toLowerCase().endsWith(".pdf")
   );
 }
 
@@ -388,10 +387,7 @@ export function FileAttachmentModal({
                   )}
 
                   {!isUploading && (
-                    <Button
-                      className="w-full mt-4"
-                      onClick={handleUpload}
-                    >
+                    <Button className="w-full mt-4" onClick={handleUpload}>
                       <Upload className="mr-2 size-4" />
                       Tải lên
                     </Button>

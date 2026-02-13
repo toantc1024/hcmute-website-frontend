@@ -55,7 +55,7 @@ export const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
       maxHeight,
       showToolbar = true,
     },
-    ref
+    ref,
   ) {
     const editor = useEditor({
       extensions: getExtensions(placeholder),
@@ -78,21 +78,29 @@ export const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
     });
 
     // Expose methods via ref
-    useImperativeHandle(ref, () => ({
-      insertFileAttachment: (data: FileAttachmentData) => {
-        if (editor) {
-          editor.chain().focus().setFileAttachment({
-            src: data.src,
-            fileName: data.fileName,
-            fileType: data.fileType,
-            fileSize: data.fileSize,
-            displayType: data.displayType,
-            title: data.title,
-          }).run();
-        }
-      },
-      getEditor: () => editor,
-    }), [editor]);
+    useImperativeHandle(
+      ref,
+      () => ({
+        insertFileAttachment: (data: FileAttachmentData) => {
+          if (editor) {
+            editor
+              .chain()
+              .focus()
+              .setFileAttachment({
+                src: data.src,
+                fileName: data.fileName,
+                fileType: data.fileType,
+                fileSize: data.fileSize,
+                displayType: data.displayType,
+                title: data.title,
+              })
+              .run();
+          }
+        },
+        getEditor: () => editor,
+      }),
+      [editor],
+    );
 
     useEffect(() => {
       if (editor && !editor.isDestroyed) {
@@ -137,7 +145,7 @@ export const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
         </div>
       </div>
     );
-  }
+  },
 );
 
 export function TiptapViewer({

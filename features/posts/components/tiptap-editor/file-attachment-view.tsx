@@ -103,8 +103,7 @@ function getFileIcon(fileType: string, fileName: string) {
 
 function isPdfFile(fileType: string, fileName: string): boolean {
   return (
-    fileType === "application/pdf" ||
-    fileName?.toLowerCase().endsWith(".pdf")
+    fileType === "application/pdf" || fileName?.toLowerCase().endsWith(".pdf")
   );
 }
 
@@ -134,7 +133,7 @@ export default function FileAttachmentBlockView({
   const [isEditing, setIsEditing] = useState(false);
   const [tempTitle, setTempTitle] = useState(title || "");
   const [tempDisplayType, setTempDisplayType] = useState<"iframe" | "link">(
-    displayType || "link"
+    displayType || "link",
   );
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -219,14 +218,18 @@ export default function FileAttachmentBlockView({
                           placeholder={fileName}
                         />
                       </div>
-                      
+
                       {isPdf && (
                         <div className="space-y-2">
                           <Label>Kiểu hiển thị</Label>
                           <div className="flex gap-2">
                             <Button
                               type="button"
-                              variant={tempDisplayType === "iframe" ? "default" : "outline"}
+                              variant={
+                                tempDisplayType === "iframe"
+                                  ? "default"
+                                  : "outline"
+                              }
                               size="sm"
                               className="flex-1"
                               onClick={() => setTempDisplayType("iframe")}
@@ -236,7 +239,11 @@ export default function FileAttachmentBlockView({
                             </Button>
                             <Button
                               type="button"
-                              variant={tempDisplayType === "link" ? "default" : "outline"}
+                              variant={
+                                tempDisplayType === "link"
+                                  ? "default"
+                                  : "outline"
+                              }
                               size="sm"
                               className="flex-1"
                               onClick={() => setTempDisplayType("link")}
@@ -247,7 +254,7 @@ export default function FileAttachmentBlockView({
                           </div>
                         </div>
                       )}
-                      
+
                       <Button className="w-full" onClick={handleSave}>
                         Lưu thay đổi
                       </Button>
@@ -368,14 +375,18 @@ export default function FileAttachmentBlockView({
                         placeholder={fileName}
                       />
                     </div>
-                    
+
                     {isPdf && (
                       <div className="space-y-2">
                         <Label>Kiểu hiển thị</Label>
                         <div className="flex gap-2">
                           <Button
                             type="button"
-                            variant={tempDisplayType === "iframe" ? "default" : "outline"}
+                            variant={
+                              tempDisplayType === "iframe"
+                                ? "default"
+                                : "outline"
+                            }
                             size="sm"
                             className="flex-1"
                             onClick={() => setTempDisplayType("iframe")}
@@ -385,7 +396,9 @@ export default function FileAttachmentBlockView({
                           </Button>
                           <Button
                             type="button"
-                            variant={tempDisplayType === "link" ? "default" : "outline"}
+                            variant={
+                              tempDisplayType === "link" ? "default" : "outline"
+                            }
                             size="sm"
                             className="flex-1"
                             onClick={() => setTempDisplayType("link")}
@@ -396,7 +409,7 @@ export default function FileAttachmentBlockView({
                         </div>
                       </div>
                     )}
-                    
+
                     <Button className="w-full" onClick={handleSave}>
                       Lưu thay đổi
                     </Button>
