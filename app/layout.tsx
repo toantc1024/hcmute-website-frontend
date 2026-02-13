@@ -5,7 +5,8 @@ import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "HCM-UTE - Trường Đại học Công nghệ Kỹ thuật TP. HCM",
-  description: "Website chính thức của Trường Đại học Công nghệ Kỹ thuật TP. HCM",
+  description:
+    "Website chính thức của Trường Đại học Công nghệ Kỹ thuật TP. HCM",
 };
 
 export default function RootLayout({

@@ -30,6 +30,7 @@ import {
   Sparkles,
   Wand2,
   ChevronDown,
+  Paperclip,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -61,6 +62,7 @@ import { ImageUploadDialog } from "./image-upload-dialog";
 interface ToolbarProps {
   editor: Editor | null;
   onImageUpload?: (file: File) => Promise<string>;
+  onFileAttachment?: () => void;
   onAIAssist?: (action: AIAction, selectedText?: string) => Promise<string>;
 }
 
@@ -112,7 +114,7 @@ function ToolbarButton({
   );
 }
 
-export function Toolbar({ editor, onImageUpload, onAIAssist }: ToolbarProps) {
+export function Toolbar({ editor, onImageUpload, onFileAttachment, onAIAssist }: ToolbarProps) {
   const [linkUrl, setLinkUrl] = useState("");
   const [isLinkPopoverOpen, setIsLinkPopoverOpen] = useState(false);
   const [showImageDialog, setShowImageDialog] = useState(false);
@@ -397,6 +399,16 @@ export function Toolbar({ editor, onImageUpload, onAIAssist }: ToolbarProps) {
             tooltip="Chèn hình ảnh"
           >
             <ImageIcon className="size-4" />
+          </ToolbarButton>
+        )}
+
+        {/* File Attachment */}
+        {onFileAttachment && (
+          <ToolbarButton
+            onClick={onFileAttachment}
+            tooltip="Đính kèm tệp"
+          >
+            <Paperclip className="size-4" />
           </ToolbarButton>
         )}
 

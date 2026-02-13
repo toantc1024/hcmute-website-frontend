@@ -370,7 +370,7 @@ export const postsApi = {
 
     if (!response.data.result) {
       throw new Error(
-        getErrorMessage(response.data, "Không thể đặt lịch xuất bản"),
+        getErrorMessage(response.data, "Không thể lên lịch xuất bản"),
       );
     }
 

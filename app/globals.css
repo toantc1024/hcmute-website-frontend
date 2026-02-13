@@ -125,18 +125,8 @@
   body {
     @apply bg-background text-foreground;
     font-family: Inter, sans-serif;
-    /* font-feature-settings: "cv02", "cv03", "cv04", "cv11", "salt";
-    font-variation-settings: "cv02", "cv03", "cv04", "cv11", "salt"; */
   }
 
-  @supports (font-variation-settings: normal) {
-    /* :root {
-      font-family: InterVariable, sans-serif;
-      font-feature-settings: "cv02", "cv03", "cv04", "cv11", "salt";
-    } */
-  }
-
-  /* Inter Black (900) - Bold for navigation items */
   .font-inter-black {
     font-family: Inter, sans-serif;
     font-weight: 900;

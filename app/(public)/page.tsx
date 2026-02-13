@@ -169,10 +169,10 @@ export default function HomePage() {
         <VideoIntroduction />
         <UniversityLeadership />
         <UnitsSection />
-        <NewsSection />
         <div ref={footerRef}>
           <PartnerLogos />
         </div>
+        <NewsSection />
       </main>
     </div>
   );

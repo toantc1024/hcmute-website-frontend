@@ -27,6 +27,7 @@ import {
   AlignLeft,
   AlertTriangle,
   Lock,
+  Paperclip,
 } from "lucide-react";
 import type { JSONContent } from "@tiptap/react";
 import { toast } from "sonner";
@@ -46,6 +47,8 @@ import {
   type FileDto,
   type ExtendedAttributes,
   type MediaMetadataRequest,
+  type TiptapEditorRef,
+  type FileAttachmentData,
   getPostStatusLabel,
 } from "@/features/posts";
 
@@ -78,6 +81,7 @@ import { SearchableTagSelect } from "@/components/ui/searchable-tag-select";
 import { TagManagementModal } from "./tag-management-modal";
 import { CategoryManagementModal } from "./category-management-modal";
 import { ImageUploadModal } from "./image-upload-modal";
+import { FileAttachmentModal, type FileAttachment } from "./file-attachment-modal";
 import { SimpleDescriptionEditor } from "./simple-description-editor";
 import {
   ImageCropper,
@@ -295,6 +299,10 @@ export function PostForm({
   const [showImageModal, setShowImageModal] = useState(false);
   const [showImageCropper, setShowImageCropper] = useState(false);
   const [imageToCrop, setImageToCrop] = useState<string | null>(null);
+  const [showFileAttachmentModal, setShowFileAttachmentModal] = useState(false);
+
+  // Editor ref for file attachment insertion
+  const editorRef = useRef<TiptapEditorRef>(null);
 
   // ========== Effects ==========
   useEffect(() => {
@@ -331,6 +339,23 @@ export function PostForm({
     const result = await filesApi.uploadFile(file);
     return result.publicUrl;
   }, []);
+
+  const handleFileAttachment = useCallback(
+    (attachment: FileAttachment) => {
+      const { file, displayType, title } = attachment;
+      
+      // Insert file attachment block via TipTap editor
+      editorRef.current?.insertFileAttachment({
+        src: file.publicUrl,
+        fileName: file.fileName,
+        fileType: file.fileType,
+        fileSize: 0, // API doesn't return file size
+        displayType,
+        title: title || file.fileName,
+      });
+    },
+    [],
+  );
 
   const handleAIAssist = useCallback(
     async (action: string, selectedText?: string): Promise<string> => {
@@ -797,10 +822,12 @@ export function PostForm({
           <div className="flex-1 min-h-0 overflow-y-auto p-4 lg:p-6">
             <div className="w-full max-w-4xl mx-auto h-full">
               <TiptapEditor
+                ref={editorRef}
                 content={content}
                 contentJson={contentJson}
                 onChange={handleContentChange}
                 onImageUpload={handleImageUpload}
+                onFileAttachment={() => setShowFileAttachmentModal(true)}
                 onAIAssist={handleAIAssist}
                 editable={!isLocked}
                 placeholder="Bắt đầu viết nội dung bài viết..."
@@ -1205,6 +1232,12 @@ export function PostForm({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <FileAttachmentModal
+        open={showFileAttachmentModal}
+        onOpenChange={setShowFileAttachmentModal}
+        onAttach={handleFileAttachment}
+      />
     </motion.div>
   );
 }

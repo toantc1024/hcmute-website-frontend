@@ -13,6 +13,11 @@ import {
   Send,
   Copy,
   Download,
+  CircleDashed,
+  Clock,
+  CheckCircle,
+  XCircle,
+  List,
 } from "lucide-react";
 
 import { useI18n } from "@/lib/i18n";
@@ -77,6 +82,22 @@ function getStatusColorClass(status: PostStatus): string {
       return "bg-red-100 text-red-800 border-red-200";
     default:
       return "";
+  }
+}
+
+// Status icon for visual distinction
+function getStatusIcon(status: PostStatus) {
+  switch (status) {
+    case PostStatus.PUBLISHED:
+      return <CheckCircle className="size-3" />;
+    case PostStatus.PENDING:
+      return <Clock className="size-3" />;
+    case PostStatus.DRAFT:
+      return <CircleDashed className="size-3" />;
+    case PostStatus.REJECTED:
+      return <XCircle className="size-3" />;
+    default:
+      return null;
   }
 }
 
@@ -163,10 +184,26 @@ function PostsContent() {
   };
 
   const statusFilterOptions = [
-    { label: t.posts.filters.draft, value: String(PostStatus.DRAFT) },
-    { label: t.posts.filters.pending, value: String(PostStatus.PENDING) },
-    { label: t.posts.filters.published, value: String(PostStatus.PUBLISHED) },
-    { label: t.posts.filters.rejected, value: String(PostStatus.REJECTED) },
+    {
+      label: t.posts.filters.draft,
+      value: String(PostStatus.DRAFT),
+      icon: <CircleDashed className="size-4 text-gray-500" />,
+    },
+    {
+      label: t.posts.filters.pending,
+      value: String(PostStatus.PENDING),
+      icon: <Clock className="size-4 text-yellow-600" />,
+    },
+    {
+      label: t.posts.filters.published,
+      value: String(PostStatus.PUBLISHED),
+      icon: <CheckCircle className="size-4 text-green-600" />,
+    },
+    {
+      label: t.posts.filters.rejected,
+      value: String(PostStatus.REJECTED),
+      icon: <XCircle className="size-4 text-red-600" />,
+    },
   ];
 
   const columns: ColumnDef<PostAuditView>[] = useMemo(
@@ -218,7 +255,8 @@ function PostsContent() {
         filterOptions: statusFilterOptions,
         cell: ({ row }) => (
           <Badge className={getStatusColorClass(row.status)}>
-            {getPostStatusLabel(row.status)}
+            {getStatusIcon(row.status)}
+            <span className="ml-1">{getPostStatusLabel(row.status)}</span>
           </Badge>
         ),
       },
@@ -317,6 +355,7 @@ function PostsContent() {
           className="h-7 px-3 text-xs"
           onClick={() => handleStatusFilter("all")}
         >
+          <List className="mr-1.5 size-3.5" />
           Tất cả
         </Button>
         <Button
@@ -329,6 +368,7 @@ function PostsContent() {
           }`}
           onClick={() => handleStatusFilter(String(PostStatus.DRAFT))}
         >
+          <CircleDashed className="mr-1.5 size-3.5" />
           Nháp
         </Button>
         <Button
@@ -341,6 +381,7 @@ function PostsContent() {
           }`}
           onClick={() => handleStatusFilter(String(PostStatus.PENDING))}
         >
+          <Clock className="mr-1.5 size-3.5" />
           Chờ duyệt
         </Button>
         <Button
@@ -353,6 +394,7 @@ function PostsContent() {
           }`}
           onClick={() => handleStatusFilter(String(PostStatus.PUBLISHED))}
         >
+          <CheckCircle className="mr-1.5 size-3.5" />
           Đã xuất bản
         </Button>
         <Button
@@ -365,6 +407,7 @@ function PostsContent() {
           }`}
           onClick={() => handleStatusFilter(String(PostStatus.REJECTED))}
         >
+          <XCircle className="mr-1.5 size-3.5" />
           Từ chối
         </Button>
       </div>

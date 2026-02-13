@@ -8,6 +8,7 @@ import TextAlign from "@tiptap/extension-text-align";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { common, createLowlight } from "lowlight";
 import { ImageBlock } from "./image-block-extension";
+import { FileAttachment } from "./file-attachment-extension";
 
 const lowlight = createLowlight(common);
 
@@ -52,6 +53,7 @@ export function getExtensions(options?: ExtensionOptions | string) {
       },
     }),
     ImageBlock,
+    FileAttachment,
     Underline,
     Highlight.configure({
       multicolor: true,

@@ -3,11 +3,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
 import {
   ArrowLeft,
   Edit,
   Trash2,
-  Calendar,
+  Calendar as CalendarIcon,
   User,
   Eye,
   Tag,
@@ -25,6 +27,7 @@ import {
   FolderOpen,
   Hash,
   FileText,
+  CalendarClock,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -59,8 +62,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { PageLoader, ButtonLoader } from "@/components/ui/loader";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -71,11 +72,14 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { Calendar } from "@/components/ui/calendar";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 function getStatusBadgeVariant(
   status: PostStatus,
@@ -286,7 +290,10 @@ export default function PostDetailPage() {
 
   const [showPublishDialog, setShowPublishDialog] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
-  const [scheduledPublishDate, setScheduledPublishDate] = useState<string>("");
+  const [scheduledDate, setScheduledDate] = useState<Date | undefined>(
+    undefined,
+  );
+  const [scheduledTime, setScheduledTime] = useState("09:00");
 
   const fetchPost = useCallback(
     async (showRefreshState = false) => {
@@ -410,24 +417,27 @@ export default function PostDetailPage() {
   };
 
   // TEMPORARY_POST: Force publish handler
-  const handleForcePublish = async () => {
+  const handleForcePublish = async (scheduleForLater = false) => {
     if (!post) return;
 
     try {
       setIsPublishing(true);
-      // Pass scheduledPublishDate if set, otherwise publish immediately
-      const publishedAt = scheduledPublishDate
-        ? new Date(scheduledPublishDate).toISOString()
-        : undefined;
+
+      let publishedAt: string | undefined;
+      if (scheduleForLater && scheduledDate) {
+        const [hours, minutes] = scheduledTime.split(":").map(Number);
+        const scheduled = new Date(scheduledDate);
+        scheduled.setHours(hours, minutes, 0, 0);
+        publishedAt = scheduled.toISOString();
+      }
+
       await postsApi.forcePublish(postId, publishedAt);
-      toast.success(
-        scheduledPublishDate
-          ? "Đã đặt lịch đăng bài thành công!"
-          : "Đã đăng bài viết thành công!",
-      );
+      toast.success("Đã đăng bài viết thành công!");
 
       const updatedPost = await postsApi.getPostById(postId);
       setPost(updatedPost);
+      setScheduledDate(undefined);
+      setScheduledTime("09:00");
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : "Đã xảy ra lỗi khi đăng bài",
@@ -435,7 +445,6 @@ export default function PostDetailPage() {
     } finally {
       setIsPublishing(false);
       setShowPublishDialog(false);
-      setScheduledPublishDate("");
     }
   };
 
@@ -611,7 +620,8 @@ export default function PostDetailPage() {
               Gửi duyệt
             </Button>
           )}
-          {post.status === PostStatus.PUBLISHED ? (
+          {post.status === PostStatus.PUBLISHED ||
+          post.status === PostStatus.WAITING_PUBLISH ? (
             <Button
               variant="ghost"
               size="sm"
@@ -619,7 +629,9 @@ export default function PostDetailPage() {
               onClick={() => setShowPublishDialog(true)}
             >
               <XCircle className="mr-1.5 size-4" />
-              Hủy đăng
+              {post.status === PostStatus.WAITING_PUBLISH
+                ? "Hủy lịch đăng"
+                : "Hủy đăng"}
             </Button>
           ) : (
             <Button
@@ -743,7 +755,7 @@ export default function PostDetailPage() {
                   </div>
                   <Separator />
                   <div className="flex items-center gap-3">
-                    <Calendar className="size-4 text-muted-foreground" />
+                    <CalendarIcon className="size-4 text-muted-foreground" />
                     <div>
                       <p className="text-sm text-muted-foreground">
                         {t.posts.postDate}
@@ -757,12 +769,20 @@ export default function PostDetailPage() {
                     <>
                       <Separator />
                       <div className="flex items-center gap-3">
-                        <Eye className="size-4 text-muted-foreground" />
+                        {post.status === PostStatus.WAITING_PUBLISH ? (
+                          <CalendarClock className="size-4 text-blue-500" />
+                        ) : (
+                          <Eye className="size-4 text-muted-foreground" />
+                        )}
                         <div>
                           <p className="text-sm text-muted-foreground">
-                            {t.posts.publishedAt}
+                            {post.status === PostStatus.WAITING_PUBLISH
+                              ? "Lịch đăng bài"
+                              : t.posts.publishedAt}
                           </p>
-                          <p className="font-medium">
+                          <p
+                            className={`font-medium ${post.status === PostStatus.WAITING_PUBLISH ? "text-blue-600" : ""}`}
+                          >
                             {formatDate(post.publishedAt)}
                           </p>
                         </div>
@@ -910,18 +930,23 @@ export default function PostDetailPage() {
         open={showPublishDialog}
         onOpenChange={(open) => {
           setShowPublishDialog(open);
-          if (!open) setScheduledPublishDate("");
+          if (!open) {
+            setScheduledDate(undefined);
+            setScheduledTime("09:00");
+          }
         }}
       >
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-md">
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <AlertCircle
-                className={`size-5 ${post.status === PostStatus.PUBLISHED ? "text-orange-500" : "text-yellow-500"}`}
+                className={`size-5 ${post.status === PostStatus.PUBLISHED || post.status === PostStatus.WAITING_PUBLISH ? "text-orange-500" : "text-yellow-500"}`}
               />
               {post.status === PostStatus.PUBLISHED
                 ? "Hủy đăng bài?"
-                : "Đăng bài ngay?"}
+                : post.status === PostStatus.WAITING_PUBLISH
+                  ? "Hủy lịch đăng bài?"
+                  : "Đăng bài"}
             </AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div>
@@ -930,35 +955,96 @@ export default function PostDetailPage() {
                     Bài viết sẽ được gỡ khỏi trang công khai. Người dùng sẽ
                     không thể xem bài viết này cho đến khi bạn đăng lại.
                   </p>
+                ) : post.status === PostStatus.WAITING_PUBLISH ? (
+                  <p>
+                    Bài viết đã được lên lịch đăng vào{" "}
+                    <span className="font-medium">
+                      {post.publishedAt && formatDate(post.publishedAt)}
+                    </span>
+                    . Bạn có chắc muốn hủy lịch đăng bài này?
+                  </p>
                 ) : (
-                  <>
+                  <div className="space-y-4">
                     <p>
                       <span className="text-yellow-600 font-medium">
                         [TEMPORARY_POST]
                       </span>{" "}
                       Bạn đang sử dụng tính năng đăng bài nhanh. Bài viết sẽ
-                      được xuất bản ngay lập tức mà không cần qua quy trình phê
-                      duyệt.
+                      được xuất bản ngay lập tức.
                     </p>
-                    <div className="mt-4 space-y-2">
-                      <Label htmlFor="publishDate" className="text-foreground">
-                        Ngày xuất bản (tùy chọn)
-                      </Label>
-                      <Input
-                        id="publishDate"
-                        type="datetime-local"
-                        value={scheduledPublishDate}
-                        onChange={(e) =>
-                          setScheduledPublishDate(e.target.value)
-                        }
-                        className="w-full"
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Để trống để xuất bản ngay lập tức, hoặc chọn ngày để đặt
-                        lịch xuất bản.
-                      </p>
+
+                    <div className="space-y-3 pt-2">
+                      <div className="space-y-2">
+                        <Label>Ngày hiển thị đăng bài</Label>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className="w-full justify-start text-left font-normal"
+                            >
+                              <CalendarIcon className="mr-2 size-4" />
+                              {scheduledDate ? (
+                                format(scheduledDate, "dd/MM/yyyy", {
+                                  locale: vi,
+                                })
+                              ) : (
+                                <span className="text-muted-foreground">
+                                  Hôm nay (mặc định)
+                                </span>
+                              )}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={scheduledDate}
+                              onSelect={setScheduledDate}
+                              locale={vi}
+                            />
+                            {scheduledDate && (
+                              <div className="p-3 border-t">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="w-full"
+                                  onClick={() => setScheduledDate(undefined)}
+                                >
+                                  Đặt về mặc định (hôm nay)
+                                </Button>
+                              </div>
+                            )}
+                          </PopoverContent>
+                        </Popover>
+                        <p className="text-xs text-muted-foreground">
+                          Chọn ngày trong quá khứ để đăng bài viết cũ
+                        </p>
+                      </div>
+
+                      {scheduledDate && (
+                        <div className="space-y-2">
+                          <Label>Giờ hiển thị</Label>
+                          <Input
+                            type="time"
+                            value={scheduledTime}
+                            onChange={(e) => setScheduledTime(e.target.value)}
+                            className="w-full"
+                          />
+                        </div>
+                      )}
+
+                      {scheduledDate && (
+                        <p className="text-sm text-muted-foreground bg-muted p-2 rounded-md">
+                          Bài viết sẽ hiển thị ngày đăng là{" "}
+                          <span className="font-medium text-foreground">
+                            {format(scheduledDate, "dd/MM/yyyy", {
+                              locale: vi,
+                            })}{" "}
+                            lúc {scheduledTime}
+                          </span>
+                        </p>
+                      )}
                     </div>
-                  </>
+                  </div>
                 )}
               </div>
             </AlertDialogDescription>
@@ -967,7 +1053,8 @@ export default function PostDetailPage() {
             <AlertDialogCancel disabled={isPublishing}>
               {t.common.cancel}
             </AlertDialogCancel>
-            {post.status === PostStatus.PUBLISHED ? (
+            {post.status === PostStatus.PUBLISHED ||
+            post.status === PostStatus.WAITING_PUBLISH ? (
               <AlertDialogAction
                 onClick={handleUnpublish}
                 disabled={isPublishing}
@@ -978,11 +1065,13 @@ export default function PostDetailPage() {
                 ) : (
                   <XCircle className="mr-2 size-4" />
                 )}
-                Hủy đăng bài
+                {post.status === PostStatus.WAITING_PUBLISH
+                  ? "Hủy lịch"
+                  : "Hủy đăng bài"}
               </AlertDialogAction>
             ) : (
               <AlertDialogAction
-                onClick={handleForcePublish}
+                onClick={() => handleForcePublish(!!scheduledDate)}
                 disabled={isPublishing}
                 className="bg-green-600 hover:bg-green-700"
               >
@@ -991,7 +1080,7 @@ export default function PostDetailPage() {
                 ) : (
                   <Rocket className="mr-2 size-4" />
                 )}
-                {scheduledPublishDate ? "Đặt lịch đăng" : "Đăng bài"}
+                Đăng bài
               </AlertDialogAction>
             )}
           </AlertDialogFooter>
