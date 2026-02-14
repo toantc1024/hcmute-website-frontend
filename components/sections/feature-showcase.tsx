@@ -177,25 +177,26 @@ export default function FeatureShowcase() {
           );
         });
 
-        // Animate the divider line and diamond
-        const dividerLine = section.querySelector(".section-divider-line");
+        // Animate the divider curves and diamond
+        const dividerSvg = section.querySelector(".section-divider-line");
         const diamond = section.querySelector(".divider-diamond");
 
-        if (dividerLine) {
-          gsap.fromTo(
-            dividerLine,
-            { scaleX: 0 },
-            {
-              scaleX: 1,
+        if (dividerSvg) {
+          const paths = dividerSvg.querySelectorAll("path");
+          paths.forEach((path) => {
+            const length = (path as SVGPathElement).getTotalLength?.() || 600;
+            gsap.set(path, { strokeDasharray: length, strokeDashoffset: length });
+            gsap.to(path, {
+              strokeDashoffset: 0,
               duration: 1.2,
               ease: "power2.out",
               scrollTrigger: {
-                trigger: dividerLine,
+                trigger: dividerSvg,
                 start: "top 95%",
                 toggleActions: "play none none reverse",
               },
-            },
-          );
+            });
+          });
         }
 
         if (diamond) {
@@ -521,25 +522,47 @@ export default function FeatureShowcase() {
 
       {/* ═══════════ Full-width Gradient Divider with Diamond ═══════════ */}
       <div className="relative flex items-center justify-center py-8 w-full">
-        {/* Full-width gradient line */}
-        <div
-          className="section-divider-line w-full h-[1.5px]"
-          style={{
-            background:
-              "linear-gradient(to right, transparent 0%, #0c4ebf 20%, #1760df 45%, #ae0303 75%, transparent 100%)",
-          }}
-        />
-        {/* Center diamond (45° rotated square) — gradient border with white fill */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <div
-            className="divider-diamond w-5 h-5 rotate-45 rounded-[1px] p-[1.5px]"
-            style={{
-              background: "linear-gradient(135deg, #0c4ebf, #1760df, #ae0303)",
-            }}
-          >
-            <div className="w-full h-full bg-white rounded-[0.5px]" />
-          </div>
-        </div>
+        <svg
+          className="section-divider-line w-full"
+          viewBox="0 0 1200 40"
+          fill="none"
+          style={{ height: "2.5rem" }}
+        >
+          <defs>
+            <linearGradient id="dividerCurveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="transparent" />
+              <stop offset="20%" stopColor="#0c4ebf" />
+              <stop offset="50%" stopColor="#1760df" />
+              <stop offset="80%" stopColor="#ae0303" />
+              <stop offset="100%" stopColor="transparent" />
+            </linearGradient>
+            <linearGradient id="diamondStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#0c4ebf" />
+              <stop offset="50%" stopColor="#1760df" />
+              <stop offset="100%" stopColor="#ae0303" />
+            </linearGradient>
+          </defs>
+          {/* Single smooth parabola — Q curve peak at center */}
+          <path
+            d="M0 36 Q600 4 1200 36"
+            stroke="url(#dividerCurveGrad)"
+            strokeWidth="1.5"
+            fill="none"
+          />
+          {/* Diamond sitting at the parabola peak (x=600, y=20) */}
+          <rect
+            className="divider-diamond"
+            x="592"
+            y="12"
+            width="16"
+            height="16"
+            rx="1"
+            transform="rotate(45 600 20)"
+            stroke="url(#diamondStroke)"
+            strokeWidth="1.5"
+            fill="white"
+          />
+        </svg>
       </div>
     </section>
   );
