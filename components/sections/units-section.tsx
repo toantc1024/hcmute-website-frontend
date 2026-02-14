@@ -190,7 +190,7 @@ export default function UnitsSection() {
 
   return (
     <>
-      <section id="units" className="bg-white overflow-hidden">
+      <section id="units" className="bg-white overflow-x-clip">
         <Container>
           <motion.div
             className="mb-10 lg:mb-12"
@@ -200,7 +200,7 @@ export default function UnitsSection() {
             transition={{ duration: 0.6 }}
           >
             <div className="flex flex-col items-center gap-3 mb-6 lg:mb-8">
-              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-foreground leading-tight">
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-foreground leading-relaxed">
                 <AuroraText
                   className="px-3"
                   colors={["#0c4ebfff", "#1760dfff", "#ae0303ff"]}

@@ -47,7 +47,7 @@ export default function NewsSection() {
   }, []);
 
   return (
-    <section className="relative overflow-hidden py-12" id="news">
+    <section className="relative overflow-x-clip py-12" id="news">
       <Container className="relative">
         <div className="bg-white  border-1 relative h-[200px] lg:h-[500px] rounded-3xl overflow-hidden">
           <div className="absolute inset-0 p-6 lg:p-8 flex flex-col lg:flex-row gap-6 lg:gap-8">
@@ -64,7 +64,7 @@ export default function NewsSection() {
                 Tin tức nổi bật của HCM-UTE
               </div>
 
-              <h2 className="text-3xl sm:text-4xl lg:text-4xl xl:text-[46px] font-semibold leading-tight text-foreground">
+              <h2 className="text-3xl sm:text-4xl lg:text-4xl xl:text-[46px] font-semibold leading-relaxed text-foreground">
                 <AuroraText
                   colors={["#0c4ebfff", "#1760dfff", "#ae0303ff"]}
                   className="text-3xl md:text-4xl font-bold text-foreground  whitespace-nowrap"

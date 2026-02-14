@@ -76,7 +76,7 @@ export default function CoreValues() {
   }, [isUserInteracting]);
 
   return (
-    <section id="values" className="relative bg-white overflow-hidden">
+    <section id="values" className="relative bg-white overflow-x-clip">
       <Container className="relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-0 items-start">
           <motion.div
@@ -86,7 +86,7 @@ export default function CoreValues() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-4">
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-4 leading-relaxed">
               TRIẾT LÝ
               <AuroraText
                 className="px-2"

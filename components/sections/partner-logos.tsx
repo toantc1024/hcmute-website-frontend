@@ -30,7 +30,7 @@ const companyLogos = [
 
 export default function PartnerLogos() {
   return (
-    <section id="partners" className="bg-white relative overflow-hidden">
+    <section id="partners" className="bg-white relative overflow-x-clip">
       <div className="hidden lg:block max-w-xl size-full opacity-[.4] absolute top-0 left-0 -translate-x-1/2">
         <Globe className="right-0" />
       </div>
@@ -42,7 +42,7 @@ export default function PartnerLogos() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-4">
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-4 leading-relaxed overflow-visible">
             ĐỐI TÁC CHIẾN LƯỢC
           </h2>
           <p className="text-sm sm:text-base lg:text-lg text-gray-600 max-w-2xl mx-auto px-4">

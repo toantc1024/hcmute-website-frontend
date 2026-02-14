@@ -14,6 +14,38 @@ if (typeof window !== "undefined") {
 const CARD_GAP = 48; // px between content cards
 const MOBILE_BREAKPOINT = 1024;
 
+/* ── Engineering icon SVG paths (one per feature) ── */
+const ENGINEERING_ICONS = [
+  // Wrench (Đào tạo)
+  {
+    paths: [
+      "M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76Z",
+    ],
+  },
+  // Graduation cap (Tuyển sinh)
+  {
+    paths: [
+      "M22 10v6M2 10l10-5 10 5-10 5z",
+      "M6 12v5c0 1.1 2.7 3 6 3s6-1.9 6-3v-5",
+    ],
+  },
+  // Microscope/Flask (Khoa học)
+  {
+    paths: [
+      "M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2",
+      "M8.5 2h7M7 16.5h10",
+    ],
+  },
+  // Heart-handshake (Cộng đồng)
+  {
+    paths: [
+      "M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z",
+      "M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66",
+      "M18 15l-2-2M15 18l-2-2",
+    ],
+  },
+];
+
 const featureData = [
   {
     id: "dao-tao",
@@ -102,19 +134,88 @@ export default function FeatureShowcase() {
 
     const timer = setTimeout(() => {
       ctx = gsap.context(() => {
-        // Track active index — one ScrollTrigger per card
+        // Track active index — continuous scroll-based tracking
         featureData.forEach((_, i) => {
           const card = contentRefs.current[i];
           if (!card) return;
 
           ScrollTrigger.create({
             trigger: card,
-            start: "top 60%",
-            end: "bottom 40%",
+            start: "top 65%",
+            end: "bottom 35%",
             onEnter: () => setActiveIndex(i),
             onEnterBack: () => setActiveIndex(i),
+            onLeave: () => {
+              // When leaving downward, activate next if available
+              if (i < featureData.length - 1) setActiveIndex(i + 1);
+            },
+            onLeaveBack: () => {
+              // When leaving upward, activate previous if available
+              if (i > 0) setActiveIndex(i - 1);
+            },
           });
         });
+
+        // Animate decorative icons on scroll
+        gsap.utils.toArray<HTMLElement>(".decor-icon").forEach((icon) => {
+          gsap.fromTo(
+            icon,
+            { opacity: 0, scale: 0.6, rotate: -15 },
+            {
+              opacity: 1,
+              scale: 1,
+              rotate: 0,
+              duration: 1.2,
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: icon,
+                start: "top 90%",
+                end: "top 40%",
+                toggleActions: "play none none reverse",
+              },
+            },
+          );
+        });
+
+        // Animate the divider line and diamond
+        const dividerLine = section.querySelector(".section-divider-line");
+        const diamond = section.querySelector(".divider-diamond");
+
+        if (dividerLine) {
+          gsap.fromTo(
+            dividerLine,
+            { scaleX: 0 },
+            {
+              scaleX: 1,
+              duration: 1.2,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: dividerLine,
+                start: "top 95%",
+                toggleActions: "play none none reverse",
+              },
+            },
+          );
+        }
+
+        if (diamond) {
+          gsap.fromTo(
+            diamond,
+            { opacity: 0, scale: 0 },
+            {
+              opacity: 1,
+              scale: 1,
+              duration: 0.5,
+              delay: 0.4,
+              ease: "back.out(1.7)",
+              scrollTrigger: {
+                trigger: diamond,
+                start: "top 95%",
+                toggleActions: "play none none reverse",
+              },
+            },
+          );
+        }
       }, section);
     }, 300);
 
@@ -201,6 +302,111 @@ export default function FeatureShowcase() {
       data-section="feature-showcase"
       className="relative bg-white"
     >
+      {/* ═══════════ Large Decorative Engineering Icons ═══════════ */}
+
+      {/* Top-left: Wrench & Screwdriver */}
+      <svg
+        className="absolute -left-10 md:-left-20 lg:-left-24 top-[8%] w-48 h-48 md:w-72 md:h-72 lg:w-[22rem] lg:h-[22rem] pointer-events-none -z-0 opacity-[0.18]"
+        viewBox="0 0 24 24"
+        fill="none"
+        strokeWidth="0.3"
+      >
+        <defs>
+          <linearGradient id="engGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#0c4ebf" stopOpacity="1" />
+            <stop offset="60%" stopColor="#1760df" stopOpacity="1" />
+            <stop offset="100%" stopColor="#ae0303" stopOpacity="1" />
+          </linearGradient>
+        </defs>
+        {/* Wrench */}
+        <path
+          stroke="url(#engGrad1)"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76Z"
+        />
+      </svg>
+
+      {/* Bottom-right: Circuit/Chip */}
+      <svg
+        className="absolute -right-10 md:-right-20 lg:-right-24 bottom-[12%] w-44 h-44 md:w-64 md:h-64 lg:w-80 lg:h-80 pointer-events-none -z-0 opacity-[0.15]"
+        viewBox="0 0 24 24"
+        fill="none"
+        strokeWidth="0.3"
+      >
+        <defs>
+          <linearGradient id="engGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#ae0303" stopOpacity="1" />
+            <stop offset="50%" stopColor="#1760df" stopOpacity="1" />
+            <stop offset="100%" stopColor="#0c4ebf" stopOpacity="1" />
+          </linearGradient>
+        </defs>
+        {/* CPU/Chip */}
+        <rect
+          x="4"
+          y="4"
+          width="16"
+          height="16"
+          rx="2"
+          stroke="url(#engGrad2)"
+        />
+        <rect x="9" y="9" width="6" height="6" rx="1" stroke="url(#engGrad2)" />
+        <path
+          stroke="url(#engGrad2)"
+          strokeLinecap="round"
+          d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"
+        />
+      </svg>
+
+      {/* Mid-left: Compass/Drafting */}
+      <svg
+        className="absolute -left-6 md:-left-12 lg:-left-16 top-[55%] w-36 h-36 md:w-56 md:h-56 lg:w-64 lg:h-64 pointer-events-none -z-0 opacity-[0.14]"
+        viewBox="0 0 24 24"
+        fill="none"
+        strokeWidth="0.3"
+      >
+        <defs>
+          <linearGradient id="engGrad3" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#0c4ebf" stopOpacity="1" />
+            <stop offset="100%" stopColor="#ae0303" stopOpacity="1" />
+          </linearGradient>
+        </defs>
+        {/* Compass tool */}
+        <circle cx="12" cy="5" r="3" stroke="url(#engGrad3)" />
+        <path
+          stroke="url(#engGrad3)"
+          strokeLinecap="round"
+          d="m12 8-4 13M12 8l4 13M9 18h6"
+        />
+      </svg>
+
+      {/* Top-right: Graduation Cap (Tuyển sinh) */}
+      <svg
+        className="absolute -right-8 md:-right-16 lg:-right-20 top-[25%] w-40 h-40 md:w-56 md:h-56 lg:w-72 lg:h-72 pointer-events-none -z-0 opacity-[0.14]"
+        viewBox="0 0 24 24"
+        fill="none"
+        strokeWidth="0.3"
+      >
+        <defs>
+          <linearGradient id="engGrad4" x1="50%" y1="0%" x2="50%" y2="100%">
+            <stop offset="0%" stopColor="#1760df" stopOpacity="1" />
+            <stop offset="100%" stopColor="#ae0303" stopOpacity="1" />
+          </linearGradient>
+        </defs>
+        {/* Graduation cap */}
+        <path
+          stroke="url(#engGrad4)"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M22 10v6M2 10l10-5 10 5-10 5z"
+        />
+        <path
+          stroke="url(#engGrad4)"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M6 12v5c0 1.1 2.7 3 6 3s6-1.9 6-3v-5"
+        />
+      </svg>
       {/* ═══════════ Mobile Layout ═══════════ */}
       <div className="lg:hidden" ref={mobileScrollContainerRef}>
         <div className="h-screen flex flex-col">
@@ -312,6 +518,29 @@ export default function FeatureShowcase() {
           </div>
         </div>
       </Container>
+
+      {/* ═══════════ Full-width Gradient Divider with Diamond ═══════════ */}
+      <div className="relative flex items-center justify-center py-8 w-full">
+        {/* Full-width gradient line */}
+        <div
+          className="section-divider-line w-full h-[1.5px]"
+          style={{
+            background:
+              "linear-gradient(to right, transparent 0%, #0c4ebf 20%, #1760df 45%, #ae0303 75%, transparent 100%)",
+          }}
+        />
+        {/* Center diamond (45° rotated square) — gradient border with white fill */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <div
+            className="divider-diamond w-5 h-5 rotate-45 rounded-[1px] p-[1.5px]"
+            style={{
+              background: "linear-gradient(135deg, #0c4ebf, #1760df, #ae0303)",
+            }}
+          >
+            <div className="w-full h-full bg-white rounded-[0.5px]" />
+          </div>
+        </div>
+      </div>
     </section>
   );
 }

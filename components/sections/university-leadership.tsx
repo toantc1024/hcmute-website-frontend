@@ -53,7 +53,7 @@ export default function UniversityLeadership() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-1 sm:mb-2">
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-1 sm:mb-2 leading-relaxed">
               LÃNH ĐẠO CỦA
               <AuroraText className="px-2" colors={["#002e7dff", "#ae0303ff"]}>
                 HCM-UTE

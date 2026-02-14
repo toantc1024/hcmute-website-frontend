@@ -401,7 +401,7 @@ export default function VideoIntroduction() {
   }));
 
   return (
-    <section id="history" className="bg-white h-auto relative overflow-hidden">
+    <section id="history" className="bg-white h-auto relative overflow-x-clip">
       <div
         className="absolute w-full pointer-events-none z-0"
         style={{ top: "20px", height: "calc(100% + 400px)" }}
@@ -436,7 +436,7 @@ export default function VideoIntroduction() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-4">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-4 leading-relaxed">
             KHÁM PHÁ
             <AuroraText
               className="px-2"

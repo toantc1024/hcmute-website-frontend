@@ -62,7 +62,7 @@ const itemVariants = {
 
 export default function UniversityStats() {
   return (
-    <section id="stats" className="overflow-hidden">
+    <section id="stats" className="">
       <Container className="w-full text-center !gap-0">
         <motion.div
           className="text-center "
@@ -71,7 +71,7 @@ export default function UniversityStats() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-2xl md:text-3xl lg:text-4xl text-center font-bold text-foreground mb-4 ">
+          <h2 className="text-2xl md:text-3xl py-8 lg:text-4xl text-center font-bold text-foreground mb-4 leading-relaxed overflow-visible">
             TRƯỜNG TRỌNG ĐIỂM QUỐC GIA VỀ
             <AuroraText
               className="px-2"
