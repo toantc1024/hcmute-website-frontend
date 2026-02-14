@@ -185,7 +185,10 @@ export default function FeatureShowcase() {
           const paths = dividerSvg.querySelectorAll("path");
           paths.forEach((path) => {
             const length = (path as SVGPathElement).getTotalLength?.() || 600;
-            gsap.set(path, { strokeDasharray: length, strokeDashoffset: length });
+            gsap.set(path, {
+              strokeDasharray: length,
+              strokeDashoffset: length,
+            });
             gsap.to(path, {
               strokeDashoffset: 0,
               duration: 1.2,
@@ -529,14 +532,26 @@ export default function FeatureShowcase() {
           style={{ height: "2.5rem" }}
         >
           <defs>
-            <linearGradient id="dividerCurveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <linearGradient
+              id="dividerCurveGrad"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="0%"
+            >
               <stop offset="0%" stopColor="transparent" />
               <stop offset="20%" stopColor="#0c4ebf" />
               <stop offset="50%" stopColor="#1760df" />
               <stop offset="80%" stopColor="#ae0303" />
               <stop offset="100%" stopColor="transparent" />
             </linearGradient>
-            <linearGradient id="diamondStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient
+              id="diamondStroke"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="100%"
+            >
               <stop offset="0%" stopColor="#0c4ebf" />
               <stop offset="50%" stopColor="#1760df" />
               <stop offset="100%" stopColor="#ae0303" />

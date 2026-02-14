@@ -40,7 +40,7 @@ export function NavbarProvider({ children }: { children: React.ReactNode }) {
     }
     timeoutRef.current = setTimeout(() => {
       setActiveMenu(null);
-    }, 15);
+    }, 150);
   }, []);
 
   const handleContentMouseEnter = useCallback(() => {

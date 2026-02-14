@@ -45,25 +45,31 @@ function NavItems({ items }: { items: MenuItem[] }) {
               <span className="font-inter-black">{item.label}</span>
             </Button>
           ) : (
-            <Button
-              variant="ute"
-              size="sm"
-              onClick={() => handleClick(item.id)}
-              className={cn(
-                "uppercase font-extrabold text-xs xl:text-sm px-2.5 xl:px-3.5",
-                activeMenu === item.id
-                  ? " !bg-primary !text-primary-foreground"
-                  : "bg-transparent",
-              )}
-            >
-              {item.label}
-              <motion.div
-                animate={{ rotate: activeMenu === item.id ? 180 : 0 }}
-                transition={{ duration: 0.2, ease: "easeInOut" }}
+            <>
+              <Button
+                variant="ute"
+                size="sm"
+                onClick={() => handleClick(item.id)}
+                className={cn(
+                  "uppercase font-extrabold text-xs xl:text-sm px-2.5 xl:px-3.5",
+                  activeMenu === item.id
+                    ? " !bg-primary !text-primary-foreground"
+                    : "bg-transparent",
+                )}
               >
-                <ChevronDown className="w-3.5 h-3.5 xl:w-4 xl:h-4" />
-              </motion.div>
-            </Button>
+                {item.label}
+                <motion.div
+                  animate={{ rotate: activeMenu === item.id ? 180 : 0 }}
+                  transition={{ duration: 0.2, ease: "easeInOut" }}
+                >
+                  <ChevronDown className="w-3.5 h-3.5 xl:w-4 xl:h-4" />
+                </motion.div>
+              </Button>
+              {/* Invisible bridge to prevent gap between button and dropdown */}
+              {activeMenu === item.id && (
+                <div className="absolute left-0 right-0 top-full h-8 z-50" />
+              )}
+            </>
           )}
         </div>
       ))}
