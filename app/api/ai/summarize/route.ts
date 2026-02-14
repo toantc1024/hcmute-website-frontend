@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 
 /**
@@ -29,37 +29,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
+    const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
-        { error: "API key chưa được cấu hình" },
+        { error: "OpenAI API key chưa được cấu hình" },
         { status: 500 },
       );
     }
 
-    // Strip HTML to get plain text
+    // Strip HTML — truncate for speed
     const plainText = stripHtml(content);
-
-    // Truncate to ~8000 chars to stay within token limits
     const truncatedText =
-      plainText.length > 8000 ? plainText.slice(0, 8000) + "..." : plainText;
+      plainText.length > 4000 ? plainText.slice(0, 4000) + "..." : plainText;
 
-    const model = new ChatGoogleGenerativeAI({
-      model: "gemini-2.0-flash",
-      apiKey,
-      temperature: 0.3,
-      maxOutputTokens: 512,
+    const model = new ChatOpenAI({
+      model: "gpt-4.1-mini",
+      openAIApiKey: apiKey,
+      temperature: 0.2,
+      maxTokens: 256,
     });
 
     const messages = [
       new SystemMessage(
-        `Bạn là trợ lý AI của Trường Đại học Sư phạm Kỹ thuật TP.HCM (HCM-UTE). 
-Nhiệm vụ: Tóm tắt bài viết ngắn gọn, rõ ràng bằng tiếng Việt.
-Yêu cầu:
-- Tóm tắt trong 3-5 câu, nêu bật ý chính
-- Giữ nguyên tên riêng, số liệu, ngày tháng quan trọng
-- Giọng văn trang trọng, phù hợp với bối cảnh đại học
-- Không thêm thông tin ngoài bài viết`,
+        `Bạn là trợ lý AI của Trường ĐH Sư phạm Kỹ thuật TP.HCM (HCM-UTE).
+Tóm tắt bài viết trong 2-3 câu ngắn gọn bằng tiếng Việt.
+Giữ nguyên tên riêng, số liệu quan trọng. Không thêm thông tin ngoài bài.`,
       ),
       new HumanMessage(
         `Tiêu đề: ${title || "Không có tiêu đề"}\n\nNội dung:\n${truncatedText}`,

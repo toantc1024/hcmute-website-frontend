@@ -111,21 +111,23 @@ export default function NewsDetailContent() {
   const [outlineOpen, setOutlineOpen] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
   const [processedContent, setProcessedContent] = useState("");
-  const [readingProgress, setReadingProgress] = useState(0);
   const [isAiSummarizing, setIsAiSummarizing] = useState(false);
   const [aiSummary, setAiSummary] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
   const heroRef = useRef<HTMLElement>(null);
   const contentRef = useRef<HTMLElement>(null);
+  const progressBarRef = useRef<HTMLDivElement>(null);
 
-  // Reading progress
+  // Reading progress — update DOM directly to avoid re-renders
   useEffect(() => {
     const handleScroll = () => {
       const totalHeight =
         document.documentElement.scrollHeight - window.innerHeight;
       const progress = (window.scrollY / totalHeight) * 100;
-      setReadingProgress(progress);
+      if (progressBarRef.current) {
+        progressBarRef.current.style.width = `${progress}%`;
+      }
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
@@ -299,8 +301,9 @@ export default function NewsDetailContent() {
         {/* Reading Progress Bar */}
         <div className="fixed top-0 left-0 w-full h-1 bg-transparent z-[60]">
           <div
-            className="h-full bg-primary shadow-[0_0_15px_hsl(var(--primary)/0.6)] transition-all duration-150"
-            style={{ width: `${readingProgress}%` }}
+            ref={progressBarRef}
+            className="h-full bg-primary shadow-[0_0_15px_hsl(var(--primary)/0.6)] transition-[width] duration-150"
+            style={{ width: "0%" }}
           />
         </div>
 
@@ -761,10 +764,20 @@ export default function NewsDetailContent() {
                       <div className="p-6">
                         <div className="flex items-center justify-between mb-4">
                           <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-wider">
-                            <Sparkles className="w-4 h-4" />
+                            <Sparkles
+                              className={cn(
+                                "w-4 h-4",
+                                isAiSummarizing && "animate-pulse",
+                              )}
+                            />
                             <span>AI Summary</span>
+                            {isAiSummarizing && (
+                              <span className="ml-1 text-[10px] font-normal text-muted-foreground normal-case tracking-normal animate-pulse">
+                                Đang tạo...
+                              </span>
+                            )}
                           </div>
-                          {aiSummary && (
+                          {!isAiSummarizing && aiSummary && (
                             <button
                               onClick={() => setAiSummary(null)}
                               className="text-muted-foreground hover:text-foreground transition-colors"
@@ -775,10 +788,20 @@ export default function NewsDetailContent() {
                         </div>
 
                         {isAiSummarizing ? (
-                          <div className="space-y-3 animate-pulse">
-                            <div className="h-2 bg-primary/20 rounded w-full" />
-                            <div className="h-2 bg-primary/20 rounded w-5/6" />
-                            <div className="h-2 bg-primary/20 rounded w-4/6" />
+                          <div className="space-y-3">
+                            <div className="h-2.5 ai-shimmer-line rounded-full w-full" />
+                            <div
+                              className="h-2.5 ai-shimmer-line rounded-full w-[92%]"
+                              style={{ animationDelay: "0.15s" }}
+                            />
+                            <div
+                              className="h-2.5 ai-shimmer-line rounded-full w-[78%]"
+                              style={{ animationDelay: "0.3s" }}
+                            />
+                            <div
+                              className="h-2.5 ai-shimmer-line rounded-full w-[65%]"
+                              style={{ animationDelay: "0.45s" }}
+                            />
                           </div>
                         ) : (
                           <p className="text-foreground/80 leading-relaxed text-[15px]">
