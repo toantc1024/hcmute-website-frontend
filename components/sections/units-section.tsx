@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X } from "lucide-react";
 import Link from "next/link";
@@ -9,7 +9,7 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  type CarouselApi,
+  useCarousel,
 } from "@/components/ui/carousel";
 import { AuroraText } from "@/components/ui/aurora-text";
 import { AnimatedTabs } from "@/components/ui/animated-tabs";
@@ -17,6 +17,7 @@ import { MagicCard } from "@/components/ui/magic-card";
 import { BorderBeam } from "@/components/ui/border-beam";
 import { Container } from "@/components/layout";
 import { CarouselNavButton } from "@/components/blocks/carousel-nav-button";
+import { cn } from "@/lib/utils";
 
 const FLOWER_BLUE = "/assets/FLOWER_BLUE_GRADIENT_UTE.png";
 
@@ -155,38 +156,48 @@ const UNIT_GROUPS: UnitGroup[] = [
   },
 ];
 
+/* ------------------------------------------------------------------ */
+/*  Carousel Nav — rendered inside Carousel context, shown on hover   */
+/* ------------------------------------------------------------------ */
+function UnitCarouselNav({ visible }: { visible: boolean }) {
+  const { scrollPrev, scrollNext, canScrollPrev, canScrollNext } =
+    useCarousel();
+
+  return (
+    <>
+      <div
+        className={cn(
+          "pointer-events-none absolute left-2 top-1/2 z-20 -translate-y-1/2 transition-all duration-300 sm:left-4 lg:left-16 xl:left-24 2xl:left-56",
+          visible && canScrollPrev
+            ? "pointer-events-auto translate-x-0 opacity-100"
+            : "-translate-x-4 opacity-0",
+        )}
+      >
+        <CarouselNavButton direction="prev" onClick={scrollPrev} size="md" />
+      </div>
+      <div
+        className={cn(
+          "pointer-events-none absolute right-2 top-1/2 z-20 -translate-y-1/2 transition-all duration-300 sm:right-4 lg:right-16 xl:right-24 2xl:right-56",
+          visible && canScrollNext
+            ? "pointer-events-auto translate-x-0 opacity-100"
+            : "translate-x-4 opacity-0",
+        )}
+      >
+        <CarouselNavButton direction="next" onClick={scrollNext} size="md" />
+      </div>
+    </>
+  );
+}
+
 export default function UnitsSection() {
   const [selectedGroup, setSelectedGroup] = useState<UnitGroup | null>(null);
   const [activeTab, setActiveTab] = useState(0);
-  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
-  const [canScrollPrev, setCanScrollPrev] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
 
   const tabItems = UNIT_GROUPS.map((group, index) => ({
     label: group.title,
     value: index,
   }));
-
-  useEffect(() => {
-    if (!carouselApi) {
-      return;
-    }
-
-    const updateScrollState = () => {
-      setCanScrollPrev(carouselApi.canScrollPrev());
-      setCanScrollNext(carouselApi.canScrollNext());
-    };
-
-    updateScrollState();
-    carouselApi.on("select", updateScrollState);
-    carouselApi.on("reInit", updateScrollState);
-
-    return () => {
-      carouselApi.off("select", updateScrollState);
-      carouselApi.off("reInit", updateScrollState);
-    };
-  }, [carouselApi]);
 
   return (
     <>
@@ -222,115 +233,88 @@ export default function UnitsSection() {
           </motion.div>
         </Container>
 
-        {/* Full-width carousel area with hover-to-show nav */}
+        {/* Full-width carousel — breaks out of container, Visa-style */}
         <div
           className="relative"
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
         >
-          {/* Prev button — overlays on left edge, show on hover */}
-          <div
-            className={`absolute px-2 pb-4 left-6 sm:left-12 lg:left-24 xl:left-32 2xl:left-64 top-1/2 -translate-y-1/2 z-20 transition-all duration-300 ${
-              isHovering && canScrollPrev
-                ? "opacity-100 translate-x-0"
-                : "opacity-0 -translate-x-3 pointer-events-none"
-            }`}
+          <Carousel
+            key={activeTab}
+            opts={{
+              align: "start",
+              loop: true,
+              dragFree: true,
+            }}
+            className="w-full"
           >
-            <CarouselNavButton
-              direction="prev"
-              onClick={() => carouselApi?.scrollPrev()}
-            />
-          </div>
-
-          {/* Next button — overlays on right edge, show on hover */}
-          <div
-            className={`absolute px-2 pb-4 right-6 sm:right-12 lg:right-24 xl:right-32 2xl:right-64 top-1/2 -translate-y-1/2 z-20 transition-all duration-300 ${
-              isHovering && canScrollNext
-                ? "opacity-100 translate-x-0"
-                : "opacity-0 translate-x-3 pointer-events-none"
-            }`}
-          >
-            <CarouselNavButton
-              direction="next"
-              onClick={() => carouselApi?.scrollNext()}
-            />
-          </div>
-
-          <Container>
-            <Carousel
-              key={activeTab}
-              opts={{
-                align: "start",
-                loop: true,
-              }}
-              className="w-full"
-              setApi={setCarouselApi}
-            >
-              <CarouselContent className="-ml-3 md:-ml-4">
-                {UNIT_GROUPS[activeTab]?.items.map((unit) => (
-                  <CarouselItem
-                    key={unit.name}
-                    className="pl-3 md:pl-4 basis-[80%] sm:basis-1/2 lg:basis-1/3 xl:basis-1/4"
-                  >
-                    <Link href={unit.href} className="block h-full">
-                      <MagicCard
-                        className="h-full border border-gray-100 hover:border-blue-200 transition-all duration-300 group/card"
-                        gradientColor="from-blue-500 via-blue-600 to-indigo-600"
-                      >
-                        <div className="relative h-52 rounded-2xl overflow-hidden">
-                          {/* Background gradient with initials */}
-                          <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700">
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <span className="text-5xl lg:text-6xl font-bold text-white/15 select-none">
-                                {unit.initials}
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* UTE Flower watermark on hover */}
-                          <div className="absolute top-3 right-3 w-8 h-8 opacity-0 group-hover/card:opacity-20 transition-all duration-500 group-hover/card:rotate-12 pointer-events-none">
-                            <Image
-                              src={FLOWER_BLUE}
-                              alt=""
-                              fill
-                              className="object-contain brightness-200"
-                            />
-                          </div>
-
-                          {/* Dark overlay */}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-
-                          {/* Content */}
-                          <div className="absolute bottom-0 left-0 right-0 p-4 lg:p-5">
-                            <h3 className="text-white text-sm lg:text-base font-bold mb-1.5 line-clamp-2 group-hover/card:underline decoration-blue-300 underline-offset-2">
-                              {unit.name}
-                            </h3>
-                            <p className="text-white/80 text-xs lg:text-sm line-clamp-2 leading-relaxed">
-                              {unit.description}
-                            </p>
-                          </div>
-
-                          {/* Shimmer sweep on hover */}
-                          <div className="absolute inset-0 -translate-x-full group-hover/card:translate-x-full transition-transform duration-700 ease-out bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none" />
-
-                          {/* Border beam on hover */}
-                          <div className="opacity-0 group-hover/card:opacity-100 transition-opacity duration-500">
-                            <BorderBeam
-                              size={120}
-                              duration={4}
-                              colorFrom="#60a5fa"
-                              colorTo="#3b82f6"
-                              borderWidth={2}
-                            />
+            <CarouselContent className="-ml-3 pl-6 pr-6 sm:-ml-4 sm:pl-12 sm:pr-12 lg:pl-24 lg:pr-24 xl:pl-32 xl:pr-32 2xl:pl-64 2xl:pr-64">
+              {UNIT_GROUPS[activeTab]?.items.map((unit) => (
+                <CarouselItem
+                  key={unit.name}
+                  className="pl-3 sm:pl-4 basis-[75%] sm:basis-[44%] md:basis-[34%] lg:basis-[28%] xl:basis-[24%]"
+                >
+                  <Link href={unit.href} className="block h-full">
+                    <MagicCard
+                      className="h-full border border-gray-100 hover:border-blue-200 transition-all duration-300 group/card"
+                      gradientColor="from-blue-500 via-blue-600 to-indigo-600"
+                    >
+                      <div className="relative aspect-[3/2] rounded-2xl overflow-hidden">
+                        {/* Background gradient with initials */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700">
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="text-6xl lg:text-7xl font-bold text-white/15 select-none">
+                              {unit.initials}
+                            </span>
                           </div>
                         </div>
-                      </MagicCard>
-                    </Link>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-            </Carousel>
-          </Container>
+
+                        {/* UTE Flower watermark on hover */}
+                        <div className="absolute top-4 right-4 w-10 h-10 opacity-0 group-hover/card:opacity-20 transition-all duration-500 group-hover/card:rotate-12 pointer-events-none">
+                          <Image
+                            src={FLOWER_BLUE}
+                            alt=""
+                            fill
+                            className="object-contain brightness-200"
+                          />
+                        </div>
+
+                        {/* Dark overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+
+                        {/* Content */}
+                        <div className="absolute bottom-0 left-0 right-0 p-4 lg:p-5">
+                          <h3 className="text-white text-sm lg:text-base font-bold mb-1.5 line-clamp-2 group-hover/card:underline decoration-blue-300 underline-offset-2">
+                            {unit.name}
+                          </h3>
+                          <p className="text-white/80 text-xs lg:text-sm line-clamp-2 leading-relaxed">
+                            {unit.description}
+                          </p>
+                        </div>
+
+                        {/* Shimmer sweep on hover */}
+                        <div className="absolute inset-0 -translate-x-full group-hover/card:translate-x-full transition-transform duration-700 ease-out bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none" />
+
+                        {/* Border beam on hover */}
+                        <div className="opacity-0 group-hover/card:opacity-100 transition-opacity duration-500">
+                          <BorderBeam
+                            size={120}
+                            duration={4}
+                            colorFrom="#60a5fa"
+                            colorTo="#3b82f6"
+                            borderWidth={2}
+                          />
+                        </div>
+                      </div>
+                    </MagicCard>
+                  </Link>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+
+            {/* Nav buttons — inside Carousel context, shown on hover */}
+            <UnitCarouselNav visible={isHovering} />
+          </Carousel>
         </div>
       </section>
 

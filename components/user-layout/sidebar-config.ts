@@ -90,13 +90,6 @@ export const sidebarMenuGroups: SidebarMenuGroup[] = [
     defaultOpen: false,
     items: [
       {
-        id: "news",
-        title: "Tin tức",
-        titleKey: "navigation.news",
-        href: "/manage/tin-tuc",
-        icon: Newspaper,
-      },
-      {
         id: "homepageContent",
         title: "Nội dung trang chủ",
         titleKey: "navigation.homepageContent",
