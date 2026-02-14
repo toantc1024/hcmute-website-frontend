@@ -1,15 +1,71 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { useRef, useState, useCallback, useEffect } from "react";
-import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NewsListCard } from "@/components/blocks/news-bento";
-import type { PostAuditView } from "@/lib/api-client";
-import type { CategoryView } from "@/lib/api-client";
+import { CarouselNavButton } from "@/components/blocks/carousel-nav-button";
+import { DecorativeLine } from "@/components/blocks/decorative-line";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  useCarousel,
+} from "@/components/ui/carousel";
+import type { PostAuditView, CategoryView } from "@/lib/api-client";
 
 /* ------------------------------------------------------------------ */
-/*  Section: category title + "Xem thêm" + horizontal card carousel    */
+/*  Carousel Nav Buttons — rendered inside Carousel context            */
+/*  Only visible on hover of the entire section                        */
+/* ------------------------------------------------------------------ */
+function CarouselNavOverlay({ visible }: { visible: boolean }) {
+  const { scrollPrev, scrollNext, canScrollPrev, canScrollNext } =
+    useCarousel();
+
+  return (
+    <>
+      {/* Previous */}
+      <div
+        className={cn(
+          "pointer-events-none absolute left-2 top-1/2 z-20 -translate-y-1/2 transition-all duration-300 sm:left-4 lg:left-16 xl:left-24 2xl:left-56",
+          visible && canScrollPrev
+            ? "pointer-events-auto translate-x-0 opacity-100"
+            : "-translate-x-4 opacity-0",
+        )}
+      >
+        <CarouselNavButton
+          direction="prev"
+          onClick={scrollPrev}
+          size="md"
+          variant="light"
+        />
+      </div>
+
+      {/* Next */}
+      <div
+        className={cn(
+          "pointer-events-none absolute right-2 top-1/2 z-20 -translate-y-1/2 transition-all duration-300 sm:right-4 lg:right-16 xl:right-24 2xl:right-56",
+          visible && canScrollNext
+            ? "pointer-events-auto translate-x-0 opacity-100"
+            : "translate-x-4 opacity-0",
+        )}
+      >
+        <CarouselNavButton
+          direction="next"
+          onClick={scrollNext}
+          size="md"
+          variant="light"
+        />
+      </div>
+    </>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Full-width category carousel (Visa-style)                          */
+/*  Header stays in container padding, carousel bleeds to screen edge  */
+/*  Nav buttons use CarouselNavButton, shown only on hover             */
 /* ------------------------------------------------------------------ */
 
 interface NewsCategoryCarouselProps {
@@ -23,110 +79,58 @@ export function NewsCategoryCarousel({
   posts,
   className,
 }: NewsCategoryCarouselProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
-
-  const checkScroll = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    setCanScrollLeft(el.scrollLeft > 4);
-    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
-  }, []);
-
-  useEffect(() => {
-    checkScroll();
-    const el = scrollRef.current;
-    if (el) {
-      el.addEventListener("scroll", checkScroll, { passive: true });
-      window.addEventListener("resize", checkScroll);
-    }
-    return () => {
-      el?.removeEventListener("scroll", checkScroll);
-      window.removeEventListener("resize", checkScroll);
-    };
-  }, [checkScroll, posts]);
-
-  const scroll = (dir: "left" | "right") => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const cardWidth = el.querySelector("div")?.offsetWidth ?? 300;
-    el.scrollBy({
-      left: dir === "left" ? -cardWidth - 12 : cardWidth + 12,
-      behavior: "smooth",
-    });
-  };
+  const [hovered, setHovered] = useState(false);
 
   if (posts.length === 0) return null;
 
   return (
-    <section className={cn("space-y-3 sm:space-y-4", className)}>
-      {/* ── Header row: Title left — "Xem thêm" right ── */}
-      <div className="flex items-center justify-between gap-4">
-        <h2 className="text-lg font-bold text-neutral-900 sm:text-xl md:text-2xl">
-          {category.name}
-        </h2>
-        <Link
-          href={`/tin-tuc/danh-muc/${category.slug}`}
-          className="group inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-blue-600 transition-colors hover:text-blue-700"
-        >
-          Xem thêm
-          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-        </Link>
+    <section
+      className={cn("space-y-4 sm:space-y-5", className)}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {/* ── Header row: Decorative line + Title + "Xem thêm" ── */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="text-lg font-bold text-neutral-900 sm:text-xl md:text-2xl">
+            {category.name}
+          </h2>
+          <Link
+            href={`/tin-tuc/danh-muc/${category.slug}`}
+            className="group inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-blue-600 transition-colors hover:text-blue-700"
+          >
+            Xem thêm
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          </Link>
+        </div>
+        <DecorativeLine variant="light" />
       </div>
 
-      {/* ── Carousel ── */}
-      <div className="relative group/carousel">
-        {/* Left nav */}
-        {canScrollLeft && (
-          <button
-            onClick={() => scroll("left")}
-            className="absolute -left-2 top-1/2 z-20 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-neutral-200 bg-white shadow-md transition-all hover:scale-105 hover:shadow-lg sm:-left-4 sm:h-10 sm:w-10"
-            aria-label="Scroll left"
-          >
-            <ChevronLeft className="h-4 w-4 text-neutral-600 sm:h-5 sm:w-5" />
-          </button>
-        )}
-
-        {/* Right nav */}
-        {canScrollRight && (
-          <button
-            onClick={() => scroll("right")}
-            className="absolute -right-2 top-1/2 z-20 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-neutral-200 bg-white shadow-md transition-all hover:scale-105 hover:shadow-lg sm:-right-4 sm:h-10 sm:w-10"
-            aria-label="Scroll right"
-          >
-            <ChevronRight className="h-4 w-4 text-neutral-600 sm:h-5 sm:w-5" />
-          </button>
-        )}
-
-        {/* Blur masks */}
-        <div
-          className={cn(
-            "pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-neutral-50/80 to-transparent transition-opacity duration-300 sm:w-12",
-            canScrollLeft ? "opacity-100" : "opacity-0",
-          )}
-        />
-        <div
-          className={cn(
-            "pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-neutral-50/80 to-transparent transition-opacity duration-300 sm:w-12",
-            canScrollRight ? "opacity-100" : "opacity-0",
-          )}
-        />
-
-        {/* Scrollable track */}
-        <div
-          ref={scrollRef}
-          className="no-scrollbar flex gap-3 overflow-x-auto scroll-smooth pb-1 sm:gap-4"
+      {/* ── Full-width carousel — breaks out of container ── */}
+      <div className="relative left-1/2 right-1/2 -mx-[50vw] w-screen">
+        <Carousel
+          opts={{
+            align: "start",
+            loop: false,
+            skipSnaps: false,
+            dragFree: true,
+          }}
+          className="w-full"
         >
-          {posts.map((post) => (
-            <div
-              key={post.id}
-              className="w-[260px] shrink-0 sm:w-[280px] md:w-[300px] lg:w-[320px]"
-            >
-              <NewsListCard post={post} showCategory={false} />
-            </div>
-          ))}
-        </div>
+          <CarouselContent className="-ml-3 pl-6 pr-6 sm:-ml-4 sm:pl-12 sm:pr-12 lg:pl-24 lg:pr-24 xl:pl-32 xl:pr-32 2xl:pl-64 2xl:pr-64">
+            {posts.map((post) => (
+              <CarouselItem
+                key={post.id}
+                className="basis-[75%] pl-3 sm:basis-[44%] sm:pl-4 md:basis-[34%] lg:basis-[28%] xl:basis-[24%]"
+              >
+                <NewsListCard post={post} showCategory={false} />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+
+          {/* Nav buttons — only visible on section hover */}
+          <CarouselNavOverlay visible={hovered} />
+        </Carousel>
       </div>
     </section>
   );

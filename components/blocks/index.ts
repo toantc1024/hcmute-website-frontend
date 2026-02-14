@@ -4,6 +4,7 @@ export { default as Footer } from "./footer";
 export { CarouselNavButton } from "./carousel-nav-button";
 export { CategoryTabs } from "./category-tabs";
 export { NewsCategoryCarousel } from "./news-carousel-section";
+export { DecorativeLine, SectionDivider } from "./decorative-line";
 export {
   BentoHeroCard,
   BentoSmallCard,

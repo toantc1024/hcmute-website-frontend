@@ -60,13 +60,14 @@ export function CategoryCarouselSkeleton({
         {[...Array(4)].map((_, i) => (
           <div
             key={i}
-            className="w-[260px] shrink-0 sm:w-[280px] md:w-[300px] lg:w-[320px]"
+            className="w-[280px] shrink-0 sm:w-[300px] md:w-[320px] lg:w-[340px]"
           >
-            <div className="overflow-hidden rounded-lg border border-neutral-200 bg-white">
-              <Skeleton className="aspect-[16/9] w-full" />
-              <div className="flex flex-col gap-2 p-4">
-                <Skeleton className="h-4 w-3/4 rounded" />
+            <div className="overflow-hidden rounded-xl bg-white">
+              <Skeleton className="aspect-[3/2] w-full" />
+              <div className="flex flex-col gap-2.5 p-4 sm:p-5">
+                <Skeleton className="h-4 w-4/5 rounded" />
                 <Skeleton className="h-3 w-full rounded" />
+                <Skeleton className="h-3 w-2/3 rounded" />
                 <Skeleton className="h-3 w-1/3 rounded" />
               </div>
             </div>
@@ -111,16 +112,12 @@ export function NewsSectionSkeleton({ className }: { className?: string }) {
 /* ------------------------------------------------------------------ */
 export function NewsCardSkeleton({ className }: { className?: string }) {
   return (
-    <div
-      className={cn(
-        "overflow-hidden rounded-lg border border-neutral-200 bg-white",
-        className,
-      )}
-    >
-      <Skeleton className="aspect-[16/9] w-full" />
-      <div className="flex flex-col gap-2 p-4">
-        <Skeleton className="h-4 w-3/4 rounded" />
+    <div className={cn("overflow-hidden rounded-xl bg-white", className)}>
+      <Skeleton className="aspect-[3/2] w-full" />
+      <div className="flex flex-col gap-2.5 p-4 sm:p-5">
+        <Skeleton className="h-4 w-4/5 rounded" />
         <Skeleton className="h-3 w-full rounded" />
+        <Skeleton className="h-3 w-2/3 rounded" />
         <Skeleton className="h-3 w-1/3 rounded" />
       </div>
     </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -59,6 +59,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Container } from "@/components/layout";
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -98,6 +99,7 @@ const extractHeadings = (html: string) => {
 
 export default function NewsDetailContent() {
   const params = useParams();
+  const router = useRouter();
   const slug = params.slug as string;
 
   const [post, setPost] = useState<PostDetailView | null>(null);
@@ -265,12 +267,10 @@ export default function NewsDetailContent() {
           <p className="text-sm text-muted-foreground mb-6">
             Bài viết không tồn tại hoặc đã bị xóa
           </p>
-          <Link href="/tin-tuc">
-            <Button variant="outline" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Quay lại
-            </Button>
-          </Link>
+          <Button variant="outline" size="sm" onClick={() => router.back()}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Quay lại
+          </Button>
         </div>
       </div>
     );
@@ -344,50 +344,91 @@ export default function NewsDetailContent() {
               </div>
             )}
 
-            {/* Top Bar */}
-            <div className="absolute top-0 left-0 w-full p-4 sm:p-6 flex justify-between items-start z-20">
-              <Link href="/tin-tuc">
+            {/* Top Bar — uses Container padding for alignment */}
+            <div className="absolute top-0 left-0 w-full z-20">
+              <Container className="flex justify-between items-start py-4 sm:py-6">
                 <Button
                   variant="secondary"
                   size="sm"
                   className="group/btn bg-white/10 backdrop-blur-md text-white border border-white/20 hover:bg-white/20 hover:pr-5"
+                  onClick={() => router.back()}
                 >
                   <ArrowLeft className="w-4 h-4 mr-2 transition-transform group-hover/btn:-translate-x-1" />
                   <span>Quay lại</span>
                 </Button>
-              </Link>
 
-              {/* Mobile Share */}
-              <div className="md:hidden">
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  className="bg-white/10 backdrop-blur-md text-white border border-white/20 hover:bg-white/20"
-                  onClick={copyLink}
-                >
-                  {copied ? (
-                    <span className="text-xs">OK</span>
-                  ) : (
-                    <Share2 className="w-4 h-4" />
-                  )}
-                </Button>
-              </div>
-            </div>
-
-            {/* Hero Content - Only Back Button and Photo Credits */}
-            <div className="absolute bottom-0 left-0 w-full p-4 pb-8 sm:p-6 sm:pb-10 lg:p-12 z-20">
-              {/* Photo/Author credits are handled separately above */}
+                {/* Mobile Share */}
+                <div className="md:hidden">
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="bg-white/10 backdrop-blur-md text-white border border-white/20 hover:bg-white/20"
+                    onClick={copyLink}
+                  >
+                    {copied ? (
+                      <span className="text-xs">OK</span>
+                    ) : (
+                      <Share2 className="w-4 h-4" />
+                    )}
+                  </Button>
+                </div>
+              </Container>
             </div>
           </section>
 
-          {/* Main Layout Grid */}
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-16 pb-20 lg:pb-32">
-            {/* Full Width Article Header - Above Content & Sidebar */}
+          {/* Breadcrumb + Main Layout */}
+          <Container className="py-8 sm:py-10 lg:py-14 pb-20 lg:pb-32">
+            {/* Back + Breadcrumb row — same layout as /tin-tuc and /danh-muc */}
+            <div className="mb-6 flex items-center gap-3">
+              <button
+                onClick={() => router.back()}
+                className="group/back inline-flex shrink-0 items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <ArrowLeft className="h-4 w-4 transition-transform group-hover/back:-translate-x-0.5" />
+                <span className="hidden sm:inline">Quay lại</span>
+              </button>
+              <div className="h-4 w-px bg-border" />
+              <nav className="flex items-center gap-1.5 overflow-hidden text-sm text-muted-foreground">
+                <Link
+                  href="/"
+                  className="shrink-0 transition-colors hover:text-foreground"
+                >
+                  Trang chủ
+                </Link>
+                <ChevronRight className="h-3.5 w-3.5 shrink-0" />
+                <Link
+                  href="/tin-tuc"
+                  className="shrink-0 transition-colors hover:text-foreground"
+                >
+                  Tin tức
+                </Link>
+                {post.categories?.[0] && (
+                  <>
+                    <ChevronRight className="h-3.5 w-3.5 shrink-0" />
+                    <Link
+                      href={`/tin-tuc/danh-muc/${post.categories[0].slug || post.categories[0].id}`}
+                      className="shrink-0 transition-colors hover:text-foreground"
+                    >
+                      {post.categories[0].name}
+                    </Link>
+                  </>
+                )}
+                <ChevronRight className="h-3.5 w-3.5 shrink-0" />
+                <span className="max-w-[200px] truncate font-medium text-foreground">
+                  {post.title}
+                </span>
+              </nav>
+            </div>
+
+            {/* Full Width Article Header */}
             <div className="mb-8 lg:mb-12">
               {/* Category Badges */}
               <div className="flex flex-wrap gap-2 mb-4">
                 {post.categories?.map((cat, i) => (
-                  <Link key={cat.id} href={`/tin-tuc?category=${cat.id}`}>
+                  <Link
+                    key={cat.id}
+                    href={`/tin-tuc/danh-muc/${cat.slug || cat.id}`}
+                  >
                     <Badge
                       variant={i === 0 ? "default" : "secondary"}
                       className={cn(
@@ -955,7 +996,7 @@ export default function NewsDetailContent() {
                 </div>
               </aside>
             </div>
-          </div>
+          </Container>
         </main>
 
         {/* Mobile Sticky Action Bar */}

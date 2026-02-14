@@ -20,7 +20,7 @@ const leadershipData = [
   },
   {
     name: "TS. Trương Thị Hiền",
-    position: "Bí thư Đảng uỷ, Chủ tịch Hội đồng Trường",
+    position: "Bí thư Đảng uỷ, Phó Hiệu trưởng Thường trựcT",
     image: "/PGS_TS_THH.png",
     description:
       "Nhà trường xây dựng môi trường học tập thân thiện, năng động, hội nhập và giàu trải nghiệm, giúp các em rèn luyện toàn diện cả tri thức, kỹ năng và bản lĩnh.",

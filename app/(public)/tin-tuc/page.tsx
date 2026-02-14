@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { Search, ArrowRight } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Search, ArrowRight, ArrowLeft, ChevronRight } from "lucide-react";
 import {
   postsApi,
   categoriesApi,
@@ -15,6 +16,7 @@ import { Container } from "@/components/layout";
 import { cn } from "@/lib/utils";
 import { NewsBentoGrid, NewsListCard } from "@/components/blocks/news-bento";
 import { NewsCategoryCarousel } from "@/components/blocks/news-carousel-section";
+import { SectionDivider } from "@/components/blocks/decorative-line";
 import {
   NewsCardSkeleton,
   AllCategoriesLoadingSkeleton,
@@ -24,6 +26,7 @@ import {
 const POSTS_PER_CATEGORY = 10;
 
 export default function TinTucPage() {
+  const router = useRouter();
   /* ── state ── */
   const [categories, setCategories] = useState<CategoryView[]>([]);
   const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
@@ -124,9 +127,7 @@ export default function TinTucPage() {
   /** Categories that actually have posts */
   const categoriesWithPosts = useMemo(
     () =>
-      categories.filter(
-        (cat) => (categoryPostsMap[cat.id]?.length ?? 0) > 0,
-      ),
+      categories.filter((cat) => (categoryPostsMap[cat.id]?.length ?? 0) > 0),
     [categories, categoryPostsMap],
   );
 
@@ -137,16 +138,31 @@ export default function TinTucPage() {
   }, [activeCategoryId, categoriesWithPosts]);
 
   return (
-    <div className="min-h-screen bg-neutral-50/50">
+    <div className="min-h-screen overflow-x-hidden bg-neutral-50/50">
       {/* ─── Header ───────────────────────────────────────────── */}
       <div className="border-b border-neutral-200 bg-white">
-        <Container className="py-4 sm:py-6">
-          <Link
-            href="/"
-            className="mb-2 inline-flex text-xs text-neutral-400 transition-colors hover:text-neutral-600 sm:mb-3 sm:text-sm"
-          >
-            ← Trang chủ
-          </Link>
+        <Container className="py-6 sm:py-8">
+          {/* Back + Breadcrumb row */}
+          <div className="mb-4 flex items-center gap-3">
+            <button
+              onClick={() => router.back()}
+              className="group/back inline-flex items-center gap-1.5 text-sm text-neutral-400 transition-colors hover:text-neutral-700"
+            >
+              <ArrowLeft className="h-4 w-4 transition-transform group-hover/back:-translate-x-0.5" />
+              <span className="hidden sm:inline">Quay lại</span>
+            </button>
+            <div className="h-4 w-px bg-neutral-200" />
+            <nav className="flex items-center gap-1.5 text-sm text-neutral-400">
+              <Link
+                href="/"
+                className="transition-colors hover:text-neutral-600"
+              >
+                Trang chủ
+              </Link>
+              <ChevronRight className="h-3.5 w-3.5" />
+              <span className="font-medium text-neutral-700">Tin tức</span>
+            </nav>
+          </div>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6">
             <h1 className="shrink-0 text-xl font-bold text-neutral-900 sm:text-2xl md:text-3xl">
@@ -188,7 +204,7 @@ export default function TinTucPage() {
             </div>
 
             {searching ? (
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
                 {[...Array(8)].map((_, i) => (
                   <NewsCardSkeleton key={i} />
                 ))}
@@ -203,7 +219,7 @@ export default function TinTucPage() {
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
                 {searchResults.map((post) => (
                   <NewsListCard key={post.id} post={post} />
                 ))}
@@ -259,6 +275,7 @@ export default function TinTucPage() {
                           </Link>
                         )}
                       </div>
+                      <SectionDivider className="!py-0 mb-1" variant="light" />
                       <NewsBentoGrid
                         posts={
                           categoryPostsMap[visibleCategories[0].id]?.slice(

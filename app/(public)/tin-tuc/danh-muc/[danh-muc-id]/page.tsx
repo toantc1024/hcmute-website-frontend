@@ -1,9 +1,15 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Search, ChevronDown, Loader2, ChevronRight } from "lucide-react";
+import {
+  Search,
+  ChevronDown,
+  Loader2,
+  ChevronRight,
+  ArrowLeft,
+} from "lucide-react";
 import {
   postsApi,
   categoriesApi,
@@ -23,6 +29,7 @@ const ITEMS_PER_PAGE = 12;
 
 export default function DanhMucPage() {
   const params = useParams();
+  const router = useRouter();
   const categorySlug = params["danh-muc-id"] as string;
 
   const [category, setCategory] = useState<CategoryView | null>(null);
@@ -128,32 +135,45 @@ export default function DanhMucPage() {
     <div className="min-h-screen bg-neutral-50/50">
       {/* ─── Header ─────────────────────────────────────────── */}
       <div className="border-b border-neutral-200 bg-white">
-        <Container className="py-10">
-          {/* Breadcrumb */}
-          <nav className="mb-4 flex items-center gap-1.5 text-sm text-neutral-400">
-            <Link href="/" className="transition-colors hover:text-neutral-600">
-              Trang chủ
-            </Link>
-            <ChevronRight className="h-3.5 w-3.5" />
-            <Link
-              href="/tin-tuc"
-              className="transition-colors hover:text-neutral-600"
+        <Container className="py-6 sm:py-8">
+          {/* Back + Breadcrumb row */}
+          <div className="mb-4 flex items-center gap-3">
+            <button
+              onClick={() => router.back()}
+              className="group/back inline-flex items-center gap-1.5 text-sm text-neutral-400 transition-colors hover:text-neutral-700"
             >
-              Tin tức
-            </Link>
-            <ChevronRight className="h-3.5 w-3.5" />
-            <span className="font-medium text-neutral-700">
-              {category?.name || "..."}
-            </span>
-          </nav>
+              <ArrowLeft className="h-4 w-4 transition-transform group-hover/back:-translate-x-0.5" />
+              <span className="hidden sm:inline">Quay lại</span>
+            </button>
+            <div className="h-4 w-px bg-neutral-200" />
+            <nav className="flex items-center gap-1.5 text-sm text-neutral-400">
+              <Link
+                href="/"
+                className="transition-colors hover:text-neutral-600"
+              >
+                Trang chủ
+              </Link>
+              <ChevronRight className="h-3.5 w-3.5" />
+              <Link
+                href="/tin-tuc"
+                className="transition-colors hover:text-neutral-600"
+              >
+                Tin tức
+              </Link>
+              <ChevronRight className="h-3.5 w-3.5" />
+              <span className="font-medium text-neutral-700 truncate max-w-[200px]">
+                {category?.name || "..."}
+              </span>
+            </nav>
+          </div>
 
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="flex flex-col gap-4 sm:gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-neutral-900">
+              <h1 className="text-2xl font-bold text-neutral-900 sm:text-3xl">
                 {category?.name || "Đang tải..."}
               </h1>
               {category?.description && (
-                <p className="mt-1.5 text-neutral-500">
+                <p className="mt-1.5 text-neutral-500 text-sm sm:text-base">
                   {category.description}
                 </p>
               )}
@@ -173,7 +193,7 @@ export default function DanhMucPage() {
                 placeholder="Tìm kiếm trong danh mục..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-11 rounded-full border-neutral-200 bg-neutral-50 pl-11 transition-colors focus:bg-white"
+                className="h-10 sm:h-11 rounded-full border-neutral-200 bg-neutral-50 pl-10 sm:pl-11 text-sm transition-colors focus:bg-white"
               />
             </div>
           </div>
@@ -211,9 +231,9 @@ export default function DanhMucPage() {
       </div>
 
       {/* ─── Content ────────────────────────────────────────── */}
-      <Container className="py-8">
+      <Container className="py-6 sm:py-8 lg:py-10">
         {loading ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
             {[...Array(ITEMS_PER_PAGE)].map((_, i) => (
               <NewsCardSkeleton key={i} />
             ))}
@@ -243,7 +263,7 @@ export default function DanhMucPage() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
             {posts.map((post) => (
               <NewsListCard key={post.id} post={post} showCategory={false} />
             ))}

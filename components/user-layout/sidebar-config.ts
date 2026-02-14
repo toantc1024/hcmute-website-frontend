@@ -48,7 +48,6 @@ export const quickNavItems: SidebarMenuItem[] = [
     titleKey: "navigation.traffic",
     href: "/manage/luot-truy-cap",
     icon: BarChart2,
-    requiredRoles: ["UNIT_ADMIN", "SCHOOL_ADMIN", "SYSTEM_ADMIN"],
   },
   {
     id: "utilities",
@@ -56,7 +55,6 @@ export const quickNavItems: SidebarMenuItem[] = [
     titleKey: "navigation.utilities",
     href: "/manage/tien-ich",
     icon: Sparkles,
-    requiredRoles: ["UNIT_ADMIN", "SCHOOL_ADMIN", "SYSTEM_ADMIN"],
   },
 ];
 
@@ -67,14 +65,6 @@ export const sidebarMenuGroups: SidebarMenuGroup[] = [
     titleKey: "sidebar.management",
     icon: FileText,
     defaultOpen: true,
-    requiredRoles: [
-      "CONTRIBUTOR",
-      "EDITOR",
-      "LEADER",
-      "UNIT_ADMIN",
-      "SCHOOL_ADMIN",
-      "SYSTEM_ADMIN",
-    ],
     items: [
       {
         id: "posts",
@@ -82,14 +72,6 @@ export const sidebarMenuGroups: SidebarMenuGroup[] = [
         titleKey: "navigation.posts",
         href: "/manage/posts",
         icon: FileText,
-        requiredRoles: [
-          "CONTRIBUTOR",
-          "EDITOR",
-          "LEADER",
-          "UNIT_ADMIN",
-          "SCHOOL_ADMIN",
-          "SYSTEM_ADMIN",
-        ],
       },
       {
         id: "users",
@@ -97,7 +79,6 @@ export const sidebarMenuGroups: SidebarMenuGroup[] = [
         titleKey: "navigation.users",
         href: "/manage/users",
         icon: Users,
-        requiredRoles: ["UNIT_ADMIN", "SCHOOL_ADMIN", "SYSTEM_ADMIN"],
       },
     ],
   },
@@ -107,7 +88,6 @@ export const sidebarMenuGroups: SidebarMenuGroup[] = [
     titleKey: "sidebar.adminTools",
     icon: Settings,
     defaultOpen: false,
-    requiredRoles: ["UNIT_ADMIN", "SCHOOL_ADMIN", "SYSTEM_ADMIN"],
     items: [
       {
         id: "news",
@@ -115,7 +95,6 @@ export const sidebarMenuGroups: SidebarMenuGroup[] = [
         titleKey: "navigation.news",
         href: "/manage/tin-tuc",
         icon: Newspaper,
-        requiredRoles: ["UNIT_ADMIN", "SCHOOL_ADMIN", "SYSTEM_ADMIN"],
       },
       {
         id: "homepageContent",
@@ -123,7 +102,6 @@ export const sidebarMenuGroups: SidebarMenuGroup[] = [
         titleKey: "navigation.homepageContent",
         href: "/manage/noi-dung-trang-chu",
         icon: LayoutTemplate,
-        requiredRoles: ["UNIT_ADMIN", "SCHOOL_ADMIN", "SYSTEM_ADMIN"],
       },
       {
         id: "websiteManagement",
@@ -131,7 +109,6 @@ export const sidebarMenuGroups: SidebarMenuGroup[] = [
         titleKey: "navigation.websiteManagement",
         href: "/manage/quan-ly-website",
         icon: Globe,
-        requiredRoles: ["UNIT_ADMIN", "SCHOOL_ADMIN", "SYSTEM_ADMIN"],
       },
     ],
   },
