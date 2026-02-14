@@ -21,7 +21,7 @@ const TIMELINE_EVENTS: TimelineEvent[] = [
     yearRange: "1962 - 1974",
     title: "Khai Sinh",
     description:
-      "Ra đời từ Ban Cao đẳng Sư phạm Kỹ thuật, năm 1974 Trường được nâng cấp thành Trường đại học Giáo dục Thủ Đức, bước đầu đào tạo nhân lực kỹ thuật cho nước.",
+      "Ra đời từ Ban Cao đẳng Công nghệ Kỹ thuật, năm 1974 Trường được nâng cấp thành Trường đại học Giáo dục Thủ Đức, bước đầu đào tạo nhân lực kỹ thuật cho nước.",
     imageUrl: "/assets/1962.png",
   },
   {
@@ -35,7 +35,7 @@ const TIMELINE_EVENTS: TimelineEvent[] = [
     yearRange: "1984 - 1995",
     title: "Hợp Nhất & Mở Rộng",
     description:
-      "Sáp nhập Trường Trung học Công nghiệp Thủ Đức và Trường Sư phạm Kỹ thuật 5, tăng cường quy mô và chuyên ngành. Từ đó chính thức mang tên Trường Đại học Công nghệ Kỹ Thuật TP. Hồ Chí Minh.",
+      "Sáp nhập Trường Trung học Công nghiệp Thủ Đức và Trường Công nghệ Kỹ thuật 5, tăng cường quy mô và chuyên ngành. Từ đó chính thức mang tên Trường Đại học Công nghệ Kỹ Thuật TP. Hồ Chí Minh.",
     imageUrl: "/assets/1984.png",
   },
   {

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { API_CONFIG } from "@/lib/api-client";
 import NewsDetailContent from "./news-detail-content";
 
-const SITE_NAME = "HCM-UTE - Trường Đại học Sư phạm Kỹ thuật TP.HCM";
+const SITE_NAME = "HCM-UTE - Trường Đại học Công nghệ Kỹ thuật TP.HCM";
 
 /**
  * Strip HTML tags and decode HTML entities to get plain text for meta description.
@@ -91,7 +91,7 @@ export async function generateMetadata({
       ...tags,
       category,
       "HCM-UTE",
-      "Đại học Sư phạm Kỹ thuật",
+      "Đại học Công nghệ Kỹ thuật",
       "tin tức",
     ].filter(Boolean) as string[],
     authors: authors.map((name: string) => ({ name })),

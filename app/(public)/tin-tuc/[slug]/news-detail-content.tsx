@@ -245,12 +245,55 @@ export default function NewsDetailContent() {
         }),
       });
 
-      const data = await res.json();
+      if (!res.ok || !res.body) {
+        let errMsg = "Không thể tóm tắt bài viết.";
+        try {
+          const data = await res.json();
+          errMsg = data.error || errMsg;
+        } catch {}
+        setAiSummary(errMsg);
+        setIsAiSummarizing(false);
+        return;
+      }
 
-      if (!res.ok) {
-        setAiSummary(data.error || "Không thể tóm tắt bài viết.");
-      } else {
-        setAiSummary(data.summary);
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let accumulated = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed || !trimmed.startsWith("data: ")) continue;
+          const payload = trimmed.slice(6);
+          if (payload === "[DONE]") continue;
+
+          try {
+            const parsed = JSON.parse(payload);
+            if (parsed.error) {
+              setAiSummary(parsed.error);
+              setIsAiSummarizing(false);
+              return;
+            }
+            if (parsed.token) {
+              accumulated += parsed.token;
+              setAiSummary(accumulated);
+            }
+          } catch {
+            // skip
+          }
+        }
+      }
+
+      if (!accumulated) {
+        setAiSummary("Không nhận được phản hồi từ AI.");
       }
     } catch {
       setAiSummary("Đã xảy ra lỗi khi kết nối. Vui lòng thử lại sau.");
@@ -733,7 +776,7 @@ export default function NewsDetailContent() {
                   <div
                     className={cn(
                       "relative overflow-hidden rounded-2xl transition-all duration-500",
-                      aiSummary
+                      aiSummary || isAiSummarizing
                         ? "bg-gradient-to-br from-primary/5 to-background border border-primary/20 shadow-sm"
                         : "bg-background",
                     )}
@@ -764,12 +807,7 @@ export default function NewsDetailContent() {
                       <div className="p-6">
                         <div className="flex items-center justify-between mb-4">
                           <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-wider">
-                            <Sparkles
-                              className={cn(
-                                "w-4 h-4",
-                                isAiSummarizing && "animate-pulse",
-                              )}
-                            />
+                            <Sparkles className="w-4 h-4" />
                             <span>AI Summary</span>
                             {isAiSummarizing && (
                               <span className="ml-1 text-[10px] font-normal text-muted-foreground normal-case tracking-normal animate-pulse">
@@ -787,25 +825,28 @@ export default function NewsDetailContent() {
                           )}
                         </div>
 
-                        {isAiSummarizing ? (
+                        {isAiSummarizing && !aiSummary ? (
                           <div className="space-y-3">
-                            <div className="h-2.5 ai-shimmer-line rounded-full w-full" />
+                            <div className="h-2.5 ai-shadow-line rounded-full w-full" />
                             <div
-                              className="h-2.5 ai-shimmer-line rounded-full w-[92%]"
+                              className="h-2.5 ai-shadow-line rounded-full w-[92%]"
                               style={{ animationDelay: "0.15s" }}
                             />
                             <div
-                              className="h-2.5 ai-shimmer-line rounded-full w-[78%]"
+                              className="h-2.5 ai-shadow-line rounded-full w-[78%]"
                               style={{ animationDelay: "0.3s" }}
                             />
                             <div
-                              className="h-2.5 ai-shimmer-line rounded-full w-[65%]"
+                              className="h-2.5 ai-shadow-line rounded-full w-[60%]"
                               style={{ animationDelay: "0.45s" }}
                             />
                           </div>
                         ) : (
-                          <p className="text-foreground/80 leading-relaxed text-[15px]">
+                          <p className="text-foreground/80 leading-relaxed text-[15px] transition-opacity duration-300">
                             {aiSummary}
+                            {isAiSummarizing && (
+                              <span className="inline-block w-0.5 h-[1em] bg-primary/60 ml-0.5 align-middle animate-pulse" />
+                            )}
                           </p>
                         )}
                       </div>

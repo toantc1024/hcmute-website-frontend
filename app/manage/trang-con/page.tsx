@@ -148,10 +148,10 @@ const MOCK_TENANTS: TenantView[] = [
   },
   {
     id: "6",
-    name: "Viện Sư phạm Kỹ thuật",
+    name: "Viện Công nghệ Kỹ thuật",
     code: "vien-spkt",
     domain: "ite.hcmute.edu.vn",
-    description: "Website Viện Sư phạm Kỹ thuật",
+    description: "Website Viện Công nghệ Kỹ thuật",
     status: "ACTIVE",
     ownerName: "Hoàng Minh Quân",
     ownerEmail: "quanhm@hcmute.edu.vn",
