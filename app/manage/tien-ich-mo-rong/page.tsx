@@ -32,12 +32,7 @@ import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageLoader } from "@/components/ui/loader";
 
 // ── Animation variants ──────────────────────────────────────────────
@@ -63,7 +58,7 @@ const cardHoverVariants = {
   hover: {
     scale: 1.02,
     y: -4,
-    transition: { duration: 0.25, ease: "easeOut" },
+    transition: { duration: 0.25, ease: "easeOut" as const },
   },
 };
 
@@ -250,11 +245,7 @@ function ExtensionCard({ ext }: { ext: ExtensionItem }) {
   const Icon = ext.icon;
 
   return (
-    <motion.div
-      variants={cardHoverVariants}
-      initial="rest"
-      whileHover="hover"
-    >
+    <motion.div variants={cardHoverVariants} initial="rest" whileHover="hover">
       <a
         href={ext.url}
         target="_blank"
@@ -317,7 +308,13 @@ interface StatCardProps {
   description?: string;
 }
 
-function StatCard({ title, value, icon, gradient, description }: StatCardProps) {
+function StatCard({
+  title,
+  value,
+  icon,
+  gradient,
+  description,
+}: StatCardProps) {
   return (
     <motion.div variants={itemVariants}>
       <Card
@@ -352,7 +349,7 @@ function StatCard({ title, value, icon, gradient, description }: StatCardProps) 
 // ── Category label helper ───────────────────────────────────────────
 function getCategoryInfo(
   category: ExtensionCategory,
-  t: ReturnType<typeof useI18n>["t"]
+  t: ReturnType<typeof useI18n>["t"],
 ) {
   switch (category) {
     case "ecosystem":
@@ -378,7 +375,7 @@ function ExtensionsContent() {
   const { t } = useI18n();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<ExtensionCategory | "all">(
-    "all"
+    "all",
   );
 
   const filteredExtensions = useMemo(() => {
@@ -394,7 +391,7 @@ function ExtensionsContent() {
         (ext) =>
           ext.name.toLowerCase().includes(q) ||
           ext.subtitle.toLowerCase().includes(q) ||
-          ext.description.toLowerCase().includes(q)
+          ext.description.toLowerCase().includes(q),
       );
     }
 
@@ -412,7 +409,8 @@ function ExtensionsContent() {
         value: allExtensions.length,
         icon: <Blocks className="size-4" />,
         description: t.extensionsManagement.description,
-        gradient: "bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500",
+        gradient:
+          "bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500",
       },
       {
         title: t.extensionsManagement.ecosystem,
@@ -565,10 +563,7 @@ function ExtensionsContent() {
 
       {/* Empty state */}
       {filteredExtensions.length === 0 && (
-        <motion.div
-          variants={itemVariants}
-          className="text-center py-16"
-        >
+        <motion.div variants={itemVariants} className="text-center py-16">
           <div className="size-16 mx-auto rounded-2xl bg-muted/50 flex items-center justify-center mb-4">
             <Blocks className="size-8 text-muted-foreground" />
           </div>
