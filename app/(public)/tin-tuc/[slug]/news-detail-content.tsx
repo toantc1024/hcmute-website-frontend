@@ -228,16 +228,33 @@ export default function NewsDetailContent() {
     });
   };
 
-  const handleAiSummary = () => {
+  const handleAiSummary = async () => {
+    if (!post) return;
     setIsAiSummarizing(true);
-    // Simulate AI summary generation
-    setTimeout(() => {
+    setAiSummary(null);
+
+    try {
+      const res = await fetch("/api/ai/summarize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content: post.content,
+          title: post.title,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setAiSummary(data.error || "Không thể tóm tắt bài viết.");
+      } else {
+        setAiSummary(data.summary);
+      }
+    } catch {
+      setAiSummary("Đã xảy ra lỗi khi kết nối. Vui lòng thử lại sau.");
+    } finally {
       setIsAiSummarizing(false);
-      setAiSummary(
-        post?.excerpt?.replace(/<[^>]*>/g, "") ||
-          "Tóm tắt nội dung bài viết sẽ được hiển thị ở đây sau khi AI xử lý.",
-      );
-    }, 1500);
+    }
   };
 
   const copyLink = () => {
