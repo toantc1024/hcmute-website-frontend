@@ -212,13 +212,16 @@ function PostsContent() {
         id: "title",
         header: t.posts.postTitle,
         accessorKey: "title",
-        minWidth: 300,
+        minWidth: 200,
+        maxWidth: 350,
         enableFiltering: true,
         filterType: "text",
         cell: ({ row }) => (
-          <div className="flex items-center gap-3">
-            <div className="min-w-0">
-              <p className="font-medium line-clamp-1">{row.title}</p>
+          <div className="flex items-center gap-3 max-w-[350px]">
+            <div className="min-w-0 flex-1">
+              <p className="font-medium truncate" title={row.title}>
+                {row.title}
+              </p>
             </div>
           </div>
         ),

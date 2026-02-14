@@ -94,10 +94,10 @@ export default function HomePage() {
         </div>
         <div className="h-12" aria-hidden="true" />
         <UniversityStats />
-        <FeatureShowcase />
         <CoreValues />
         <VideoIntroduction />
         <UniversityLeadership />
+        <FeatureShowcase />
         <UnitsSection />
         <div ref={footerRef}>
           <PartnerLogos />

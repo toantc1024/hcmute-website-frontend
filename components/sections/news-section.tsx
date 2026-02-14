@@ -194,30 +194,6 @@ export default function NewsSection() {
             )}
           </div>
         </div>
-
-        {!loading && posts.length > 0 && (
-          <>
-            {/* Section header — "SỰ KIỆN NỔI BẬT" + "Xem thêm" */}
-            <motion.div
-              className="flex items-center justify-between gap-4 pt-8 sm:pt-10 lg:pt-14 pb-4 sm:pb-6"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-            >
-              <h3 className="text-lg font-bold text-neutral-900 italic sm:text-xl md:text-2xl">
-                SỰ KIỆN NỔI BẬT
-              </h3>
-              <Link
-                href="/tin-tuc"
-                className="group inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-blue-600 transition-colors hover:text-blue-700"
-              >
-                Xem thêm
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-              </Link>
-            </motion.div>
-          </>
-        )}
       </Container>
 
       {/* Full-width carousel — edge-to-edge, cards aligned with container */}

@@ -15,7 +15,7 @@ export const Container = React.forwardRef<HTMLElement, ContainerProps>(
       <Component
         ref={ref}
         className={cn(
-          "w-full mx-auto px-6 sm:px-12 lg:px-24 xl:px-32 2xl:px-64 max-w-[1920px]",
+          "w-full mx-auto px-6 sm:px-12 lg:px-64 max-w-[1920px]",
           className,
         )}
         {...props}

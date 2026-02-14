@@ -1,8 +1,24 @@
-export { apiClient, publicApiClient, setAuthHandlers } from './axios-instance';
-export { API_CONFIG } from './config';
+export { apiClient, publicApiClient, setAuthHandlers } from "./axios-instance";
+export { API_CONFIG } from "./config";
 
-export { authApi, type TokenResponse, type ExchangeCodeRequest, type RefreshTokenRequest } from './endpoints/auth';
-export { usersApi, type UserProfile, type UpdateProfileRequest } from './endpoints/users';
+export {
+  authApi,
+  type TokenResponse,
+  type ExchangeCodeRequest,
+  type RefreshTokenRequest,
+} from "./endpoints/auth";
+export {
+  usersApi,
+  type UserProfile,
+  type UpdateProfileRequest,
+  type AdminUserView,
+  type AdminUsersQueryParams,
+  type AdminUsersPaginatedResponse,
+  type AccountStatus,
+  type GroupSimpleView,
+  type UpdateUserStatusRequest,
+  type UpdateUserGroupsRequest,
+} from "./endpoints/users";
 export {
   postsApi,
   type PostAuthor,
@@ -13,16 +29,19 @@ export {
   type PostAuditView,
   type KeysetPaginationResponse,
   type PostsQueryParams,
-} from './endpoints/posts';
+} from "./endpoints/posts";
 export {
   categoriesApi,
   type CategoryView,
   type CategoriesQueryParams,
-} from './endpoints/categories';
-export {
-  tagsApi,
-  type TagView,
-  type TagsQueryParams,
-} from './endpoints/tags';
+  type CreateCategoryRequest,
+  type UpdateCategoryRequest,
+} from "./endpoints/categories";
+export { tagsApi, type TagView, type TagsQueryParams } from "./endpoints/tags";
 
-export type { ApiResponse, ApiError, PaginatedResponse, PaginationParams } from './types';
+export type {
+  ApiResponse,
+  ApiError,
+  PaginatedResponse,
+  PaginationParams,
+} from "./types";

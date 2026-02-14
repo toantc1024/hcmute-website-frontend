@@ -11,6 +11,9 @@ import {
   Newspaper,
   LayoutTemplate,
   Globe,
+  FolderTree,
+  Blocks,
+  Layers,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { UserRole } from "@/features/user";
@@ -74,11 +77,11 @@ export const sidebarMenuGroups: SidebarMenuGroup[] = [
         icon: FileText,
       },
       {
-        id: "users",
-        title: "Người dùng",
-        titleKey: "navigation.users",
-        href: "/manage/users",
-        icon: Users,
+        id: "categories",
+        title: "Danh mục",
+        titleKey: "navigation.categories",
+        href: "/manage/categories",
+        icon: FolderTree,
       },
     ],
   },
@@ -89,6 +92,27 @@ export const sidebarMenuGroups: SidebarMenuGroup[] = [
     icon: Settings,
     defaultOpen: false,
     items: [
+      {
+        id: "users",
+        title: "Người dùng",
+        titleKey: "navigation.users",
+        href: "/manage/users",
+        icon: Users,
+      },
+      {
+        id: "tenants",
+        title: "Quản lý trang con",
+        titleKey: "navigation.tenants",
+        href: "/manage/trang-con",
+        icon: Layers,
+      },
+      {
+        id: "extensions",
+        title: "Tiện ích mở rộng",
+        titleKey: "navigation.extensions",
+        href: "/manage/tien-ich-mo-rong",
+        icon: Blocks,
+      },
       {
         id: "homepageContent",
         title: "Nội dung trang chủ",

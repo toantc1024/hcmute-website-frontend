@@ -107,7 +107,7 @@ export default function FeatureShowcase() {
     const timer = setTimeout(() => {
       ctx = gsap.context(() => {
         const contentColumn = container.querySelector(
-          ".lg\\:w-1\\/2:last-child",
+          ".lg\\:w-1\/2:last-child",
         ) as HTMLElement;
         if (!contentColumn) return;
 
@@ -298,7 +298,7 @@ export default function FeatureShowcase() {
           </div>
 
           {/* Image */}
-          <div className="relative w-full max-w-[360px] aspect-[4/3] rounded-xl overflow-hidden shadow-xl bg-gray-100 mb-4">
+          <div className="relative w-full max-w-[360px] aspect-[16/10] rounded-xl overflow-hidden shadow-xl bg-gray-100 mb-4">
             <Image
               src={feature.imageUrl}
               alt={feature.titleHighlight}
@@ -408,22 +408,6 @@ export default function FeatureShowcase() {
       data-section="feature-showcase"
       className="relative bg-white py-12"
     >
-      {/* Section Title - Mobile only (desktop title is inside the pinned layout) */}
-      <Container className="mb-8 lg:hidden">
-        <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-          KHÁM PHÁ{" "}
-          <AuroraText
-            className="inline"
-            colors={["#0c4ebf", "#1760df", "#ae0303"]}
-          >
-            HCM-UTE
-          </AuroraText>
-        </h2>
-        <p className="text-base text-gray-600 mt-2">
-          Hành trình kiến tạo tri thức và đổi mới sáng tạo
-        </p>
-      </Container>
-
       {/* Mobile Layout - Horizontal Scroll on Vertical Scroll */}
       <div className="lg:hidden" ref={mobileScrollContainerRef}>
         <div className="h-screen flex flex-col">
@@ -468,28 +452,12 @@ export default function FeatureShowcase() {
         ref={containerRef}
         className="hidden lg:block relative"
       >
-        {/* Section Title - Desktop */}
-        <div className="mb-4">
-          <h2 className="text-3xl lg:text-4xl font-bold text-foreground">
-            KHÁM PHÁ{" "}
-            <AuroraText
-              className="inline"
-              colors={["#0c4ebf", "#1760df", "#ae0303"]}
-            >
-              HCM-UTE
-            </AuroraText>
-          </h2>
-          <p className="text-base lg:text-lg text-gray-600 mt-2">
-            Hành trình kiến tạo tri thức và đổi mới sáng tạo
-          </p>
-        </div>
-
         <div className="flex flex-col lg:flex-row lg:gap-12">
           {/* Left - Pinned Image */}
           <div className="lg:w-1/2">
             <div
               ref={imageWrapperRef}
-              className="lg:h-screen flex items-center py-8 lg:py-12"
+              className="lg:h-screen flex items-center py-4 lg:py-6"
             >
               <ImageSection />
             </div>

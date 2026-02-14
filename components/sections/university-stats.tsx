@@ -62,7 +62,7 @@ const itemVariants = {
 
 export default function UniversityStats() {
   return (
-    <section id="stats" className="py-12 overflow-hidden">
+    <section id="stats" className="py-12 bg-gray-200 overflow-hidden">
       <Container className="w-full">
         <motion.div
           className="text-center mb-12"
