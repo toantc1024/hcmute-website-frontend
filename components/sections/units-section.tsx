@@ -252,7 +252,7 @@ export default function UnitsSection() {
               {UNIT_GROUPS[activeTab]?.items.map((unit) => (
                 <CarouselItem
                   key={unit.name}
-                  className="pl-3 sm:pl-4 basis-[75%] sm:basis-[44%] md:basis-[34%] lg:basis-[28%] xl:basis-[24%]"
+                  className="pl-3 sm:pl-4 basis-[70%] sm:basis-[40%] md:basis-[32%] lg:basis-[26%] xl:basis-[22%]"
                 >
                   <Link href={unit.href} className="block h-full">
                     <MagicCard

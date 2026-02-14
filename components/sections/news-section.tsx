@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
-import { Calendar, ArrowRight, Clock, TrendingUp, Hash } from "lucide-react";
+import { Calendar, ArrowRight, Eye } from "lucide-react";
 import Image from "next/image";
 import CardSwap, { Card } from "@/components/ui/card-swap";
 import Link from "next/link";
@@ -11,30 +11,65 @@ import { cn } from "@/lib/utils";
 import { Container } from "@/components/layout";
 import { AuroraText } from "../ui/aurora-text";
 import { postsApi, type PostAuditView } from "@/lib/api-client";
-import { COVER_IMAGE_SIZES } from "@/features/posts/components/image-cropper";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  useCarousel,
+} from "@/components/ui/carousel";
+import { CarouselNavButton } from "@/components/blocks/carousel-nav-button";
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
   return date.toLocaleDateString("vi-VN", {
     day: "2-digit",
-    month: "2-digit",
+    month: "short",
     year: "numeric",
   });
 };
 
-const calculateReadTime = (wordCount: number = 500) => {
-  const minutes = Math.ceil(wordCount / 200);
-  return `${minutes} phút`;
-};
+/* ------------------------------------------------------------------ */
+/*  Carousel nav — rendered inside Carousel context, shown on hover   */
+/* ------------------------------------------------------------------ */
+function NewsCarouselNav({ visible }: { visible: boolean }) {
+  const { scrollPrev, scrollNext, canScrollPrev, canScrollNext } =
+    useCarousel();
+
+  return (
+    <>
+      <div
+        className={cn(
+          "pointer-events-none absolute left-2 top-1/2 z-20 -translate-y-1/2 transition-all duration-300 sm:left-4 lg:left-16 xl:left-24 2xl:left-56",
+          visible && canScrollPrev
+            ? "pointer-events-auto translate-x-0 opacity-100"
+            : "-translate-x-4 opacity-0",
+        )}
+      >
+        <CarouselNavButton direction="prev" onClick={scrollPrev} size="md" />
+      </div>
+      <div
+        className={cn(
+          "pointer-events-none absolute right-2 top-1/2 z-20 -translate-y-1/2 transition-all duration-300 sm:right-4 lg:right-16 xl:right-24 2xl:right-56",
+          visible && canScrollNext
+            ? "pointer-events-auto translate-x-0 opacity-100"
+            : "translate-x-4 opacity-0",
+        )}
+      >
+        <CarouselNavButton direction="next" onClick={scrollNext} size="md" />
+      </div>
+    </>
+  );
+}
 
 export default function NewsSection() {
   const [posts, setPosts] = useState<PostAuditView[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isHovering, setIsHovering] = useState(false);
 
   useEffect(() => {
     const fetchLatestPosts = async () => {
       try {
-        const response = await postsApi.getPublishedPosts({ limit: 4 });
+        const response = await postsApi.getPublishedPosts({ limit: 10 });
         setPosts(response.content);
       } catch (error) {
         console.error("Failed to fetch latest posts:", error);
@@ -162,144 +197,127 @@ export default function NewsSection() {
 
         {!loading && posts.length > 0 && (
           <>
+            {/* Section header — "SỰ KIỆN NỔI BẬT" + "Xem thêm" */}
             <motion.div
-              className="grid grid-cols-2 md:grid-cols-4 pt-6 sm:pt-8 lg:pt-12 gap-2 sm:gap-3 lg:gap-4"
+              className="flex items-center justify-between gap-4 pt-8 sm:pt-10 lg:pt-14 pb-4 sm:pb-6"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={{ duration: 0.5 }}
             >
-              {posts.map((post, index) => (
-                <Link key={post.id} href={`/tin-tuc/${post.slug}`}>
-                  <motion.article
-                    className="group relative rounded-3xl overflow-hidden bg-white border border-gray-200 transition-all duration-500 hover:shadow-xl cursor-pointer"
-                    style={{
-                      aspectRatio: "16/9", // Same as cover image ratio for consistency
-                    }}
-                    initial={{ opacity: 0, y: 40 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: index * 0.1 }}
-                  >
-                    <div className="relative rounded-3xl h-full w-full overflow-hidden">
-                      {post.coverImageUrl ? (
-                        <Image
-                          src={post.coverImageUrl}
-                          alt={post.title}
-                          fill
-                          unoptimized
-                          className="object-cover transition-transform duration-700 group-hover:scale-110"
-                          sizes="(max-width: 768px) 50vw, 25vw"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-                          <span className="text-white/50 text-4xl font-bold">
-                            HCM-UTE
-                          </span>
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-
-                      {/* Views Indicator - Top Right */}
-                      {post.viewCount > 0 && (
-                        <div className="absolute top-2 right-2 lg:top-2.5 lg:right-2.5 flex items-center gap-1 px-1.5 py-1 rounded-2xl bg-black/50 backdrop-blur-sm border border-white/20 z-10">
-                          <span className="text-[10px] lg:text-xs font-medium text-white">
-                            {post.viewCount}
-                          </span>
-                          <TrendingUp className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-white/80" />
-                        </div>
-                      )}
-
-                      {/* Category Badge - Top Left */}
-                      {post.categories?.[0] && (
-                        <div className="absolute top-2 left-2 lg:top-2.5 lg:left-2.5 z-10">
-                          <span className="inline-flex rounded-2xl items-center px-1.5 py-0.5 lg:px-2 lg:py-1 bg-white/95 backdrop-blur-sm text-[9px] lg:text-[10px] font-semibold uppercase tracking-wider text-gray-800 border border-white/30 shadow-sm">
-                            {post.categories[0].name}
-                          </span>
-                        </div>
-                      )}
-
-                      {/* Content Overlay - Bottom */}
-                      <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-2.5 lg:p-3 bg-gradient-to-t from-black/90 via-black/70 to-transparent">
-                        {/* Date */}
-                        <div className="flex items-center justify-end mb-0.5 sm:mb-1">
-                          <span className="text-[9px] lg:text-[10px] font-medium text-white/80">
-                            {formatDate(post.publishedAt || post.createdAt)}
-                          </span>
-                        </div>
-
-                        {/* Title */}
-                        <h3 className="text-xs lg:text-sm font-bold text-white leading-tight line-clamp-2 mb-1">
-                          {post.title}
-                        </h3>
-
-                        {/* Short Description */}
-                        {post.excerpt && (
-                          <div
-                            className="hidden lg:block text-[10px] text-white/70 line-clamp-2 mb-1"
-                            dangerouslySetInnerHTML={{ __html: post.excerpt }}
-                          />
-                        )}
-
-                        {/* Tags - Hidden on mobile */}
-                        {post.tags && post.tags.length > 0 && (
-                          <div className="hidden lg:flex flex-wrap items-center gap-1 mb-1.5">
-                            {post.tags.slice(0, 2).map((tag) => (
-                              <span
-                                key={tag.id}
-                                className="inline-flex rounded-xl items-center gap-0.5 px-1.5 py-0.5 bg-white/20 backdrop-blur-sm text-[9px] font-medium text-white border border-white/30"
-                              >
-                                <Hash className="w-2 h-2" />
-                                {tag.name}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-
-                        {/* Read Time */}
-                        <div className="flex items-center gap-0.5 text-[9px] lg:text-[10px] text-white/70">
-                          <Clock className="w-2 h-2 lg:w-2.5 lg:h-2.5" />
-                          {calculateReadTime()}
-                        </div>
-                      </div>
-
-                      {/* Hover Overlay */}
-                      <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center z-10">
-                        <div className="flex items-center gap-1.5 text-white text-sm lg:text-base font-semibold">
-                          <span>Xem chi tiết</span>
-                          <ArrowRight className="w-4 h-4" />
-                        </div>
-                      </div>
-                    </div>
-                  </motion.article>
-                </Link>
-              ))}
-            </motion.div>
-
-            <motion.div
-              className="mt-6 sm:mt-8 mb-6 sm:mb-8 flex flex-col sm:flex-row flex-wrap items-center sm:items-center justify-between gap-4 sm:gap-6 rounded-2xl sm:rounded-3xl border border-gray-200 bg-white px-5 sm:px-8 py-5 sm:py-6 shadow-sm text-center sm:text-left"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-            >
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-foreground">
-                  Khám phá toàn bộ tin tức, sự kiện và thông báo từ HCM-UTE.
-                </h3>
-                <p className="text-xs sm:text-sm text-gray-500 mt-1">
-                  Cập nhật những hoạt động mới nhất của trường
-                </p>
-              </div>
+              <h3 className="text-lg font-bold text-neutral-900 italic sm:text-xl md:text-2xl">
+                SỰ KIỆN NỔI BẬT
+              </h3>
               <Link
                 href="/tin-tuc"
-                className="inline-flex items-center gap-2 rounded-2xl sm:rounded-3xl border border-gray-200 bg-white px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-medium text-gray-700 transition-all duration-300 hover:bg-gray-50 hover:border-gray-300 hover:shadow-md group"
+                className="group inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-blue-600 transition-colors hover:text-blue-700"
               >
-                Xem tất cả tin tức
-                <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+                Xem thêm
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
             </motion.div>
           </>
+        )}
+      </Container>
+
+      {/* Full-width carousel — edge-to-edge, cards aligned with container */}
+      {!loading && posts.length > 0 && (
+        <div
+          className="relative pb-8 sm:pb-10"
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
+        >
+          <Carousel
+            opts={{
+              align: "start",
+              loop: true,
+              dragFree: true,
+            }}
+            className="w-full"
+          >
+            <CarouselContent className="-ml-3 pl-6 pr-6 sm:-ml-4 sm:pl-12 sm:pr-12 lg:pl-24 lg:pr-24 xl:pl-32 xl:pr-32 2xl:pl-64 2xl:pr-64">
+              {posts.map((post) => (
+                <CarouselItem
+                  key={post.id}
+                  className="pl-3 sm:pl-4 basis-[70%] sm:basis-[40%] md:basis-[32%] lg:basis-[26%] xl:basis-[22%]"
+                >
+                  <Link href={`/tin-tuc/${post.slug}`} className="group block">
+                    <article className="overflow-hidden rounded-xl bg-white">
+                      {/* Image */}
+                      <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-neutral-100">
+                        {post.coverImageUrl ? (
+                          <Image
+                            src={post.coverImageUrl}
+                            alt={post.title}
+                            fill
+                            unoptimized
+                            className="object-cover transition-transform duration-700 group-hover:scale-105"
+                            sizes="(max-width: 640px) 70vw, (max-width: 1024px) 40vw, 26vw"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-700">
+                            <span className="text-2xl font-bold text-white/20">
+                              HCM-UTE
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Text below image */}
+                      <div className="flex flex-col gap-1.5 pt-3 pb-1">
+                        <h3 className="line-clamp-2 text-sm font-bold leading-snug text-neutral-900 sm:text-base">
+                          {post.title}
+                        </h3>
+                        <div className="flex items-center gap-3 text-[11px] text-neutral-400 sm:text-xs">
+                          <span className="flex items-center gap-1">
+                            <Calendar className="h-3 w-3" />
+                            {formatDate(post.publishedAt || post.createdAt)}
+                          </span>
+                          {post.viewCount > 0 && (
+                            <span className="flex items-center gap-1">
+                              <Eye className="h-3 w-3" />
+                              {post.viewCount.toLocaleString("vi-VN")}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </article>
+                  </Link>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+
+            {/* Hover nav buttons */}
+            <NewsCarouselNav visible={isHovering} />
+          </Carousel>
+        </div>
+      )}
+
+      <Container>
+        {!loading && posts.length > 0 && (
+          <motion.div
+            className="mb-6 sm:mb-8 flex flex-col sm:flex-row flex-wrap items-center sm:items-center justify-between gap-4 sm:gap-6 rounded-2xl sm:rounded-3xl border border-gray-200 bg-white px-5 sm:px-8 py-5 sm:py-6 shadow-sm text-center sm:text-left"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            <div>
+              <h3 className="text-base sm:text-lg font-semibold text-foreground">
+                Khám phá toàn bộ tin tức, sự kiện và thông báo từ HCM-UTE.
+              </h3>
+              <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                Cập nhật những hoạt động mới nhất của trường
+              </p>
+            </div>
+            <Link
+              href="/tin-tuc"
+              className="inline-flex items-center gap-2 rounded-2xl sm:rounded-3xl border border-gray-200 bg-white px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-medium text-gray-700 transition-all duration-300 hover:bg-gray-50 hover:border-gray-300 hover:shadow-md group"
+            >
+              Xem tất cả tin tức
+              <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+            </Link>
+          </motion.div>
         )}
       </Container>
     </section>

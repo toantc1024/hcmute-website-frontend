@@ -121,7 +121,7 @@ export function NewsCategoryCarousel({
             {posts.map((post) => (
               <CarouselItem
                 key={post.id}
-                className="basis-[75%] pl-3 sm:basis-[44%] sm:pl-4 md:basis-[34%] lg:basis-[28%] xl:basis-[24%]"
+                className="basis-[70%] pl-3 sm:basis-[40%] sm:pl-4 md:basis-[32%] lg:basis-[26%] xl:basis-[22%]"
               >
                 <NewsListCard post={post} showCategory={false} />
               </CarouselItem>
