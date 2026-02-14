@@ -401,10 +401,7 @@ export default function VideoIntroduction() {
   }));
 
   return (
-    <section
-      id="history"
-      className="bg-white h-auto relative py-12 overflow-hidden"
-    >
+    <section id="history" className="bg-white h-auto relative overflow-hidden">
       <div
         className="absolute w-full pointer-events-none z-0"
         style={{ top: "20px", height: "calc(100% + 400px)" }}

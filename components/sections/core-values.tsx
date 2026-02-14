@@ -76,7 +76,7 @@ export default function CoreValues() {
   }, [isUserInteracting]);
 
   return (
-    <section id="values" className="py-12 relative bg-white overflow-hidden">
+    <section id="values" className="relative bg-white overflow-hidden">
       <Container className="relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-0 items-start">
           <motion.div

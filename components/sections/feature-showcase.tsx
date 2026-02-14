@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
@@ -11,8 +11,8 @@ if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-const SECTION_HEIGHT = 80; // vh per section
-const MOBILE_BREAKPOINT = 1024; // lg breakpoint
+const CARD_GAP = 48; // px between content cards
+const MOBILE_BREAKPOINT = 1024;
 
 const featureData = [
   {
@@ -75,9 +75,7 @@ function useIsMobile() {
 
 export default function FeatureShowcase() {
   const sectionRef = useRef<HTMLElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const imageWrapperRef = useRef<HTMLDivElement>(null);
-  const indicatorWrapperRef = useRef<HTMLDivElement>(null);
+  const contentColumnRef = useRef<HTMLDivElement>(null);
   const mobileScrollContainerRef = useRef<HTMLDivElement>(null);
   const mobileContentWrapperRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -93,68 +91,32 @@ export default function FeatureShowcase() {
     });
   }, []);
 
-  // Desktop scroll behavior
+  // ── Desktop: active index tracking only (sticky handles pinning) ──
   useEffect(() => {
     if (typeof window === "undefined" || isMobile) return;
 
     const section = sectionRef.current;
-    const container = containerRef.current;
-    const imageWrapper = imageWrapperRef.current;
-    if (!section || !container || !imageWrapper) return;
+    if (!section) return;
 
     let ctx: gsap.Context | null = null;
 
     const timer = setTimeout(() => {
       ctx = gsap.context(() => {
-        const contentColumn = container.querySelector(
-          ".lg\\:w-1\/2:last-child",
-        ) as HTMLElement;
-        if (!contentColumn) return;
+        // Track active index — one ScrollTrigger per card
+        featureData.forEach((_, i) => {
+          const card = contentRefs.current[i];
+          if (!card) return;
 
-        const contentHeight = contentColumn.offsetHeight;
-        const imageHeight = imageWrapper.offsetHeight;
-        const pinDistance = contentHeight - imageHeight;
-
-        ScrollTrigger.create({
-          trigger: container,
-          start: "top top",
-          end: () => `+=${Math.max(0, pinDistance)}`,
-          pin: imageWrapper,
-          pinSpacing: false,
-        });
-
-        // Pin the indicator on the right side
-        const indicatorWrapper = indicatorWrapperRef.current;
-        if (indicatorWrapper) {
           ScrollTrigger.create({
-            trigger: container,
-            start: "top top",
-            end: () => `+=${Math.max(0, pinDistance)}`,
-            pin: indicatorWrapper,
-            pinSpacing: false,
+            trigger: card,
+            start: "top 60%",
+            end: "bottom 40%",
+            onEnter: () => setActiveIndex(i),
+            onEnterBack: () => setActiveIndex(i),
           });
-        }
-
-        // Use a single ScrollTrigger with onUpdate for continuous progress tracking
-        // This ensures there's ALWAYS an active item — no dead zones between items
-        ScrollTrigger.create({
-          trigger: contentColumn,
-          start: "top 50%",
-          end: "bottom 50%",
-          onUpdate: (self) => {
-            const progress = self.progress;
-            const totalItems = featureData.length;
-            const newIndex = Math.min(
-              Math.floor(progress * totalItems),
-              totalItems - 1,
-            );
-            setActiveIndex(newIndex);
-          },
-          onLeaveBack: () => setActiveIndex(0),
-          onLeave: () => setActiveIndex(featureData.length - 1),
         });
       }, section);
-    }, 100);
+    }, 300);
 
     return () => {
       clearTimeout(timer);
@@ -162,7 +124,7 @@ export default function FeatureShowcase() {
     };
   }, [isMobile]);
 
-  // Mobile horizontal scroll behavior
+  // ── Mobile: horizontal scroll ──
   useEffect(() => {
     if (typeof window === "undefined" || !isMobile) return;
 
@@ -177,11 +139,8 @@ export default function FeatureShowcase() {
       ctx = gsap.context(() => {
         const viewportWidth = window.innerWidth;
         const totalCards = featureData.length;
-        // Each card is 100vw, scroll distance is (totalCards - 1) * viewportWidth
-        // This way the last card ends up centered
         const scrollDistance = viewportWidth * (totalCards - 1);
 
-        // Pin and scroll horizontally - ends when last card is centered
         gsap.to(mobileContentWrapper, {
           x: -scrollDistance,
           ease: "none",
@@ -192,9 +151,8 @@ export default function FeatureShowcase() {
             pin: true,
             scrub: 0.3,
             onUpdate: (self) => {
-              const progress = self.progress;
               const newIndex = Math.min(
-                Math.round(progress * (totalCards - 1)),
+                Math.round(self.progress * (totalCards - 1)),
                 totalCards - 1,
               );
               setActiveIndex(newIndex);
@@ -202,7 +160,7 @@ export default function FeatureShowcase() {
           },
         });
       }, section);
-    }, 100);
+    }, 300);
 
     return () => {
       clearTimeout(timer);
@@ -213,16 +171,15 @@ export default function FeatureShowcase() {
   const scrollToSection = useCallback(
     (index: number) => {
       if (isMobile) {
-        const scrollTrigger = ScrollTrigger.getAll().find(
-          (st) => st.trigger === mobileScrollContainerRef.current,
+        const st = ScrollTrigger.getAll().find(
+          (t) => t.trigger === mobileScrollContainerRef.current,
         );
-        if (scrollTrigger) {
+        if (st) {
           const totalCards = featureData.length;
-          const scrollRange = scrollTrigger.end - scrollTrigger.start;
-          // Each card takes equal portion of scroll
+          const scrollRange = st.end - st.start;
           const cardProgress = index / (totalCards - 1);
           const targetScroll =
-            scrollTrigger.start + scrollRange * Math.min(cardProgress, 1);
+            st.start + scrollRange * Math.min(cardProgress, 1);
           window.scrollTo({ top: targetScroll, behavior: "smooth" });
         }
       } else {
@@ -235,183 +192,18 @@ export default function FeatureShowcase() {
     [isMobile],
   );
 
-  // Shared Image Component
-  const ImageSection = ({ className = "" }: { className?: string }) => {
-    return (
-      <div className={`w-full ${className}`}>
-        {/* Tab - on left, bottom-left radius 0 to connect with image */}
-        <div className="mb-0">
-          <span
-            className={`inline-block rounded-lg rounded-br-none rounded-bl-none px-3 py-1 lg:px-4 lg:py-2 text-xs lg:text-sm font-semibold text-white bg-gradient-to-r ${featureData[activeIndex].tabColor} shadow-md transition-all duration-300`}
-          >
-            {featureData[activeIndex].tabLabel}
-          </span>
-        </div>
-
-        {/* Image - top-left radius 0 to connect with badge */}
-        <div className="relative aspect-[4/3] rounded-xl lg:rounded-2xl !rounded-tl-none overflow-hidden shadow-xl bg-gray-100">
-          {featureData.map((feature, i) => (
-            <Image
-              key={feature.id}
-              src={feature.imageUrl}
-              alt={feature.titleHighlight}
-              fill
-              className={`object-cover transition-opacity duration-500 ${
-                activeIndex === i ? "opacity-100" : "opacity-0"
-              }`}
-              priority={i === 0}
-            />
-          ))}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-        </div>
-      </div>
-    );
-  };
-
-  // Mobile Content Card - Full section with Image, Number, and Text stacked
-  const MobileContentCard = ({
-    feature,
-    index,
-  }: {
-    feature: (typeof featureData)[0];
-    index: number;
-  }) => {
-    const isActive = activeIndex === index;
-    const sectionNumber = String(index + 1).padStart(2, "0");
-
-    return (
-      <div className="w-screen h-full flex-shrink-0 flex flex-col items-center justify-center px-6">
-        <div
-          className={`flex  flex-col items-center text-center transition-all duration-500 ease-out ${
-            isActive
-              ? "opacity-100 blur-0 scale-100"
-              : "opacity-40 blur-[1px] scale-95"
-          }`}
-        >
-          {/* Badge centered above image */}
-          <div className="mb-2">
-            <span
-              className={`inline-block rounded-lg  px-3 py-1 text-[10px] font-semibold text-white bg-gradient-to-r ${feature.tabColor}  shadow-md`}
-            >
-              {feature.tabLabel}
-            </span>
-          </div>
-
-          {/* Image */}
-          <div className="relative w-full max-w-[360px] aspect-[16/10] rounded-xl overflow-hidden shadow-xl bg-gray-100 mb-4">
-            <Image
-              src={feature.imageUrl}
-              alt={feature.titleHighlight}
-              fill
-              className="object-cover"
-              priority={index === 0}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-          </div>
-
-          {/* Big Gradient Number */}
-          <span className="font-bold text-[72px] leading-none bg-gradient-to-br from-[#0c4ebf] via-[#1760df] to-[#ae0303]   bg-clip-text text-transparent mb-2">
-            {sectionNumber}
-          </span>
-
-          {/* Title */}
-          <h2 className="text-xl font-bold mb-2 text-foreground">
-            {feature.title}{" "}
-            <AuroraText
-              className="inline"
-              colors={["#0c4ebf", "#1760df", "#ae0303"]}
-            >
-              {feature.titleHighlight}
-            </AuroraText>
-          </h2>
-
-          {/* Description */}
-          <p className="text-sm leading-relaxed text-gray-600 max-w-[300px]">
-            {feature.description}
-          </p>
-        </div>
-      </div>
-    );
-  };
-
-  // Desktop Content Card Component
-  const DesktopContentCard = ({
-    feature,
-    index,
-  }: {
-    feature: (typeof featureData)[0];
-    index: number;
-  }) => {
-    const isActive = activeIndex === index;
-    const sectionNumber = String(index + 1).padStart(2, "0");
-
-    return (
-      <div
-        ref={(el) => {
-          contentRefs.current[index] = el;
-        }}
-        className="flex flex-col justify-center relative py-8 border-b border-gray-100 last:border-b-0"
-        style={{ height: `${SECTION_HEIGHT}vh` }}
-      >
-        {/* Big Gradient Number - positioned above content, not overlapping */}
-        <div
-          className={`relative pointer-events-none transition-all duration-500 mb-2 ${
-            isActive ? "opacity-100" : "opacity-20"
-          }`}
-        >
-          <span
-            className="font-bold text-[80px] lg:text-[100px] leading-none bg-clip-text text-transparent"
-            style={{
-              backgroundImage:
-                "linear-gradient(to bottom left, #ef2a2aff 10%, #1760df 40%, transparent 85%)",
-            }}
-          >
-            {sectionNumber}
-          </span>
-        </div>
-
-        <div
-          className={`transition-all duration-500 ease-out relative z-10 ${
-            isActive
-              ? "opacity-100 blur-0 translate-y-0"
-              : "opacity-30 blur-[2px] translate-y-2"
-          }`}
-        >
-          <h2
-            className={`text-2xl lg:text-4xl font-bold mb-4 transition-colors duration-500 ${
-              isActive ? "text-foreground" : "text-gray-500"
-            }`}
-          >
-            {feature.title}{" "}
-            <AuroraText
-              className="inline"
-              colors={["#0c4ebf", "#1760df", "#ae0303"]}
-            >
-              {feature.titleHighlight}
-            </AuroraText>
-          </h2>
-          <p
-            className={`text-base lg:text-lg leading-relaxed transition-colors duration-500 text-justify ${
-              isActive ? "text-gray-600" : "text-gray-500"
-            }`}
-          >
-            {feature.description}
-          </p>
-        </div>
-      </div>
-    );
-  };
+  // Memoize the active feature to prevent unnecessary re-renders
+  const activeFeature = useMemo(() => featureData[activeIndex], [activeIndex]);
 
   return (
     <section
       ref={sectionRef}
       data-section="feature-showcase"
-      className="relative bg-white py-12"
+      className="relative bg-white"
     >
-      {/* Mobile Layout - Horizontal Scroll on Vertical Scroll */}
+      {/* ═══════════ Mobile Layout ═══════════ */}
       <div className="lg:hidden" ref={mobileScrollContainerRef}>
         <div className="h-screen flex flex-col">
-          {/* Horizontal Scrolling Full Cards */}
           <div className="flex-1 overflow-hidden flex items-center">
             <div
               ref={mobileContentWrapperRef}
@@ -422,19 +214,20 @@ export default function FeatureShowcase() {
                   key={feature.id}
                   feature={feature}
                   index={i}
+                  isActive={activeIndex === i}
                 />
               ))}
             </div>
           </div>
 
-          {/* Line-based Progress Indicator */}
+          {/* Progress bars */}
           <div className="absolute bottom-8 left-0 right-0 px-6">
             <div className="flex gap-2 w-full">
               {featureData.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => scrollToSection(i)}
-                  className={`flex-1 h-1 rounded-full ${
+                  className={`flex-1 h-1 rounded-full transition-all duration-300 ${
                     activeIndex === i
                       ? "bg-gradient-to-r from-[#0c4ebf] via-[#1760df] to-[#ae0303]"
                       : "bg-gray-200"
@@ -446,60 +239,214 @@ export default function FeatureShowcase() {
         </div>
       </div>
 
-      {/* Desktop Layout - Original Vertical Scroll */}
-      <Container
-        as="div"
-        ref={containerRef}
-        className="hidden lg:block relative"
-      >
-        <div className="flex flex-col lg:flex-row lg:gap-12">
-          {/* Left - Pinned Image */}
-          <div className="lg:w-1/2">
-            <div
-              ref={imageWrapperRef}
-              className="lg:h-screen flex items-center py-4 lg:py-6"
-            >
-              <ImageSection />
+      {/* ═══════════ Desktop Layout ═══════════ */}
+      <Container className="hidden lg:!flex relative !px-0">
+        <div className="flex w-full">
+          {/* ── Left: Sticky image (55% width) ── */}
+          <div className="w-[55%]">
+            <div className="sticky top-0 h-screen flex flex-col justify-center py-12 pl-16 xl:pl-64 pr-6">
+              {/* Tab badge */}
+              <div className="mb-0 shrink-0">
+                <span
+                  className={`inline-block rounded-t-lg px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r ${activeFeature.tabColor} shadow-md transition-all duration-300`}
+                >
+                  {activeFeature.tabLabel}
+                </span>
+              </div>
+
+              {/* Image — capped at 65vh so tag badge stays visible */}
+              <div className="relative w-full max-h-[65vh] aspect-[4/3] rounded-2xl !rounded-tl-none overflow-hidden shadow-2xl bg-gray-100">
+                {featureData.map((feature, i) => (
+                  <Image
+                    key={feature.id}
+                    src={feature.imageUrl}
+                    alt={feature.titleHighlight}
+                    fill
+                    sizes="55vw"
+                    className={`object-cover transition-opacity duration-700 ease-in-out ${
+                      activeIndex === i ? "opacity-100" : "opacity-0"
+                    }`}
+                    priority={i === 0}
+                  />
+                ))}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
+              </div>
             </div>
           </div>
 
-          {/* Right - Scrolling Content */}
-          <div className="lg:w-1/2 flex flex-col">
+          {/* ── Right: Scrolling content cards (45% width) ── */}
+          <div
+            ref={contentColumnRef}
+            className="w-[45%] flex flex-col pl-6 xl:pl-10 pr-16 xl:pr-64"
+          >
             {featureData.map((feature, i) => (
               <DesktopContentCard
                 key={feature.id}
                 feature={feature}
                 index={i}
+                isActive={activeIndex === i}
+                cardRef={(el) => {
+                  contentRefs.current[i] = el;
+                }}
               />
             ))}
           </div>
         </div>
 
-        {/* Desktop Vertical Indicator - Pinned on right side within section */}
-        <div
-          ref={indicatorWrapperRef}
-          className="absolute right-2 top-0 h-screen flex items-center z-50"
-        >
-          <div className="flex flex-col gap-2" style={{ height: "60vh" }}>
-            {featureData.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => scrollToSection(i)}
-                className={`flex-1 w-1 rounded-full transition-all duration-300 ${
-                  activeIndex === i
-                    ? "bg-gradient-to-b from-[#0c4ebf] via-[#1760df] to-[#ae0303]"
-                    : "bg-gray-200 hover:bg-gray-300"
-                }`}
-              />
-            ))}
+        {/* ── Scroll indicator (sticky on right edge) ── */}
+        <div className="absolute right-3 top-0 h-full pointer-events-none">
+          <div className="sticky top-0 h-screen flex items-center pointer-events-auto z-50">
+            <div className="flex flex-col gap-2" style={{ height: "50vh" }}>
+              {featureData.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => scrollToSection(i)}
+                  className={`flex-1 w-1 rounded-full transition-all duration-300 ${
+                    activeIndex === i
+                      ? "bg-gradient-to-b from-[#0c4ebf] via-[#1760df] to-[#ae0303]"
+                      : "bg-gray-200 hover:bg-gray-300"
+                  }`}
+                />
+              ))}
+            </div>
           </div>
         </div>
-      </Container>
-
-      {/* Section Divider — decorative line */}
-      <Container className="mt-12 lg:mt-16">
-        <div className="h-px bg-gradient-to-r from-transparent via-blue-400 to-transparent" />
       </Container>
     </section>
+  );
+}
+
+// ── Extracted as standalone components (not defined inside render) ──
+
+function DesktopContentCard({
+  feature,
+  index,
+  isActive,
+  cardRef,
+}: {
+  feature: (typeof featureData)[0];
+  index: number;
+  isActive: boolean;
+  cardRef: (el: HTMLDivElement | null) => void;
+}) {
+  const sectionNumber = String(index + 1).padStart(2, "0");
+
+  return (
+    <div
+      ref={cardRef}
+      className="flex flex-col justify-center relative min-h-screen"
+    >
+      {/* Gradient number */}
+      <div
+        className={`pointer-events-none transition-all duration-500 mb-3 ${
+          isActive ? "opacity-100" : "opacity-15"
+        }`}
+      >
+        <span
+          className="font-bold text-[100px] xl:text-[120px] leading-none bg-clip-text text-transparent select-none"
+          style={{
+            backgroundImage:
+              "linear-gradient(to bottom left, #ef2a2aff 10%, #1760df 40%, transparent 85%)",
+          }}
+        >
+          {sectionNumber}
+        </span>
+      </div>
+
+      <div
+        className={`transition-all duration-500 ease-out relative z-10 ${
+          isActive
+            ? "opacity-100 blur-0 translate-y-0"
+            : "opacity-25 blur-[2px] translate-y-3"
+        }`}
+      >
+        <h2
+          className={`text-3xl xl:text-4xl font-bold mb-4 transition-colors duration-500 ${
+            isActive ? "text-foreground" : "text-gray-400"
+          }`}
+        >
+          {feature.title}{" "}
+          <AuroraText
+            className="inline"
+            colors={["#0c4ebf", "#1760df", "#ae0303"]}
+          >
+            {feature.titleHighlight}
+          </AuroraText>
+        </h2>
+        <p
+          className={`text-base xl:text-lg leading-relaxed max-w-lg transition-colors duration-500 text-justify ${
+            isActive ? "text-gray-600" : "text-gray-400"
+          }`}
+        >
+          {feature.description}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function MobileContentCard({
+  feature,
+  index,
+  isActive,
+}: {
+  feature: (typeof featureData)[0];
+  index: number;
+  isActive: boolean;
+}) {
+  const sectionNumber = String(index + 1).padStart(2, "0");
+
+  return (
+    <div className="w-screen h-full flex-shrink-0 flex flex-col items-center justify-center px-6">
+      <div
+        className={`flex flex-col items-center text-center transition-all duration-500 ease-out ${
+          isActive
+            ? "opacity-100 blur-0 scale-100"
+            : "opacity-40 blur-[1px] scale-95"
+        }`}
+      >
+        {/* Badge */}
+        <div className="mb-2">
+          <span
+            className={`inline-block rounded-lg px-3 py-1 text-[10px] font-semibold text-white bg-gradient-to-r ${feature.tabColor} shadow-md`}
+          >
+            {feature.tabLabel}
+          </span>
+        </div>
+
+        {/* Image */}
+        <div className="relative w-full max-w-[360px] aspect-[16/10] max-h-[35vh] rounded-xl overflow-hidden shadow-xl bg-gray-100 mb-4">
+          <Image
+            src={feature.imageUrl}
+            alt={feature.titleHighlight}
+            fill
+            className="object-cover"
+            priority={index === 0}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+        </div>
+
+        {/* Number */}
+        <span className="font-bold text-[72px] leading-none bg-gradient-to-br from-[#0c4ebf] via-[#1760df] to-[#ae0303] bg-clip-text text-transparent mb-2">
+          {sectionNumber}
+        </span>
+
+        {/* Title */}
+        <h2 className="text-xl font-bold mb-2 text-foreground">
+          {feature.title}{" "}
+          <AuroraText
+            className="inline"
+            colors={["#0c4ebf", "#1760df", "#ae0303"]}
+          >
+            {feature.titleHighlight}
+          </AuroraText>
+        </h2>
+
+        {/* Description */}
+        <p className="text-sm leading-relaxed text-gray-600 max-w-[300px]">
+          {feature.description}
+        </p>
+      </div>
+    </div>
   );
 }

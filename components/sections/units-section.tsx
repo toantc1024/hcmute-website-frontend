@@ -190,7 +190,7 @@ export default function UnitsSection() {
 
   return (
     <>
-      <section id="units" className="py-12 bg-white overflow-hidden">
+      <section id="units" className="bg-white overflow-hidden">
         <Container>
           <motion.div
             className="mb-10 lg:mb-12"

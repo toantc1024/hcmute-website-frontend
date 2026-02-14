@@ -20,7 +20,7 @@ const leadershipData = [
   },
   {
     name: "TS. Trương Thị Hiền",
-    position: "Bí thư Đảng uỷ, Phó Hiệu trưởng Thường trựcT",
+    position: "Bí thư Đảng uỷ, Phó Hiệu trưởng Thường trực",
     image: "/PGS_TS_THH.png",
     description:
       "Nhà trường xây dựng môi trường học tập thân thiện, năng động, hội nhập và giàu trải nghiệm, giúp các em rèn luyện toàn diện cả tri thức, kỹ năng và bản lĩnh.",
@@ -43,10 +43,7 @@ export default function UniversityLeadership() {
   const currentLeader = leadershipData[currentSlide];
 
   return (
-    <section
-      id="leadership"
-      className="py-8 sm:py-12 relative overflow-visible"
-    >
+    <section id="leadership" className="relative overflow-visible">
       <Container className="relative">
         {/* Header section */}
         <div className="flex flex-col items-center text-center lg:flex-row lg:items-start lg:text-left lg:justify-between mb-4">

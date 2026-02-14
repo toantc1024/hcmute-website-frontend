@@ -62,16 +62,16 @@ const itemVariants = {
 
 export default function UniversityStats() {
   return (
-    <section id="stats" className="py-12 bg-gray-200 overflow-hidden">
-      <Container className="w-full">
+    <section id="stats" className="overflow-hidden">
+      <Container className="w-full text-center !gap-0">
         <motion.div
-          className="text-center mb-12"
+          className="text-center "
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-2xl md:text-3xl lg:text-4xl text-start font-bold text-foreground mb-4">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl text-center font-bold text-foreground mb-4 ">
             TRƯỜNG TRỌNG ĐIỂM QUỐC GIA VỀ
             <AuroraText
               className="px-2"
@@ -80,7 +80,7 @@ export default function UniversityStats() {
               KỸ THUẬT & CÔNG NGHỆ
             </AuroraText>
           </h2>
-          <p className="text-base lg:text-lg text-gray-600 text-start mx-auto">
+          <p className="text-base lg:text-lg text-gray-600 text-center mx-auto">
             Thúc đẩy tri thức và đổi mới sáng tạo vì một tương lai bền vững
           </p>
         </motion.div>
@@ -100,18 +100,18 @@ export default function UniversityStats() {
             >
               <div className="flex flex-col items-center text-center">
                 <div
-                  className={`text-4xl md:text-5xl lg:text-5xl font-bold mb-2 leading-none ${stat.color}`}
+                  className={`text-4xl md:text-5xl lg:text-7xl flex font-bold mb-2 leading-none ${stat.color}`}
                 >
                   {stat.number && (
                     <NumberTicker
                       value={stat.number}
-                      className={`font-bold leading-none bg-gradient-to-br from-[#0c4ebf] via-[#1760df] to-[#ae0303] bg-clip-text text-transparent`}
+                      className={`font-bold leading-none lg:text-7xl bg-gradient-to-br from-[#0c4ebf] via-[#1760df] to-[#ae0303] bg-clip-text text-transparent`}
                     />
                   )}
                   {stat.suffix && <span>{stat.suffix}</span>}
                 </div>
 
-                <p className="text-sm text-gray-600 leading-relaxed mt-2">
+                <p className="text-sm text-gray-600 text-nowrap leading-relaxed mt-2">
                   {stat.description}
                 </p>
               </div>

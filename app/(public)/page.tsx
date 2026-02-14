@@ -17,6 +17,7 @@ import {
   UnitsSection,
   FeatureShowcase,
 } from "@/components/sections";
+import { SectionSpacing } from "@/components/layout";
 
 export default function HomePage() {
   const [showFloatingNav, setShowFloatingNav] = useState(false);
@@ -53,7 +54,10 @@ export default function HomePage() {
   };
 
   return (
-    <div className="relative overflow-x-hidden">
+    <div
+      className="relative"
+      style={{ overflowClipMargin: 0, overflowX: "clip" }}
+    >
       {/* Spacing Debug Overlay — remove after testing */}
       {/* <SpacingDebug /> */}
 
@@ -92,17 +96,32 @@ export default function HomePage() {
         <div ref={heroRef}>
           <HeroCarousel />
         </div>
-        <div className="h-12" aria-hidden="true" />
-        <UniversityStats />
-        <CoreValues />
-        <VideoIntroduction />
-        <UniversityLeadership />
-        <FeatureShowcase />
-        <UnitsSection />
-        <div ref={footerRef}>
-          <PartnerLogos />
-        </div>
-        <NewsSection />
+        <SectionSpacing className="bg-gradient-to-br from-blue-50 via-blue-100 to-blue-200">
+          <UniversityStats />
+        </SectionSpacing>
+        <SectionSpacing>
+          <CoreValues />
+        </SectionSpacing>
+        <SectionSpacing>
+          <VideoIntroduction />
+        </SectionSpacing>
+        <SectionSpacing>
+          <UniversityLeadership />
+        </SectionSpacing>
+        <SectionSpacing>
+          <FeatureShowcase />
+        </SectionSpacing>
+        <SectionSpacing>
+          <UnitsSection />
+        </SectionSpacing>
+        <SectionSpacing>
+          <div ref={footerRef}>
+            <PartnerLogos />
+          </div>
+        </SectionSpacing>
+        <SectionSpacing>
+          <NewsSection />
+        </SectionSpacing>
       </main>
     </div>
   );

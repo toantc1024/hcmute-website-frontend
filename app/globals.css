@@ -48,6 +48,7 @@
 }
 
 :root {
+  --section-gap: 48px;
   --background: oklch(1 0 0);
   --foreground: oklch(25.887% 0.17942 264.073);
   --card: oklch(1 0 0);
