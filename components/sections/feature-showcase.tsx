@@ -20,7 +20,7 @@ const featureData = [
     title: "Chương trình",
     titleHighlight: "Đào tạo",
     description:
-      "52 ngành Đại học, 18 ngành Thạc sĩ, 12 ngành Tiến sĩ. Chương trình đào tạo của HCMUTE được thiết kế theo chuẩn quốc tế, kết hợp giữa lý thuyết và thực hành.",
+      "52 ngành Đại học, 18 ngành Thạc sĩ, 12 ngành Tiến sĩ. Chương trình đào tạo của HCM-UTE được thiết kế theo chuẩn quốc tế, kết hợp giữa lý thuyết và thực hành.",
     imageUrl: "/scroll/dao-tao.jpg",
     tabLabel: "52 ngành ĐH • 18 ThS • 12 TS",
     tabColor: "from-[#0c4ebf] to-[#1760df]",
@@ -30,7 +30,7 @@ const featureData = [
     title: "",
     titleHighlight: "Tuyển sinh",
     description:
-      "HCMUTE tuyển sinh đa dạng các ngành đào tạo từ bậc đại học đến sau đại học. Với phương thức tuyển sinh linh hoạt, minh bạch và công bằng.",
+      "HCM-UTE tuyển sinh đa dạng các ngành đào tạo từ bậc đại học đến sau đại học. Với phương thức tuyển sinh linh hoạt, minh bạch và công bằng.",
     imageUrl: "/scroll/tuyen-sinh.jpeg",
     tabLabel: "Khóa 2025",
     tabColor: "from-[#1760df] to-[#0c4ebf]",
@@ -40,7 +40,7 @@ const featureData = [
     title: "Nghiên cứu",
     titleHighlight: "Khoa học",
     description:
-      "Tạp chí Khoa học Giáo dục JTE uy tín hàng đầu Việt Nam. HCMUTE tiên phong trong việc ứng dụng và phát triển các công nghệ tiên tiến.",
+      "Tạp chí Khoa học Giáo dục JTE uy tín hàng đầu Việt Nam. HCM-UTE tiên phong trong việc ứng dụng và phát triển các công nghệ tiên tiến.",
     imageUrl: "/scroll/KHCN.jpg",
     tabLabel: "Tạp chí JTE",
     tabColor: "from-[#0c4ebf] to-[#1760df]",
@@ -50,7 +50,7 @@ const featureData = [
     title: "Phục vụ",
     titleHighlight: "Cộng đồng",
     description:
-      "Hướng đến phát triển bền vững. HCMUTE tạo môi trường phát triển toàn diện cho sinh viên thông qua các hoạt động ngoại khóa phong phú.",
+      "Hướng đến phát triển bền vững. HCM-UTE tạo môi trường phát triển toàn diện cho sinh viên thông qua các hoạt động ngoại khóa phong phú.",
     imageUrl: "/scroll/pvcd.jpg",
     tabLabel: "Phát triển bền vững",
     tabColor: "from-[#ae0303] to-[#1760df]",
@@ -135,18 +135,23 @@ export default function FeatureShowcase() {
           });
         }
 
-        contentRefs.current.forEach((el, i) => {
-          if (!el) return;
-          ScrollTrigger.create({
-            trigger: el,
-            start: "top 60%",
-            end: "bottom 40%",
-            onToggle: (self) => {
-              if (self.isActive) {
-                setActiveIndex(i);
-              }
-            },
-          });
+        // Use a single ScrollTrigger with onUpdate for continuous progress tracking
+        // This ensures there's ALWAYS an active item — no dead zones between items
+        ScrollTrigger.create({
+          trigger: contentColumn,
+          start: "top 50%",
+          end: "bottom 50%",
+          onUpdate: (self) => {
+            const progress = self.progress;
+            const totalItems = featureData.length;
+            const newIndex = Math.min(
+              Math.floor(progress * totalItems),
+              totalItems - 1,
+            );
+            setActiveIndex(newIndex);
+          },
+          onLeaveBack: () => setActiveIndex(0),
+          onLeave: () => setActiveIndex(featureData.length - 1),
         });
       }, section);
     }, 100);
@@ -231,35 +236,37 @@ export default function FeatureShowcase() {
   );
 
   // Shared Image Component
-  const ImageSection = ({ className = "" }: { className?: string }) => (
-    <div className={`w-full ${className}`}>
-      {/* Tab - on left, bottom-left radius 0 to connect with image */}
-      <div className="mb-0">
-        <span
-          className={`inline-block rounded-lg rounded-br-none rounded-bl-none px-3 py-1 lg:px-4 lg:py-2 text-xs lg:text-sm font-semibold text-white bg-gradient-to-r ${featureData[activeIndex].tabColor} shadow-md transition-all duration-300`}
-        >
-          {featureData[activeIndex].tabLabel}
-        </span>
-      </div>
+  const ImageSection = ({ className = "" }: { className?: string }) => {
+    return (
+      <div className={`w-full ${className}`}>
+        {/* Tab - on left, bottom-left radius 0 to connect with image */}
+        <div className="mb-0">
+          <span
+            className={`inline-block rounded-lg rounded-br-none rounded-bl-none px-3 py-1 lg:px-4 lg:py-2 text-xs lg:text-sm font-semibold text-white bg-gradient-to-r ${featureData[activeIndex].tabColor} shadow-md transition-all duration-300`}
+          >
+            {featureData[activeIndex].tabLabel}
+          </span>
+        </div>
 
-      {/* Image - top-left radius 0 to connect with badge */}
-      <div className="relative aspect-[4/3]  rounded-xl lg:rounded-2xl !rounded-tl-none overflow-hidden shadow-xl bg-gray-100">
-        {featureData.map((feature, i) => (
-          <Image
-            key={feature.id}
-            src={feature.imageUrl}
-            alt={feature.titleHighlight}
-            fill
-            className={`object-cover  transition-opacity duration-500 ${
-              activeIndex === i ? "opacity-100" : "opacity-0"
-            }`}
-            priority={i === 0}
-          />
-        ))}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+        {/* Image - top-left radius 0 to connect with badge */}
+        <div className="relative aspect-[4/3] rounded-xl lg:rounded-2xl !rounded-tl-none overflow-hidden shadow-xl bg-gray-100">
+          {featureData.map((feature, i) => (
+            <Image
+              key={feature.id}
+              src={feature.imageUrl}
+              alt={feature.titleHighlight}
+              fill
+              className={`object-cover transition-opacity duration-500 ${
+                activeIndex === i ? "opacity-100" : "opacity-0"
+              }`}
+              priority={i === 0}
+            />
+          ))}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   // Mobile Content Card - Full section with Image, Number, and Text stacked
   const MobileContentCard = ({
@@ -353,7 +360,7 @@ export default function FeatureShowcase() {
           }`}
         >
           <span
-            className="font-bold text-[80px] lg:text-[100px] leading-none bg-clip-text text-transparent "
+            className="font-bold text-[80px] lg:text-[100px] leading-none bg-clip-text text-transparent"
             style={{
               backgroundImage:
                 "linear-gradient(to bottom left, #ef2a2aff 10%, #1760df 40%, transparent 85%)",
@@ -396,7 +403,27 @@ export default function FeatureShowcase() {
   };
 
   return (
-    <section ref={sectionRef} className="relative bg-white">
+    <section
+      ref={sectionRef}
+      data-section="feature-showcase"
+      className="relative bg-white py-12"
+    >
+      {/* Section Title - Mobile only (desktop title is inside the pinned layout) */}
+      <Container className="mb-8 lg:hidden">
+        <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+          KHÁM PHÁ{" "}
+          <AuroraText
+            className="inline"
+            colors={["#0c4ebf", "#1760df", "#ae0303"]}
+          >
+            HCM-UTE
+          </AuroraText>
+        </h2>
+        <p className="text-base text-gray-600 mt-2">
+          Hành trình kiến tạo tri thức và đổi mới sáng tạo
+        </p>
+      </Container>
+
       {/* Mobile Layout - Horizontal Scroll on Vertical Scroll */}
       <div className="lg:hidden" ref={mobileScrollContainerRef}>
         <div className="h-screen flex flex-col">
@@ -441,6 +468,22 @@ export default function FeatureShowcase() {
         ref={containerRef}
         className="hidden lg:block relative"
       >
+        {/* Section Title - Desktop */}
+        <div className="mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-foreground">
+            KHÁM PHÁ{" "}
+            <AuroraText
+              className="inline"
+              colors={["#0c4ebf", "#1760df", "#ae0303"]}
+            >
+              HCM-UTE
+            </AuroraText>
+          </h2>
+          <p className="text-base lg:text-lg text-gray-600 mt-2">
+            Hành trình kiến tạo tri thức và đổi mới sáng tạo
+          </p>
+        </div>
+
         <div className="flex flex-col lg:flex-row lg:gap-12">
           {/* Left - Pinned Image */}
           <div className="lg:w-1/2">
@@ -483,6 +526,11 @@ export default function FeatureShowcase() {
             ))}
           </div>
         </div>
+      </Container>
+
+      {/* Section Divider — decorative line */}
+      <Container className="mt-12 lg:mt-16">
+        <div className="h-px bg-gradient-to-r from-transparent via-blue-400 to-transparent" />
       </Container>
     </section>
   );

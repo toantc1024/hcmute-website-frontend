@@ -19,7 +19,11 @@ function getServerSnapshot() {
 
 export function NavbarOverlay() {
   const { isOpen, closeMenu } = useNavbar();
-  const mounted = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const mounted = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot,
+  );
 
   if (!mounted) return null;
 
@@ -32,12 +36,11 @@ export function NavbarOverlay() {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }}
           onClick={closeMenu}
-          className="fixed inset-0 top-16 z-40 backdrop-blur-sm"
-     
+          className="fixed inset-0 top-0 z-40 bg-black/20 backdrop-blur-sm"
           aria-hidden="true"
         />
       )}
     </AnimatePresence>,
-    document.body
+    document.body,
   );
 }

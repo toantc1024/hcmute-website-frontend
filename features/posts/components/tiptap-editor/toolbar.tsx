@@ -604,7 +604,7 @@ export function Toolbar({
                   </p>
                 </div>
                 <Textarea
-                  placeholder="Ví dụ: Viết đoạn giới thiệu về trường HCMUTE với phong cách chuyên nghiệp..."
+                  placeholder="Ví dụ: Viết đoạn giới thiệu về trường HCM-UTE với phong cách chuyên nghiệp..."
                   value={aiPrompt}
                   onChange={(e) => setAIPrompt(e.target.value)}
                   rows={3}

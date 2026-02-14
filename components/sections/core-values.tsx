@@ -2,13 +2,7 @@
 
 import { motion } from "motion/react";
 import { useState, useEffect } from "react";
-import {
-  Users,
-  Globe,
-  Lightbulb,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { Users, Globe, Lightbulb } from "lucide-react";
 import { AuroraText } from "@/components/ui/aurora-text";
 import {
   Carousel,
@@ -17,6 +11,7 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { Container } from "@/components/layout";
+import { CarouselNavButton } from "@/components/blocks/carousel-nav-button";
 
 const coreValuesData = [
   {
@@ -81,10 +76,7 @@ export default function CoreValues() {
   }, [isUserInteracting]);
 
   return (
-    <section
-      id="values"
-      className="py-12 lg:py-20 relative bg-white overflow-hidden"
-    >
+    <section id="values" className="py-12 relative bg-white overflow-hidden">
       <Container className="relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-0 items-start">
           <motion.div
@@ -167,19 +159,15 @@ export default function CoreValues() {
                     );
                   })}
                 </CarouselContent>
-                <div className="flex justify-end gap-4 mt-4">
-                  <button
-                    className="bg-white hover:bg-gray-100 rounded-full p-3 border border-gray-200 shadow-md transition-all duration-200 flex items-center justify-center"
+                <div className="flex justify-end gap-3 mt-4">
+                  <CarouselNavButton
+                    direction="prev"
                     onClick={() => api?.scrollPrev()}
-                  >
-                    <ChevronLeft className="w-6 h-6 text-gray-600" />
-                  </button>
-                  <button
-                    className="bg-white hover:bg-gray-100 rounded-full p-3 border border-gray-200 shadow-md transition-all duration-200 flex items-center justify-center"
+                  />
+                  <CarouselNavButton
+                    direction="next"
                     onClick={() => api?.scrollNext()}
-                  >
-                    <ChevronRight className="w-6 h-6 text-gray-600" />
-                  </button>
+                  />
                 </div>
               </Carousel>
             </div>

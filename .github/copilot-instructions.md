@@ -1,4 +1,4 @@
-# HCMUTE Website Frontend - AI Coding Guide
+# HCM-UTE Website Frontend - AI Coding Guide
 
 ## Project Overview
 

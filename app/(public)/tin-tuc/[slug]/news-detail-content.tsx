@@ -837,7 +837,7 @@ export default function NewsDetailContent() {
                     <div className="p-4 space-y-1">
                       {[
                         {
-                          name: "Trang chủ HCMUTE",
+                          name: "Trang chủ HCM-UTE",
                           href: "https://hcmute.edu.vn",
                           icon: Building2,
                         },

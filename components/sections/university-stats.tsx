@@ -62,10 +62,7 @@ const itemVariants = {
 
 export default function UniversityStats() {
   return (
-    <section
-      id="stats"
-      className="py-12 lg:py-20 bg-gradient-to-br from-gray-50 to-blue-50 overflow-hidden"
-    >
+    <section id="stats" className="py-12 overflow-hidden">
       <Container className="w-full">
         <motion.div
           className="text-center mb-12"
@@ -103,7 +100,7 @@ export default function UniversityStats() {
             >
               <div className="flex flex-col items-center text-center">
                 <div
-                  className={`text-5xl md:text-6xl lg:text-7xl font-bold mb-2 leading-none ${stat.color}`}
+                  className={`text-4xl md:text-5xl lg:text-5xl font-bold mb-2 leading-none ${stat.color}`}
                 >
                   {stat.number && (
                     <NumberTicker

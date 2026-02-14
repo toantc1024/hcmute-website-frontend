@@ -47,7 +47,7 @@ export function NewsCard({
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600">
-              <span className="text-xl font-bold text-white/40">HCMUTE</span>
+              <span className="text-xl font-bold text-white/40">HCM-UTE</span>
             </div>
           )}
 

@@ -30,10 +30,7 @@ const companyLogos = [
 
 export default function PartnerLogos() {
   return (
-    <section
-      id="partners"
-      className="py-12 lg:py-20 bg-white relative overflow-hidden"
-    >
+    <section id="partners" className="py-12 bg-white relative overflow-hidden">
       <div className="hidden lg:block max-w-xl size-full opacity-[.4] absolute top-0 left-0 -translate-x-1/2">
         <Globe className="right-0" />
       </div>
@@ -55,7 +52,7 @@ export default function PartnerLogos() {
         </motion.div>
 
         <div className="relative mb-6 lg:mb-8">
-          <Marquee reverse className="[--duration:40s]">
+          <Marquee className="[--duration:40s]">
             {universityLogos.map((logo, idx) => (
               <img
                 key={idx}
@@ -70,7 +67,7 @@ export default function PartnerLogos() {
         </div>
 
         <div className="relative">
-          <Marquee className="[--duration:40s]">
+          <Marquee reverse className="[--duration:40s]">
             {companyLogos.map((logo, idx) => (
               <img
                 key={idx}

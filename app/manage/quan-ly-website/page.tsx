@@ -99,7 +99,10 @@ export default function WebsiteManagementPage() {
       <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/20 rounded-full blur-[100px] animate-pulse" />
         <div className="absolute top-60 -left-40 w-96 h-96 bg-blue-400/15 rounded-full blur-[120px]" />
-        <div className="absolute bottom-20 right-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: "1s" }} />
+        <div
+          className="absolute bottom-20 right-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px] animate-pulse"
+          style={{ animationDelay: "1s" }}
+        />
       </div>
 
       {/* Header with Glass Effect */}
@@ -189,7 +192,7 @@ export default function WebsiteManagementPage() {
                   </Label>
                   <Textarea
                     id="siteDescription"
-                    defaultValue="Trường Đại học Công nghệ Kỹ Thuật TP. Hồ Chí Minh (HCMUTE) - Đào tạo nguồn nhân lực chất lượng cao trong lĩnh vực kỹ thuật và công nghệ."
+                    defaultValue="Trường Đại học Công nghệ Kỹ Thuật TP. Hồ Chí Minh (HCM-UTE) - Đào tạo nguồn nhân lực chất lượng cao trong lĩnh vực kỹ thuật và công nghệ."
                     rows={3}
                   />
                 </div>
@@ -331,7 +334,7 @@ export default function WebsiteManagementPage() {
                   <Label htmlFor="metaTitle">Meta Title</Label>
                   <Input
                     id="metaTitle"
-                    defaultValue="HCMUTE - Trường Đại học Công nghệ Kỹ Thuật TP.HCM"
+                    defaultValue="HCM-UTE - Trường Đại học Công nghệ Kỹ Thuật TP.HCM"
                   />
                   <p className="text-xs text-muted-foreground">
                     Khuyến nghị: 50-60 ký tự
@@ -352,7 +355,7 @@ export default function WebsiteManagementPage() {
                   <Label htmlFor="keywords">Keywords</Label>
                   <Input
                     id="keywords"
-                    defaultValue="HCMUTE, đại học, sư phạm kỹ thuật, TP.HCM, tuyển sinh, đào tạo"
+                    defaultValue="HCM-UTE, đại học, sư phạm kỹ thuật, TP.HCM, tuyển sinh, đào tạo"
                   />
                 </div>
                 <div className="space-y-2">

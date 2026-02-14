@@ -403,7 +403,7 @@ export default function VideoIntroduction() {
   return (
     <section
       id="history"
-      className="bg-white h-auto relative py-12 lg:py-20 overflow-hidden"
+      className="bg-white h-auto relative py-12 overflow-hidden"
     >
       <div
         className="absolute w-full pointer-events-none z-0"

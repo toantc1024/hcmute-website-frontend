@@ -11,7 +11,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Container } from "@/components/layout/container";
+import { NavContainer } from "@/components/layout";
 
 export function TopBar() {
   const { topBar, logo } = navbarConfig;
@@ -19,8 +19,8 @@ export function TopBar() {
   if (!topBar.enabled) return null;
 
   return (
-    <div className="hidden lg:block bg-primary py-2 text-primary-foreground">
-      <Container className="flex h-10 items-center justify-between text-sm">
+    <div className="hidden lg:block bg-primary py-1.5 text-primary-foreground">
+      <NavContainer className="flex h-9 items-center justify-between text-sm">
         {/* Left - Links */}
         <div className="flex items-center gap-1">
           {/* Desktop: Show top bar links */}
@@ -59,7 +59,10 @@ export function TopBar() {
                   <React.Fragment key={link.id}>
                     {linkElement}
                     {index < topBar.links.length - 1 && (
-                      <Separator orientation="vertical" className="h-4 mx-1 bg-primary-foreground/30" />
+                      <Separator
+                        orientation="vertical"
+                        className="h-4 mx-1 bg-primary-foreground/30"
+                      />
                     )}
                   </React.Fragment>
                 );
@@ -70,7 +73,7 @@ export function TopBar() {
 
         {/* Right - Language Selector */}
         <LanguageSelector variant="topbar" />
-      </Container>
+      </NavContainer>
     </div>
   );
 }

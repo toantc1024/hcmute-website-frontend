@@ -1,6 +1,12 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback, useRef } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useRef,
+} from "react";
 
 type NavbarContextType = {
   activeMenu: string | null;
@@ -28,9 +34,13 @@ export function NavbarProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const handleMouseLeave = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
     timeoutRef.current = setTimeout(() => {
       setActiveMenu(null);
-    }, 100);
+    }, 15);
   }, []);
 
   const handleContentMouseEnter = useCallback(() => {

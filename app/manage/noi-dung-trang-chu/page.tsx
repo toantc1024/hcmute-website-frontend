@@ -57,7 +57,7 @@ interface BannerSlide {
 const mockBanners: BannerSlide[] = [
   {
     id: "1",
-    title: "Chào mừng đến với HCMUTE",
+    title: "Chào mừng đến với HCM-UTE",
     subtitle: "Trường Đại học Công nghệ Kỹ Thuật TP. Hồ Chí Minh",
     image: "/images/banner-1.jpg",
     link: "/gioi-thieu",
@@ -108,7 +108,7 @@ const mockQuickLinks: QuickLink[] = [
     href: "#",
     active: true,
   },
-  { id: "4", title: "Email HCMUTE", icon: "mail", href: "#", active: true },
+  { id: "4", title: "Email HCM-UTE", icon: "mail", href: "#", active: true },
   {
     id: "5",
     title: "Đăng ký tín chỉ",

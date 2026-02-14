@@ -38,7 +38,7 @@ function CoverImage({
         />
       ) : (
         <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-700">
-          <span className="text-2xl font-bold text-white/20">HCMUTE</span>
+          <span className="text-2xl font-bold text-white/20">HCM-UTE</span>
         </div>
       )}
 
@@ -58,7 +58,7 @@ function CoverImage({
 
 function PostMeta({ post }: { post: PostAuditView }) {
   return (
-    <div className="flex items-center gap-3 text-xs text-white/60">
+    <div className="flex items-center gap-3 text-[11px] sm:text-xs text-white/70">
       <span className="flex items-center gap-1">
         <Calendar className="h-3 w-3" />
         {formatDate(post.publishedAt || post.createdAt)}
@@ -87,7 +87,7 @@ export function BentoHeroCard({
     <Link
       href={`/tin-tuc/${post.slug}`}
       className={cn(
-        "group relative block overflow-hidden rounded-2xl",
+        "group relative block overflow-hidden rounded-lg",
         className,
       )}
     >
@@ -97,18 +97,18 @@ export function BentoHeroCard({
       />
 
       {/* Bottom content overlay */}
-      <div className="absolute inset-x-0 bottom-0 flex flex-col gap-2 p-5 sm:p-6">
+      <div className="absolute inset-x-0 bottom-0 flex flex-col gap-1.5 sm:gap-2 p-4 sm:p-5 md:p-6">
         {post.categories?.[0] && (
-          <span className="w-fit rounded-full bg-white/15 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white backdrop-blur-sm">
+          <span className="w-fit rounded bg-white/20 px-2 sm:px-2.5 py-0.5 text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-white backdrop-blur-sm">
             {post.categories[0].name}
           </span>
         )}
-        <h3 className="line-clamp-3 text-lg font-bold leading-snug text-white sm:text-xl lg:text-2xl">
+        <h3 className="line-clamp-2 sm:line-clamp-3 text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold leading-snug text-white drop-shadow-sm">
           {post.title}
         </h3>
         {post.excerpt && (
           <div
-            className="line-clamp-2 hidden text-sm leading-relaxed text-white/70 sm:block"
+            className="line-clamp-2 hidden text-sm leading-relaxed text-white/80 sm:block drop-shadow-sm"
             dangerouslySetInnerHTML={{ __html: post.excerpt }}
           />
         )}
@@ -132,15 +132,15 @@ export function BentoSmallCard({
     <Link
       href={`/tin-tuc/${post.slug}`}
       className={cn(
-        "group relative block overflow-hidden rounded-xl",
+        "group relative block overflow-hidden rounded-lg",
         className,
       )}
     >
       <CoverImage post={post} className="aspect-[16/10]" />
 
       {/* Bottom content */}
-      <div className="absolute inset-x-0 bottom-0 flex flex-col gap-1 p-3 sm:p-4">
-        <h3 className="line-clamp-2 text-xs font-semibold leading-snug text-white sm:text-sm">
+      <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0.5 sm:gap-1 p-2.5 sm:p-3 md:p-4">
+        <h3 className="line-clamp-2 text-xs sm:text-sm md:text-base font-semibold leading-snug text-white drop-shadow-sm">
           {post.title}
         </h3>
         <PostMeta post={post} />
@@ -165,12 +165,15 @@ export function NewsBentoGrid({
   const smallCards = rest.slice(0, 4);
 
   return (
-    <div className={cn("grid gap-3 lg:grid-cols-2", className)}>
+    <div className={cn("grid gap-2.5 sm:gap-3 lg:grid-cols-2", className)}>
       {/* Hero — left side, full height */}
-      <BentoHeroCard post={hero} className="min-h-[280px] sm:min-h-[360px]" />
+      <BentoHeroCard
+        post={hero}
+        className="min-h-[240px] sm:min-h-[320px] md:min-h-[400px]"
+      />
 
       {/* 4 small cards — right side, 2×2 grid */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3">
         {smallCards.map((post) => (
           <BentoSmallCard key={post.id} post={post} />
         ))}
@@ -179,7 +182,7 @@ export function NewsBentoGrid({
           [...Array(4 - smallCards.length)].map((_, i) => (
             <div
               key={`empty-${i}`}
-              className="flex items-center justify-center rounded-xl border border-dashed border-neutral-200 bg-neutral-50 text-sm text-neutral-300"
+              className="flex items-center justify-center rounded-lg border border-dashed border-neutral-200 bg-neutral-50 text-sm text-neutral-300"
             >
               Sắp cập nhật
             </div>
@@ -206,7 +209,7 @@ export function NewsListCard({
       href={`/tin-tuc/${post.slug}`}
       className={cn("group block", className)}
     >
-      <article className="relative h-full overflow-hidden rounded-xl border border-neutral-200 bg-white transition-all duration-300 hover:border-neutral-300 hover:shadow-lg">
+      <article className="relative h-full overflow-hidden rounded-lg border border-neutral-200 bg-white transition-all duration-300 hover:border-neutral-300 hover:shadow-lg">
         {/* Thumbnail with overlay */}
         <div className="relative aspect-[16/9] overflow-hidden bg-neutral-100">
           <CoverImage post={post} />
@@ -214,7 +217,7 @@ export function NewsListCard({
           {/* Category badge */}
           {showCategory && post.categories?.[0] && (
             <div className="absolute left-3 top-3 z-10">
-              <span className="inline-flex rounded-full border border-white/20 bg-white/90 px-2.5 py-0.5 text-[10px] font-semibold text-neutral-800 shadow-sm backdrop-blur-sm">
+              <span className="inline-flex rounded border border-white/20 bg-white/90 px-2 py-0.5 text-[10px] sm:text-xs font-semibold text-neutral-800 shadow-sm backdrop-blur-sm">
                 {post.categories[0].name}
               </span>
             </div>
@@ -222,21 +225,21 @@ export function NewsListCard({
         </div>
 
         {/* Content */}
-        <div className="flex flex-col gap-1.5 p-4">
-          <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-neutral-900 transition-colors group-hover:text-blue-600">
+        <div className="flex flex-col gap-1.5 p-3 sm:p-4">
+          <h3 className="line-clamp-2 text-sm sm:text-base font-semibold leading-snug text-neutral-900 transition-colors group-hover:text-blue-600">
             {post.title}
           </h3>
 
-          {/* Excerpt — slides open on hover */}
+          {/* Excerpt — always visible */}
           {post.excerpt && (
             <div
-              className="line-clamp-2 max-h-0 overflow-hidden text-xs leading-relaxed text-neutral-500 transition-all duration-300 group-hover:max-h-16"
+              className="line-clamp-2 text-xs sm:text-sm leading-relaxed text-neutral-500"
               dangerouslySetInnerHTML={{ __html: post.excerpt }}
             />
           )}
 
           {/* Meta */}
-          <div className="flex items-center gap-3 pt-1 text-xs text-neutral-400">
+          <div className="flex items-center gap-3 pt-1 text-[11px] sm:text-xs text-neutral-400">
             <span className="flex items-center gap-1">
               <Calendar className="h-3 w-3" />
               {formatDate(post.publishedAt || post.createdAt)}

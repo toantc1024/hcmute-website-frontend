@@ -8,7 +8,7 @@ import { menuData, MenuItem } from "./menu-data";
 import { cn } from "@/lib/utils";
 import { useNavbar } from "./navbar-context";
 import { Button } from "@/components/ui/button";
-import { Container } from "@/components/layout/container";
+import { NavContainer } from "@/components/layout";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
@@ -18,7 +18,7 @@ const rightItems = menuData.filter((item) => item.position === "right");
 function NavItems({ items }: { items: MenuItem[] }) {
   const { activeMenu, handleMouseEnter, handleMouseLeave, handleClick } =
     useNavbar();
-  
+
   const router = useRouter();
 
   return (
@@ -26,15 +26,16 @@ function NavItems({ items }: { items: MenuItem[] }) {
       {items.map((item) => (
         <div
           key={item.id}
-          className="relative "
+          className="relative"
           onMouseEnter={() => item.type !== "link" && handleMouseEnter(item.id)}
           onMouseLeave={handleMouseLeave}
         >
           {item.type === "link" ? (
             <Button
               variant="ute"
-               className={cn(
-                "uppercase font-extrabold hover:text-primary-foreground",
+              size="sm"
+              className={cn(
+                "uppercase font-extrabold hover:text-primary-foreground text-xs xl:text-sm px-2.5 xl:px-3.5",
                 activeMenu === item.id
                   ? " !bg-primary !text-primary-foreground"
                   : "bg-transparent",
@@ -46,9 +47,10 @@ function NavItems({ items }: { items: MenuItem[] }) {
           ) : (
             <Button
               variant="ute"
+              size="sm"
               onClick={() => handleClick(item.id)}
               className={cn(
-                "uppercase font-extrabold",
+                "uppercase font-extrabold text-xs xl:text-sm px-2.5 xl:px-3.5",
                 activeMenu === item.id
                   ? " !bg-primary !text-primary-foreground"
                   : "bg-transparent",
@@ -59,7 +61,7 @@ function NavItems({ items }: { items: MenuItem[] }) {
                 animate={{ rotate: activeMenu === item.id ? 180 : 0 }}
                 transition={{ duration: 0.2, ease: "easeInOut" }}
               >
-                <ChevronDown className="w-4 h-4" />
+                <ChevronDown className="w-3.5 h-3.5 xl:w-4 xl:h-4" />
               </motion.div>
             </Button>
           )}
@@ -105,11 +107,11 @@ export function DesktopNav() {
           animate={{ opacity: 1, height: "auto" }}
           exit={{ opacity: 0, height: 0 }}
           transition={{
-            duration: 0.2,
+            duration: 0.12,
             ease: [0.4, 0, 0.2, 1],
-            height: { duration: 0.25 },
+            height: { duration: 0.15 },
           }}
-          className="absolute left-0 right-0 top-full z-50 bg-background border-b border-border shadow-xl"
+          className="absolute left-0 right-0 top-full z-50 bg-background/98 backdrop-blur-md border-b border-border shadow-xl"
           onMouseEnter={handleContentMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
@@ -121,12 +123,12 @@ export function DesktopNav() {
                     return (
                       <motion.div
                         key={item.id}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 10 }}
-                        transition={{ duration: 0.15, ease: "easeOut" }}
+                        initial={{ opacity: 0, y: -4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -4 }}
+                        transition={{ duration: 0.1, ease: "easeOut" }}
                       >
-                        <Container className="py-6 max-h-[calc(100vh-200px)] overflow-y-auto">
+                        <NavContainer className="py-6 max-h-[calc(100vh-200px)] overflow-y-auto">
                           {item.type === "mega" ? (
                             <MegaMenuContent
                               item={item}
@@ -138,7 +140,7 @@ export function DesktopNav() {
                               closeMenu={closeMenu}
                             />
                           )}
-                        </Container>
+                        </NavContainer>
                       </motion.div>
                     );
                   }
